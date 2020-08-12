@@ -3,7 +3,7 @@ import React from 'react';
 import {Card, CardContent, CardActions, Button, Typography} from "@material-ui/core";
 import {humanReadableJoin} from "../format";
 
-function ConnectBackCard(props: { names: string[], tags: string[] }) {
+export function ConnectBackCard(props: { names: string[], tags: string[] }) {
   return (
       <Card>
         <CardContent>
@@ -25,5 +25,3 @@ function ConnectBackCard(props: { names: string[], tags: string[] }) {
       </Card>
   )
 }
-
-export default ConnectBackCard;

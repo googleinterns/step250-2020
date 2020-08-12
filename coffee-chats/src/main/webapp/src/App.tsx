@@ -3,7 +3,7 @@ import './App.css';
 import {
   Container, TextField, Typography, Box, Tooltip,
   Icon, Button, Grid, InputAdornment, IconButton} from "@material-ui/core";
-import ConnectBackCard from "./components/ConnectBackCard";
+import {ConnectBackCard} from "./components/ConnectBackCard";
 
 function App() {
   return (
