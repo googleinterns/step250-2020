@@ -12,6 +12,7 @@ function App() {
         <Typography variant="h3" align="center" gutterBottom>
           Coffee Chats
         </Typography>
+
         <TextField
             variant="outlined"
             placeholder="What do you want to chat about?"
@@ -26,6 +27,7 @@ function App() {
                 </Tooltip>
               </InputAdornment>}}
         />
+
         <Box mt={2}>
           <Grid container justify="center">
             <Button
@@ -37,6 +39,7 @@ function App() {
             </Button>
           </Grid>
         </Box>
+
         <Box mt={2}>
           <Grid container>
             <Grid item md={4}>
