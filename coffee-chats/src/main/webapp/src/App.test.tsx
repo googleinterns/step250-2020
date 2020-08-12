@@ -4,6 +4,6 @@ import App from './App';
 
 test('renders Hello World message', () => {
   const { getByText } = render(<App />);
-  const linkElement = getByText(/hello world/i);
-  expect(linkElement).toBeInTheDocument();
+  const title = getByText(/coffee chats/i);
+  expect(title).toBeInTheDocument();
 });
