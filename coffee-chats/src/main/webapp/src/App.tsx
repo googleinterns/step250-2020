@@ -1,9 +1,9 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import {
   Container, TextField, Typography, Box, Tooltip,
   Icon, Button, Grid, InputAdornment, IconButton} from "@material-ui/core";
+import ConnectBackCard from "./components/ConnectBackCard";
 
 function App() {
   return (
@@ -27,10 +27,7 @@ function App() {
               </InputAdornment>}}
         />
         <Box mt={2}>
-          <Grid
-              container
-              justify="center"
-          >
+          <Grid container justify="center">
             <Button
                 variant="text"
                 startIcon={<Icon>explore</Icon>}
@@ -38,6 +35,13 @@ function App() {
                 size="large">
               Explore Groups
             </Button>
+          </Grid>
+        </Box>
+        <Box mt={2}>
+          <Grid container>
+            <Grid item md={4}>
+              <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />
+            </Grid>
           </Grid>
         </Box>
       </Container>
