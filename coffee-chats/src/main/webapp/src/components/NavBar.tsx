@@ -10,11 +10,23 @@ export function NavBar() {
             <Grid item>
             </Grid>
             <Grid item>
-              <Tooltip title="Log out">
-                <IconButton edge="end">
-                  <Icon>exit_to_app</Icon>
-                </IconButton>
-              </Tooltip>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Tooltip title="Opt out of new chats">
+                    <IconButton edge="end" aria-label="Opt out of new chats">
+                      <Icon>notifications_none</Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+
+                <Grid item>
+                  <Tooltip title="Log out">
+                    <IconButton edge="end" aria-label="Log out">
+                      <Icon>exit_to_app</Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Toolbar>
