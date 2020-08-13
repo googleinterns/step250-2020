@@ -9,7 +9,7 @@ function App() {
         <NavBar/>
         <MainPage/>
       </React.Fragment>
-  )
+  );
 }
 
 export default App;

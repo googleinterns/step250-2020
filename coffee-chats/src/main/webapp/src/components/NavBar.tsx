@@ -1,38 +1,71 @@
 import React from "react";
 
-import {AppBar, Grid, Icon, IconButton, Toolbar, Tooltip} from "@material-ui/core";
+import {AppBar, Grid, Icon, IconButton, List, ListItem,
+  ListItemText, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
 
-export function NavBar() {
+function NavBarButtons(props: {onDrawerOpen: () => void}) {
   return (
-      <AppBar position="static" style={{ background: "transparent", boxShadow: "none"}}>
-        <Toolbar>
-          <Grid justify="space-between" container>
+      <Grid justify="space-between" container>
+        <Grid item>
+          {/* Left side of the navbar */}
+          <IconButton aria-label="Toggle navbar" onClick={props.onDrawerOpen}>
+            <Icon>menu</Icon>
+          </IconButton>
+        </Grid>
+
+        <Grid item>
+          {/* Right side of the navbar */}
+          <Grid container spacing={2}>
             <Grid item>
-              {/* Left side of the navbar */}
+              <Tooltip title="Opt out of new chats">
+                <IconButton edge="end" aria-label="Opt out of new chats">
+                  <Icon>notifications_none</Icon>
+                </IconButton>
+              </Tooltip>
             </Grid>
 
             <Grid item>
-              {/* Right side of the navbar */}
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Tooltip title="Opt out of new chats">
-                    <IconButton edge="end" aria-label="Opt out of new chats">
-                      <Icon>notifications_none</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-
-                <Grid item>
-                  <Tooltip title="Log out">
-                    <IconButton edge="end" aria-label="Log out">
-                      <Icon>exit_to_app</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
+              <Tooltip title="Log out">
+                <IconButton edge="end" aria-label="Log out">
+                  <Icon>exit_to_app</Icon>
+                </IconButton>
+              </Tooltip>
             </Grid>
           </Grid>
-        </Toolbar>
-      </AppBar>
-  )
+        </Grid>
+      </Grid>
+  );
+}
+
+function DrawerButtons() {
+  return (
+      <List>
+        {["My groups", "Upcoming chats", "History"].map(text =>
+          <ListItem button key={text}>
+            <ListItemText primary={text} />
+          </ListItem>
+        )}
+      </List>
+  );
+}
+
+export function NavBar() {
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  return (
+      <React.Fragment>
+        <AppBar position="static" style={{ background: "transparent", boxShadow: "none"}}>
+          <Toolbar>
+            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} />
+          </Toolbar>
+        </AppBar>
+        <SwipeableDrawer
+            anchor="left"
+            onClose={() => setDrawerOpen(false)}
+            onOpen={() => setDrawerOpen(true)}
+            open={drawerOpen}>
+          <DrawerButtons/>
+        </SwipeableDrawer>
+      </React.Fragment>
+  );
 }
