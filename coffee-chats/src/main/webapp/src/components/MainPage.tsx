@@ -1,15 +1,6 @@
 import React from "react";
-import {
-  Box, Button,
-  Container,
-  Grid,
-  Icon,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Tooltip,
-  Typography
-} from "@material-ui/core";
+import {Box, Button, Container, Grid, Icon, IconButton, InputAdornment,
+  TextField, Tooltip, Typography} from "@material-ui/core";
 import {ConnectBackCard} from "./ConnectBackCard";
 
 export function MainPage() {

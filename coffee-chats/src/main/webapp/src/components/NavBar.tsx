@@ -8,8 +8,11 @@ export function NavBar() {
         <Toolbar>
           <Grid justify="space-between" container>
             <Grid item>
+              {/* Left side of the navbar */}
             </Grid>
+
             <Grid item>
+              {/* Right side of the navbar */}
               <Grid container spacing={2}>
                 <Grid item>
                   <Tooltip title="Opt out of new chats">
