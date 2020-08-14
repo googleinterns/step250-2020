@@ -2,6 +2,7 @@ import React from "react";
 
 import {AppBar, Grid, Icon, IconButton, List, ListItem,
   ListItemText, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
+import {ListItemLink} from "./ListItemLink";
 
 function NavBarButtons(props: {onDrawerOpen: () => void}) {
   return (
@@ -40,11 +41,10 @@ function NavBarButtons(props: {onDrawerOpen: () => void}) {
 function DrawerButtons() {
   return (
       <List>
-        {["My groups", "Upcoming chats", "History"].map(text =>
-          <ListItem button key={text}>
-            <ListItemText primary={text} />
-          </ListItem>
-        )}
+        <ListItemLink to="/" primary="Main page" />
+        <ListItemLink to="/groups" primary="My groups" />
+        <ListItemLink to="/upcoming" primary="Upcoming chats" />
+        <ListItemLink to="/history" primary="History" />
       </List>
   );
 }
