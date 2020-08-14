@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, Container, Grid, TextField, Typography} from "@material-ui/core";
+import {Box, Container, Grid, TextField} from "@material-ui/core";
 import {GroupCard} from "./GroupCard";
 
 export function GroupListPage() {
