@@ -2,9 +2,12 @@ import React from "react";
 import {Link, useRouteMatch} from "react-router-dom";
 import {ListItem, ListItemText} from "@material-ui/core";
 
-export function ListItemLink(props: {to: string, primary: string}) {
-  const {to, primary} = props;
+interface ListItemLinkProps {
+  to: string
+  primary: string
+}
 
+export function ListItemLink({to, primary}: ListItemLinkProps) {
   const match = useRouteMatch(to)?.isExact;
 
   const renderLink = React.useMemo(
