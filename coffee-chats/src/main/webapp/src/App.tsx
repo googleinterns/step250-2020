@@ -4,16 +4,26 @@ import {MainPage} from "./components/MainPage";
 import {NavBar} from "./components/NavBar";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
+import {HashRouter as Router, Switch, Route} from "react-router-dom";
+import {GroupListPage} from "./components/GroupListPage";
 
 function App() {
   return (
-      <React.Fragment>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <NavBar/>
-          <MainPage/>
-        </MuiPickersUtilsProvider>
-      </React.Fragment>
-  )
+      <Router>
+        <NavBar/>
+        <Switch>
+          <Route path="/groups">
+            <GroupListPage/>
+          </Route>
+
+          <Route path="/">
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <MainPage/>
+            </MuiPickersUtilsProvider>
+          </Route>
+        </Switch>
+      </Router>
+  );
 }
 
 export default App;
