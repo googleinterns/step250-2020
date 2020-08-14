@@ -23,5 +23,5 @@ export function ConnectBackCard(props: { names: string[], tags: string[] }) {
           <Button size="small">More</Button>
         </CardActions>
       </Card>
-  )
+  );
 }
