@@ -3,6 +3,8 @@ import {Box, Container, Fab, Grid, Icon, TextField} from "@material-ui/core";
 import {GroupCard} from "./GroupCard";
 import {makeStyles} from "@material-ui/core/styles";
 import {GroupCreateDialog} from "./GroupCreateDialog";
+import {useFetch} from "../util/fetch";
+import {Group} from "../entity/Group";
 
 const useStyles = makeStyles((theme) => ({
   extendedIcon: {
@@ -15,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function GroupListPage() {
   const classes = useStyles();
+  const groups: Group[] = useFetch("/api/groupList") || [];
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   return (
@@ -38,9 +41,9 @@ export function GroupListPage() {
                   create
                 </Fab>
               </Grid>
-              {["Board Games Dublin", "Book Club", "Mountain Climbers @ Home"].map(name =>
-                  <Grid item xs={12} key={name}>
-                    <GroupCard name={name}/>
+              {groups.map(group =>
+                  <Grid item xs={12} key={group.id}>
+                    <GroupCard group={group} />
                   </Grid>
               )}
             </Grid>
