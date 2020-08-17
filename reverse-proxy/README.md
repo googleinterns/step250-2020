@@ -10,7 +10,7 @@ Run AppEngine dev server (workdir is `/coffee-chats`):
 
     $ mvn package appengine:run
 
-Run frontend dev server (workdir is `/coffee-chats`)
+Run frontend dev server (workdir is `/coffee-chats`):
 
     $ npm run start
 
@@ -18,3 +18,4 @@ Run the proxy:
 
     $ node ./index.js
 
+Proxy now listens on `http://127.0.0.1:9000`.
