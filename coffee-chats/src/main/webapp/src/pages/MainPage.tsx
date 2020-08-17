@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import {Box, Button, Container, Grid, Icon, IconButton, InputAdornment,
   TextField, Tooltip, Typography} from "@material-ui/core";
-import {ConnectBackCard} from "./ConnectBackCard";
-import { FindChatCard } from "./FindChatCard";
+import {ConnectBackCard} from "../components/ConnectBackCard";
+import { FindChatCard } from "../components/FindChatCard";
 
 export function MainPage() {
   const [searchTerms, setSearchTerms] = useState<string[]>([]);
