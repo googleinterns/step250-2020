@@ -1,22 +1,45 @@
 import React, { useState, ChangeEvent } from "react"
 import "./FindChatCard.css"
-import { Typography, CardActions, Card, CardContent, Button, CardHeader, createStyles, makeStyles, Theme, Collapse, Grid, TextField, MenuItem, InputLabel, Select, FormControl, FormGroup, FormControlLabel, Checkbox } from "@material-ui/core"
+import { Typography, CardActions, Card, CardContent, Button, CardHeader, createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, Select, FormControl, FormControlLabel, Checkbox, CircularProgress } from "@material-ui/core"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import clsx from "clsx";
 import { addWeeks, startOfWeek, addDays } from "date-fns";
 import { MultiDatePicker } from "./MultiDatePicker";
+import { green } from "@material-ui/core/colors";
+import { submitChatRequest } from "../utils/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
     expand: {
       transform: 'rotate(0deg)',
-      marginRight: 'auto',
       transition: theme.transitions.create('transform', {
         duration: theme.transitions.duration.shortest,
       }),
     },
     expandOpen: {
       transform: 'rotate(180deg)',
+    },
+    actions: {
+      display: 'flex',
+      justifyContent: 'space-between'
+    },
+    successBtnWrapper: {
+      margin: theme.spacing(1),
+      position: 'relative',
+    },
+    btnSuccess: {
+      backgroundColor: green[500],
+      '&:hover': {
+        backgroundColor: green[700]
+      }
+    },
+    btnProgress: {
+      color: green[500],
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginTop: -12,
+      marginLeft: -12,
     }
   })
 );
@@ -39,13 +62,21 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   const [randomMatchChecked, setRandomMatchChecked] = useState(false);
   const [pastMatched, setPastMatched] = useState(true);
 
+  const [loading, setLoading] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   }
 
-  const findAction = () => {
-    // Send request
+  const chatRequestClick = async () => {
+    if (!loading) {
+      setSuccess(false);
+      setLoading(true);
+
+      setSuccess(await submitChatRequest(interests, dates, numPeople, duration, randomMatchChecked, pastMatched));
+      setLoading(false);
+    }
   }
 
   return (
@@ -57,7 +88,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
         </Typography>
       </CardContent>
 
-      <CardActions>
+      <CardActions className={classes.actions}>
         <Button
           onClick={handleExpandClick}
           aria-expanded={expanded}
@@ -66,7 +97,19 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
           More Options
           <ExpandMoreIcon className={clsx(classes.expand, {[classes.expandOpen]: expanded})}/>
         </Button>
-        <Button onClick={findAction} variant="contained" color="primary">Find a chat!</Button>
+
+        <div className={classes.successBtnWrapper}>
+          <Button 
+            variant="contained"
+            color="primary"
+            className={clsx({[classes.btnSuccess]: success})}
+            disabled={loading}
+            onClick={chatRequestClick}
+          >
+            Find a chat!
+          </Button>
+          {loading && <CircularProgress size={24} className={classes.btnProgress} />}
+        </div>
       </CardActions>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
