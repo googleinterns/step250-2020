@@ -57,7 +57,7 @@ public class JsonServlet extends HttpServlet {
     );
   }
 
-  private void handle(HttpServletRequest request, HttpServletResponse response, JsonHttpHandler handler) throws IOException{
+  private void handle(HttpServletRequest request, HttpServletResponse response, JsonHttpHandler handler) throws IOException {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("text/json");
 
