@@ -9,7 +9,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JsonServlet extends HttpServlet {
+/**
+ *
+ * Provides an abstract class for JSON endpoints.
+ * Users of this class are expected to override <code>get</code> and <code>post</code>
+ * methods to either return a Gson-serializable <code>Object</code> or to throw an exception.
+ *
+ * If a method throws <code>HttpError</code> an appropriate HTTP error code will be
+ * set, and a JSON response in format of <code>{"errorCode": ERROR_CODE, "message": MESSAGE}</code>
+ * will be returned.
+ *
+*/
+abstract public class JsonServlet extends HttpServlet {
   protected static class HttpError extends Exception {
     @Expose private int errorCode;
     @Expose private String message;
