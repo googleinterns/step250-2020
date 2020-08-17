@@ -12,16 +12,22 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/chat-request")
 public class ChatRequestServlet extends HttpServlet {
 
+  private static final int MAX_PARTICIPANTS = 4;
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
     String[] tags = req.getParameter("tags").split(",");
     String datesString = req.getParameter("dates");
-    int numPeople = Integer.parseInt(req.getParameter("numPeople"));
     int duration = Integer.parseInt(req.getParameter("duration"));
     boolean randomMatch = Boolean.parseBoolean(req.getParameter("randomMatch"));
     boolean pastMatched = Boolean.parseBoolean(req.getParameter("pastMatched"));
+
+    boolean[] numPeople = new boolean[MAX_PARTICIPANTS];
+    for (int i = 0; i < MAX_PARTICIPANTS; i++) {
+      numPeople[i] = Boolean.parseBoolean(req.getParameter("participants" + String.valueOf(i+1)));
+    }
 
     if (datesString.equals("")) {
       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -2,12 +2,14 @@ const chatRequestURL = '/chat-request'
 
 const STATUS_OK = 200;
 
-export const submitChatRequest = async (interests: string[], dates: Date[], numPeople: number, duration: number, randomMatch: boolean, pastMatched: boolean) => {
+export const submitChatRequest = async (interests: string[], dates: Date[], numPeople: boolean[], duration: number, randomMatch: boolean, pastMatched: boolean) => {
   const data = new URLSearchParams();
   
   data.append('tags', interests.toString());
   data.append('dates', dates.map(d => +d).toString());
-  data.append('numPeople', numPeople.toString());
+  for (let i = 1; i <= numPeople.length; i++) {
+    data.append('participants' + i.toString(), numPeople[i - 1].toString())
+  }
   data.append('duration', duration.toString());
   data.append('randomMatch', randomMatch.toString());
   data.append('pastMatched', pastMatched.toString());
