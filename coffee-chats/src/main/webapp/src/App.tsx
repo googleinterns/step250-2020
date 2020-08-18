@@ -9,7 +9,7 @@ import {AuthState} from "./entity/AuthState";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
-  const authState: AuthState | null = useFetch("/api/auth");
+  const authState: AuthState | null = useFetch("/api/auth")[0];
 
   if (authState == null) {
     return null;

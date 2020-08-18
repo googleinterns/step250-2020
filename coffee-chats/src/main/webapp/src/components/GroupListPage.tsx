@@ -17,12 +17,15 @@ const useStyles = makeStyles((theme) => ({
 
 export function GroupListPage() {
   const classes = useStyles();
-  const groups: Group[] = useFetch("/api/groupList") || [];
+  const [groups, updateGroups]: [Group[], () => void] = useFetch("/api/groupList", []);
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   return (
       <React.Fragment>
-        <GroupCreateDialog open={createDialogOpen} setOpen={setCreateDialogOpen} />
+        <GroupCreateDialog
+            open={createDialogOpen}
+            setOpen={setCreateDialogOpen}
+            onSubmit={updateGroups} />
         <Box mt={4}>
           <Container maxWidth="md">
             <Grid container spacing={2}>
