@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Card, CardContent, CardActions, Button, Typography} from "@material-ui/core";
-import {humanReadableJoin} from "../format";
+import {humanReadableJoin} from "../util/format";
 
 export function ConnectBackCard(props: { names: string[], tags: string[] }) {
   return (
