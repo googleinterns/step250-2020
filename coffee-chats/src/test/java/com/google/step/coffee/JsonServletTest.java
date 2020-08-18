@@ -36,7 +36,7 @@ public class JsonServletTest {
 
   @Test
   public void testJsonWorks() throws Exception {
-    HttpServletRequest request = mock(HttpServletRequest.class);
+    JsonServletRequest request = mock(JsonServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     StringWriter stringWriter = new StringWriter();
@@ -54,7 +54,7 @@ public class JsonServletTest {
 
   @Test
   public void testBadMethod() throws Exception {
-    HttpServletRequest request = mock(HttpServletRequest.class);
+    JsonServletRequest request = mock(JsonServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     StringWriter stringWriter = new StringWriter();
@@ -73,7 +73,7 @@ public class JsonServletTest {
 
   @Test
   public void testCustomErrorCode() throws Exception {
-    HttpServletRequest request = mock(HttpServletRequest.class);
+    JsonServletRequest request = mock(JsonServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     StringWriter stringWriter = new StringWriter();
