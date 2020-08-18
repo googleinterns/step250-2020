@@ -1,6 +1,9 @@
 import React, { useState, ChangeEvent } from "react"
 import "./FindChatCard.css"
-import { Typography, CardActions, Card, CardContent, Button, CardHeader, createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, Select, FormControl, FormControlLabel, Checkbox, CircularProgress } from "@material-ui/core"
+import { Typography, CardActions, Card, CardContent, Button, CardHeader, 
+  createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
+  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider
+ } from "@material-ui/core"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import clsx from "clsx";
 import { addWeeks, startOfWeek, addDays } from "date-fns";
@@ -54,12 +57,13 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
 
   const MONDAY = 1;
   const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
+  const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}))
 
   const [expanded, setExpanded] = useState(false);
   const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)))
-  const [numPeople, setNumPeople] = useState([true, false, false, false]);
+  const [numPeopleRange, setNumPeopleRange] = useState([1, 1]);
   const [duration, setDuration] = useState(30);
-  const [randomMatchChecked, setRandomMatchChecked] = useState(false);
+  const [recentMatches, setRecentMatches] = useState(false);
   const [pastMatched, setPastMatched] = useState(true);
 
   const [loading, setLoading] = useState(false);
@@ -75,7 +79,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       setLoading(true);
 
       setExpanded(false);
-      setSuccess(await submitChatRequest(interests, dates, numPeople, duration, randomMatchChecked, pastMatched));
+      setSuccess(await submitChatRequest(interests, dates, numPeopleRange, duration, recentMatches, pastMatched));
       setLoading(false);
 
       setTimeout(() => {
@@ -132,31 +136,20 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
               <Grid container direction="column" spacing={4}>
                 
                 <Grid item xs={12}>
-                  <Typography>
+                  <Typography id="participants-slider">
                     Number of other participants:
                   </Typography>
-                  <Grid container justify="space-around">
-                    {[1,2,3,4].map((num) => (
-                      <Grid item xs={3}>
-                        <FormControl>
-                          <FormControlLabel
-                            control={
-                              <Checkbox 
-                                checked={numPeople[num - 1]}
-                                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                                  let newState = [...numPeople];
-                                  newState[num - 1] = event.target.checked;
-                                  setNumPeople(newState);
-                                }}
-                                color="primary"
-                              />
-                            }
-                            label={num.toString()}
-                          />
-                        </FormControl>
-                      </Grid>                        
-                    ))}
-                  </Grid>
+                  <Slider 
+                    value={numPeopleRange}
+                    onChange={(_event: any, newNum: number | number[]) => setNumPeopleRange(newNum as number[])}
+                    valueLabelDisplay="off"
+                    aria-labelledby="participants-slider"
+                    min={1}
+                    max={4}
+                    marks={participantSliderMarks}
+                    step={null}
+                  />
+
                 </Grid>
 
                 <Grid item xs={12}>
@@ -183,12 +176,12 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
                     <FormControlLabel 
                       control={
                         <Checkbox 
-                          checked={randomMatchChecked}
-                          onChange={(event: ChangeEvent<HTMLInputElement>) => setRandomMatchChecked(event.target.checked)}
+                          checked={recentMatches}
+                          onChange={(event: ChangeEvent<HTMLInputElement>) => setRecentMatches(event.target.checked)}
                           color="primary"
                         />
                       }
-                      label="Proceed to schedule chat even if no matches are found for given topics."
+                      label="Proceed to schedule chat even if no matches are found for selected topics."
                     />
                   </FormControl>
                 </Grid>
