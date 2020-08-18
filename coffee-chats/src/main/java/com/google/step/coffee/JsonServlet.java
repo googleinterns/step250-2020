@@ -52,7 +52,7 @@ abstract public class JsonServlet extends HttpServlet {
     response.setContentType("text/json");
 
     try {
-      Object jsonResponse = handler.handle((JsonServletRequest)request);
+      Object jsonResponse = handler.handle(new JsonServletRequest(request));
       response.getWriter().write(stringify(jsonResponse, false));
     } catch (HttpError httpError) {
       response.setStatus(httpError.getErrorCode());
