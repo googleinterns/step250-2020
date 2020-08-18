@@ -3,12 +3,17 @@ import React from "react";
 import {AppBar, Grid, Icon, IconButton, List, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
 import {ListItemLink} from "./ListItemLink";
 
-function NavBarButtons(props: {onDrawerOpen: () => void}) {
+interface NavBarButtonsProps {
+  onDrawerOpen: () => void;
+  logoutUrl: string;
+}
+
+function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
   return (
       <Grid justify="space-between" container>
         <Grid item>
           {/* Left side of the navbar */}
-          <IconButton aria-label="Toggle navbar" onClick={props.onDrawerOpen}>
+          <IconButton aria-label="Toggle navbar" onClick={onDrawerOpen}>
             <Icon>menu</Icon>
           </IconButton>
         </Grid>
@@ -26,7 +31,7 @@ function NavBarButtons(props: {onDrawerOpen: () => void}) {
 
             <Grid item>
               <Tooltip title="Log out">
-                <IconButton edge="end" aria-label="Log out">
+                <IconButton edge="end" aria-label="Log out" href={logoutUrl}>
                   <Icon>exit_to_app</Icon>
                 </IconButton>
               </Tooltip>
@@ -48,14 +53,18 @@ function DrawerButtons() {
   );
 }
 
-export function NavBar() {
+interface NavBarProps {
+  logoutUrl: string;
+}
+
+export function NavBar({logoutUrl}: NavBarProps) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
       <React.Fragment>
         <AppBar position="static" style={{ background: "transparent", boxShadow: "none"}}>
           <Toolbar>
-            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} />
+            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} logoutUrl={logoutUrl} />
           </Toolbar>
         </AppBar>
         <SwipeableDrawer
