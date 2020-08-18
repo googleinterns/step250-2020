@@ -2,11 +2,11 @@ package com.google.step.coffee.servlets;
 
 import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
+import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.PermissionChecker;
 import com.google.step.coffee.entity.Group;
 
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 @WebServlet("/api/groupList")
 public class GroupListServlet extends JsonServlet {
     @Override
-    public Object get(HttpServletRequest request) throws IOException, HttpError {
+    public Object get(JsonServletRequest request) throws IOException, HttpError {
         PermissionChecker.ensureLoggedIn();
 
         List<Group> groups = new ArrayList<>();

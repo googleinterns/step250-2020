@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 public class JsonServletTest {
   private static class GetTestServlet extends JsonServlet {
     @Override
-    public Object get(HttpServletRequest request) throws IOException, HttpError {
+    public Object get(JsonServletRequest request) throws IOException, HttpError {
       List<String> response = new ArrayList<>();
       response.add("hello");
       response.add("world");
@@ -29,7 +29,7 @@ public class JsonServletTest {
 
   private static class ErrorThrowingServlet extends JsonServlet {
     @Override
-    public Object get(HttpServletRequest request) throws IOException, HttpError {
+    public Object get(JsonServletRequest request) throws IOException, HttpError {
       throw new HttpError(403, "No access for you!");
     }
   }
