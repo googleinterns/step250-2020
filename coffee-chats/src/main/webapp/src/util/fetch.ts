@@ -1,25 +1,5 @@
 import React from "react";
 
-interface ResponseRaceDetect {
-  response: Response;
-  json: any;
-  raceOccurred: boolean;
-}
-
-const fetchAndDetectRaces: (url: string) => Promise<ResponseRaceDetect> = (() => {
-  let requestId = 0;
-
-  return async (url: string) => {
-    const currentRequestId = ++requestId;
-
-    const response = await fetch(url);
-    const json = await response.json();
-    const raceOccurred = requestId != currentRequestId;
-
-    return {response, json, raceOccurred};
-  }
-})();
-
 /**
  * A hook that fetches JSON data from a URL using a GET request
  *
@@ -27,10 +7,14 @@ const fetchAndDetectRaces: (url: string) => Promise<ResponseRaceDetect> = (() =>
  */
 export function useFetch(url: string): any {
   const [data, setData] = React.useState(null);
+  const requestId = React.useRef(0);
 
   React.useEffect(() => {
     (async () => {
-      const {response, json, raceOccurred} = await fetchAndDetectRaces(url);
+      const currentRequestId = ++requestId.current;
+      const response = await fetch(url);
+      const json = await response.json();
+      const raceOccurred = requestId.current !== currentRequestId;
 
       if (raceOccurred) {
         return;
