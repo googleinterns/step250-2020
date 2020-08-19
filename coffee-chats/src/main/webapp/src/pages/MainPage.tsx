@@ -2,7 +2,8 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import {Box, Container, Grid, Icon, IconButton, TextField, Tooltip, Typography,
   Tabs, Tab, Chip} from "@material-ui/core";
 import { Autocomplete, createFilterOptions } from '@material-ui/lab'
-import {ConnectBackCard} from "./ConnectBackCard";
+import {ConnectBackCard} from "../components/ConnectBackCard";
+import { FindChatCard } from "../components/FindChatCard";
 import { capitaliseEachWord } from "../util/stringUtils";
 import { fetchTags } from "../requests/tags";
 
@@ -12,6 +13,7 @@ export function MainPage() {
   
   const filter = createFilterOptions<string>();
   const [tags, setTags] = useState<string[]>([]);
+  const [searchTerms, setSearchTerms] = useState<string[]>([]);
 
   const [currView, setCurrView] = useState(CHATS_VIEW);
 
@@ -99,7 +101,10 @@ export function MainPage() {
           </Grid>
 
           <Box mt={2}>
-            <Grid container>
+            <Grid container spacing={4}>
+              <Grid item xs={12}>
+                <FindChatCard interests={searchTerms}/>
+              </Grid>
               <Grid item md={4}>
                 <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />
               </Grid>
