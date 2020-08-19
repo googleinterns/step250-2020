@@ -24,11 +24,7 @@ public class GroupListServlet extends JsonServlet {
         PreparedQuery results = datastore.prepare(query);
 
         for (Entity entity : results.asIterable()) {
-            groups.add(Group.builder()
-                .setId(KeyFactory.keyToString(entity.getKey()))
-                .setName((String)entity.getProperty("name"))
-                .setDescription((String)entity.getProperty("description"))
-                .build());
+            groups.add(Group.fromEntity(entity));
         }
 
         return groups;
