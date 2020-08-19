@@ -1,8 +1,8 @@
 import React from "react";
 import {Box, Container, Fab, Grid, Icon, TextField} from "@material-ui/core";
-import {GroupCard} from "./GroupCard";
+import {GroupCard} from "../components/GroupCard";
 import {makeStyles} from "@material-ui/core/styles";
-import {GroupCreateDialog} from "./GroupCreateDialog";
+import {GroupCreateDialog} from "../components/GroupCreateDialog";
 import {useFetch} from "../util/fetch";
 import {Group} from "../entity/Group";
 
