@@ -12,15 +12,15 @@ export function MainPage() {
   const CHATS_VIEW = 0;
   
   const filter = createFilterOptions<string>();
+  const [tagOptions, setTagOptions] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
-  const [searchTerms, setSearchTerms] = useState<string[]>([]);
 
   const [currView, setCurrView] = useState(CHATS_VIEW);
 
   useEffect(() => {
     const initFetchTags = (async () => {
       const fetchedTags = await fetchTags();
-      setTags(fetchedTags as string[]);
+      setTagOptions(fetchedTags as string[]);
     })
     initFetchTags();
   }, []);
@@ -50,9 +50,12 @@ export function MainPage() {
             <Grid item xs={10} sm={11}>
               <Autocomplete 
                 multiple
-                options={tags}
+                options={tagOptions}
                 freeSolo
                 autoHighlight
+                onChange={(_event: any, newValue: string[]) => {
+                  setTags(newValue);
+                }}
                 renderTags={(value: string[], getTagProps) =>
                   value.map((option: string, index: number) => (
                     <Chip variant="outlined" label={option} {...getTagProps({ index })} />
@@ -103,7 +106,7 @@ export function MainPage() {
           <Box mt={2}>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <FindChatCard interests={searchTerms}/>
+                <FindChatCard interests={tags}/>
               </Grid>
               <Grid item md={4}>
                 <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />

@@ -1,11 +1,11 @@
 package com.google.step.coffee.servlets;
 
+import com.google.step.coffee.data.TagStore;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ChatRequestServlet extends HttpServlet {
 
   private static final int MAX_PARTICIPANTS = 4;
+
+  private TagStore tagStore = TagStore.getInstance();
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -40,6 +42,8 @@ public class ChatRequestServlet extends HttpServlet {
         .map(Long::parseLong)
         .map(epochSecond -> LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC))
         .collect(Collectors.toList());
+
+    tagStore.addTags(tags);
 
     resp.setStatus(HttpServletResponse.SC_OK);
   }
