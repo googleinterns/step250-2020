@@ -9,14 +9,23 @@ public class UserManager {
     return UserServiceFactory.getUserService();
   }
 
+  /**
+   * Returns the URL to which the user will be redirected if not logged in
+   */
   public static String getLoginUrl() {
     return getUserService().createLoginURL("/");
   }
 
+  /**
+   * Returns the URL that the user can follow to log out
+   */
   public static String getLogoutUrl() {
     return getUserService().createLogoutURL("/");
   }
 
+  /**
+   * Returns current user's unique identifier or <code>null</code> if not logged in
+   */
   public static String getCurrentUserId() {
     if (!getUserService().isUserLoggedIn()) {
       return null;
@@ -25,6 +34,9 @@ public class UserManager {
     return getUserService().getCurrentUser().getUserId();
   }
 
+  /**
+   * Returns info about current user or <code>null</code> if not logged in
+   */
   public static User getCurrentUser() {
     String userId = getCurrentUserId();
 
@@ -35,6 +47,9 @@ public class UserManager {
     return User.builder().setId(userId).build();
   }
 
+  /**
+   * Returns <code>true</code> iff the user is logged in
+   */
   public static boolean isUserLoggedIn() {
     return getUserService().isUserLoggedIn();
   }
