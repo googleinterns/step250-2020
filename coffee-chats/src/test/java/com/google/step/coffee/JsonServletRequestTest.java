@@ -1,8 +1,6 @@
 package com.google.step.coffee;
 
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,6 +73,7 @@ public class JsonServletRequestTest extends TestHelper {
 
   @Test
   public void testGetRequiredEntityExists() throws Exception {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = new Entity("foo");
     datastore.put(entity);
 
@@ -118,6 +117,7 @@ public class JsonServletRequestTest extends TestHelper {
 
   @Test(expected = HttpError.class)
   public void testGetRequiredEntityWrongKind() throws Exception {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = new Entity("foo");
     datastore.put(entity);
 
