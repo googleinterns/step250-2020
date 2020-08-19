@@ -14,19 +14,19 @@ import java.util.List;
 
 @WebServlet("/api/groupList")
 public class GroupListServlet extends JsonServlet {
-    @Override
-    public Object get(JsonServletRequest request) throws IOException, HttpError {
-        PermissionChecker.ensureLoggedIn();
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+  @Override
+  public Object get(JsonServletRequest request) throws IOException, HttpError {
+    PermissionChecker.ensureLoggedIn();
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        List<Group> groups = new ArrayList<>();
-        Query query = new Query("group");
-        PreparedQuery results = datastore.prepare(query);
+    List<Group> groups = new ArrayList<>();
+    Query query = new Query("group");
+    PreparedQuery results = datastore.prepare(query);
 
-        for (Entity entity : results.asIterable()) {
-            groups.add(Group.fromEntity(entity));
-        }
-
-        return groups;
+    for (Entity entity : results.asIterable()) {
+      groups.add(Group.fromEntity(entity));
     }
+
+    return groups;
+  }
 }
