@@ -9,7 +9,7 @@ import com.google.step.coffee.entity.Group;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 
-@WebServlet("/groupInfo")
+@WebServlet("/api/groupInfo")
 public class GroupInfoServlet extends JsonServlet {
   @Override
   public Object get(JsonServletRequest request) throws IOException, HttpError {

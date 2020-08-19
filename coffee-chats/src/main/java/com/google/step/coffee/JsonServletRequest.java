@@ -46,7 +46,7 @@ public class JsonServletRequest extends HttpServletRequestWrapper {
 
     try {
       Key key = KeyFactory.stringToKey(encoded);
-      if (!key.getKind().equals(kind)) {
+      if (key.getKind().equals(kind)) {
         return key;
       }
     } catch (IllegalArgumentException ignored) {}
