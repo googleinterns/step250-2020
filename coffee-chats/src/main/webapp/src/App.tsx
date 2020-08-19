@@ -6,6 +6,7 @@ import {HashRouter as Router, Switch, Route} from "react-router-dom";
 import {GroupListPage} from "./components/GroupListPage";
 import {useFetch} from "./util/fetch";
 import {AuthState} from "./entity/AuthState";
+import {GroupInfoPage} from "./components/GroupInfoPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
@@ -21,6 +22,10 @@ function App() {
         <Switch>
           <Route path="/groups">
             <GroupListPage/>
+          </Route>
+
+          <Route path="/group/:groupId">
+            <GroupInfoPage/>
           </Route>
 
           <Route path="/">
