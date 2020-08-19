@@ -1,15 +1,16 @@
-import React, { useState, ChangeEvent } from "react"
-import "./FindChatCard.css"
+import React, { useState, ChangeEvent } from "react";
+import "./FindChatCard.css";
 import { Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
-  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider
- } from "@material-ui/core"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
+  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider, Snackbar
+ } from "@material-ui/core";
+import MuiAlert from '@material-ui/lab/Alert';
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import clsx from "clsx";
 import { addWeeks, startOfWeek, addDays } from "date-fns";
 import { MultiDatePicker } from "./MultiDatePicker";
 import { green } from "@material-ui/core/colors";
-import { submitChatRequest } from "../utils/chatRequest";
+import { submitChatRequest } from "../util/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -47,6 +48,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const MONDAY = 1;
+const MIN_PARTICIPANTS = 1;
+const MAX_PARTICIPANTS = 4;
+
 interface FindChatCardProps {
   interests: string[],
 }
@@ -55,7 +60,6 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   
   const classes = useStyles();
 
-  const MONDAY = 1;
   const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
   const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}))
 
@@ -68,13 +72,25 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [invalidDates, setInvalidDates] = useState(false);
+
+  const validParamters = () => {
+    if (dates.length === 0) {
+      setInvalidDates(true);
+      return false;
+    } else {
+      return numPeopleRange[0] <= numPeopleRange[1] &&
+      numPeopleRange[0] >= MIN_PARTICIPANTS &&
+      numPeopleRange[1] <= MAX_PARTICIPANTS
+    }
+  }
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   }
 
   const chatRequestClick = async () => {
-    if (!loading) {
+    if (!loading && validParamters()) {
       setSuccess(false);
       setLoading(true);
 
@@ -205,6 +221,12 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
           </Grid>
         </CardContent>
       </Collapse>
+
+      <Snackbar open={invalidDates} autoHideDuration={3000} onClose={() => setInvalidDates(false)}>
+        <MuiAlert elevation={6} variant="filled" onClose={() => setInvalidDates(false)} severity="error">
+          Please select at least one date.
+        </MuiAlert>
+      </Snackbar>
     </Card>
   )
 }
