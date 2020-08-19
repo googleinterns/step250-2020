@@ -5,5 +5,6 @@
  * "apple, banana, and orange"
  */
 export function humanReadableJoin(list: string[]) {
+  list = list.slice();
   return list.concat(list.splice(-2, 2).join(" and ")).join(", ");
 }
