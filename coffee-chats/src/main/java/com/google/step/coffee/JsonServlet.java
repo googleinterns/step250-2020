@@ -2,7 +2,6 @@ package com.google.step.coffee;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,24 +18,6 @@ import java.io.IOException;
  * will be returned.
 */
 abstract public class JsonServlet extends HttpServlet {
-  protected static class HttpError extends Exception {
-    @Expose private int errorCode;
-    @Expose private String message;
-
-    public HttpError(int errorCode, String message) {
-      this.errorCode = errorCode;
-      this.message = message;
-    }
-
-    public int getErrorCode() {
-      return errorCode;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-  }
-
   protected interface JsonHttpHandler {
     Object handle(HttpServletRequest request) throws IOException, HttpError;
   }
