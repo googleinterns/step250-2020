@@ -1,9 +1,9 @@
 package com.google.step.coffee.servlets;
 
+import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.data.TagStore;
 import java.io.IOException;
-import java.util.Arrays;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
