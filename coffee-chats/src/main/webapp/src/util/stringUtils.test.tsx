@@ -1,4 +1,4 @@
-import { capitaliseEachWord } from "./stringUtils";
+import {capitaliseEachWord} from "./stringUtils";
 
 test('capitalising empty string is empty', () => {
   const input = '';

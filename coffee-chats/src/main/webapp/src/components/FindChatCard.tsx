@@ -1,16 +1,16 @@
-import React, { useState, ChangeEvent } from "react";
+import React, {useState, ChangeEvent} from "react";
 import "./FindChatCard.css";
-import { Typography, CardActions, Card, CardContent, Button, CardHeader, 
+import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
-  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider, Snackbar, Box, Chip
- } from "@material-ui/core";
+  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
+  Snackbar, Box, Chip} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import clsx from "clsx";
-import { addWeeks, startOfWeek, addDays } from "date-fns";
-import { MultiDatePicker } from "./MultiDatePicker";
-import { green } from "@material-ui/core/colors";
-import { submitChatRequest } from "../util/chatRequest";
+import {addWeeks, startOfWeek, addDays} from "date-fns";
+import {MultiDatePicker} from "./MultiDatePicker";
+import {green} from "@material-ui/core/colors";
+import {submitChatRequest} from "../util/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({

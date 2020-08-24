@@ -1,11 +1,11 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, {useState, ChangeEvent, useEffect} from "react";
 import {Box, Container, Grid, Icon, IconButton, TextField, Tooltip, Typography,
   Tabs, Tab, Chip} from "@material-ui/core";
-import { Autocomplete, createFilterOptions } from '@material-ui/lab'
+import {Autocomplete, createFilterOptions} from '@material-ui/lab'
 import {ConnectBackCard} from "../components/ConnectBackCard";
-import { FindChatCard } from "../components/FindChatCard";
-import { capitaliseEachWord } from "../util/stringUtils";
-import { fetchTags } from "../requests/tags";
+import {FindChatCard} from "../components/FindChatCard";
+import {capitaliseEachWord} from "../util/stringUtils";
+import {fetchTags} from "../requests/tags";
 
 
 export function MainPage() {
