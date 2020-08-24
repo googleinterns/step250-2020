@@ -10,6 +10,9 @@ import com.google.appengine.api.datastore.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representation for the storage method for tags. Uses singleton design pattern.
+ */
 public class TagStore {
   private static TagStore instance = new TagStore();
 
@@ -23,6 +26,9 @@ public class TagStore {
     return instance;
   }
 
+  /**
+   * Returns a List of all currently stored tags.
+   */
   public List<String> getTags() {
     Query query = new Query("Tag");
     PreparedQuery results = datastore.prepare(query);
@@ -36,6 +42,10 @@ public class TagStore {
     return tags;
   }
 
+  /**
+   * Adds given tags to the store, not creating duplicates.
+   * @param tags List of tags used to be added to the store if new.
+   */
   public void addTags(List<String> tags) {
     for (String tag : tags) {
       Key tagKey = KeyFactory.createKey("Tag", tag);
