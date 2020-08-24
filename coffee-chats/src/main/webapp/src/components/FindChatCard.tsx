@@ -1,19 +1,23 @@
-import React, { useState, ChangeEvent } from "react";
+import React, {useState, ChangeEvent} from "react";
 import "./FindChatCard.css";
-import { Typography, CardActions, Card, CardContent, Button, CardHeader, 
+import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
-  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider, Snackbar
- } from "@material-ui/core";
+  Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
+  Snackbar, Box, Chip} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import clsx from "clsx";
-import { addWeeks, startOfWeek, addDays } from "date-fns";
-import { MultiDatePicker } from "./MultiDatePicker";
-import { green } from "@material-ui/core/colors";
-import { submitChatRequest } from "../util/chatRequest";
+import {addWeeks, startOfWeek, addDays} from "date-fns";
+import {MultiDatePicker} from "./MultiDatePicker";
+import {green} from "@material-ui/core/colors";
+import {submitChatRequest} from "../util/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
+    tagChip: {
+      marginTop: 4,
+      marginRight: 4
+    },
     expand: {
       transform: 'rotate(0deg)',
       transition: theme.transitions.create('transform', {
@@ -109,8 +113,13 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       <CardHeader title="Find a chat" />
       <CardContent>
         <Typography>
-          Find someone to chat to about {(interests.length > 0) ? interests.join(", ") : 'anything'}.
+          Find someone to chat to about {(interests.length > 0) ? ':' : 'anything.'}
         </Typography>
+        <Box mt={1}>
+          {interests.map((tag) => 
+            <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip}/>  
+          )}
+        </Box>
       </CardContent>
 
       <CardActions className={classes.actions}>

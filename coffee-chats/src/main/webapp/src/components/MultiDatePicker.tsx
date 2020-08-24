@@ -1,8 +1,8 @@
-import React, { ReactElement, MouseEvent } from "react";
+import React, {ReactElement, MouseEvent} from "react";
 import "./MultiDatePicker.css"
-import { DatePicker } from "@material-ui/pickers"
-import { isSameDay } from "date-fns";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import {DatePicker} from "@material-ui/pickers"
+import {isSameDay} from "date-fns";
+import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 
 interface MultiDatePickerProps {
   dates: Date[],

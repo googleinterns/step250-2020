@@ -2,12 +2,12 @@ import React from "react";
 import "./App.css";
 import {MainPage} from "./pages/MainPage";
 import {NavBar} from "./components/NavBar";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import {MuiPickersUtilsProvider} from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import {HashRouter as Router, Switch, Route} from "react-router-dom";
+import {GroupListPage} from "./pages/GroupListPage";
 import {useFetch} from "./util/fetch";
 import {AuthState} from "./entity/AuthState";
-import {GroupListPage} from "./pages/GroupListPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
