@@ -19,9 +19,8 @@ export function MainPage() {
 
   useEffect(() => {
     const initFetchTags = (async () => {
-      const fetchedTags = await fetchTags();
-      setTagOptions(fetchedTags as string[]);
-    })
+      setTagOptions(await fetchTags());
+    });
     initFetchTags();
   }, []);
 
