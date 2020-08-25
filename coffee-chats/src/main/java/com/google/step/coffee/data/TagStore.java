@@ -14,16 +14,10 @@ import java.util.List;
  * Representation for the storage method for tags. Uses singleton design pattern.
  */
 public class TagStore {
-  private static TagStore instance = new TagStore();
-
   private DatastoreService datastore;
 
-  private TagStore() {
-    datastore = DatastoreServiceFactory.getDatastoreService();
-  }
-
-  public static TagStore getInstance() {
-    return instance;
+  public TagStore() {
+    this.datastore = DatastoreServiceFactory.getDatastoreService();
   }
 
   /**

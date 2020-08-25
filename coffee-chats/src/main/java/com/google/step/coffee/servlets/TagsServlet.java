@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @WebServlet("/api/tags")
 public class TagsServlet extends JsonServlet {
-  private TagStore tagStore = TagStore.getInstance();
+  private TagStore tagStore = new TagStore();
 
   @Override
   public Object get(HttpServletRequest request) throws IOException, HttpError {

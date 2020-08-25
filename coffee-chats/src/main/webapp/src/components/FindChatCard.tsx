@@ -71,8 +71,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)))
   const [numPeopleRange, setNumPeopleRange] = useState([1, 1]);
   const [duration, setDuration] = useState(30);
-  const [recentMatches, setRecentMatches] = useState(false);
-  const [pastMatched, setPastMatched] = useState(true);
+  const [matchRandom, setMatchRandom] = useState(false);
+  const [matchRecents, setMatchRecents] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -99,7 +99,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       setLoading(true);
 
       setExpanded(false);
-      setSuccess(await submitChatRequest(interests, dates, numPeopleRange, duration, recentMatches, pastMatched));
+      setSuccess(await submitChatRequest(interests, dates, numPeopleRange, duration, matchRandom, matchRecents));
       setLoading(false);
 
       setTimeout(() => {
@@ -201,8 +201,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
                     <FormControlLabel 
                       control={
                         <Checkbox 
-                          checked={recentMatches}
-                          onChange={(event: ChangeEvent<HTMLInputElement>) => setRecentMatches(event.target.checked)}
+                          checked={matchRandom}
+                          onChange={(event: ChangeEvent<HTMLInputElement>) => setMatchRandom(event.target.checked)}
                           color="primary"
                         />
                       }
@@ -216,8 +216,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
                     <FormControlLabel 
                       control={
                         <Checkbox 
-                          checked={pastMatched}
-                          onChange={(event: ChangeEvent<HTMLInputElement>) => setPastMatched(event.target.checked)}
+                          checked={matchRecents}
+                          onChange={(event: ChangeEvent<HTMLInputElement>) => setMatchRecents(event.target.checked)}
                           color="primary"
                         />
                       }
