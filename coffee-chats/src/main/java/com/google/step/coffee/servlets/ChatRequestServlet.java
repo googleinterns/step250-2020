@@ -62,7 +62,7 @@ public class ChatRequestServlet extends HttpServlet {
       requestStore.addRequest(chatRequest, userService.getCurrentUser());
 
       resp.setStatus(HttpServletResponse.SC_OK);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | IllegalStateException e) {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
   }

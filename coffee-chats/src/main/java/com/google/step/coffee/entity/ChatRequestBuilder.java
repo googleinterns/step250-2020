@@ -16,6 +16,9 @@ public class ChatRequestBuilder {
   private boolean matchRecents = true;
 
   public ChatRequest build() {
+    if (dates.isEmpty()) {
+      throw new IllegalStateException("At least one date must be set");
+    }
     return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents);
   }
 
@@ -44,8 +47,12 @@ public class ChatRequestBuilder {
   }
 
   public ChatRequestBuilder withMaxChatLength(int duration) {
-    this.duration = duration;
-    return this;
+    if (duration > 0) {
+      this.duration = duration;
+      return this;
+    } else {
+      throw new IllegalArgumentException("Invalid chat duration");
+    }
   }
 
   public ChatRequestBuilder willMatchRandomlyOnFail(boolean randomMatch) {

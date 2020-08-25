@@ -1,5 +1,7 @@
-package com.google.step.coffee;
+package com.google.step.coffee.servlets;
 
+import com.google.step.coffee.HttpError;
+import com.google.step.coffee.JsonServlet;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
