@@ -1,5 +1,6 @@
 package com.google.step.coffee.entity;
 
+import com.google.step.coffee.HttpError;
 import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class ChatRequestBuilderTest {
       ChatRequest request = new ChatRequestBuilder().build();
 
       Assert.fail("Request built with no dates being set");
-    } catch (IllegalStateException e) {
+    } catch (HttpError e) {
       assertThat(e.getMessage(), is("At least one date must be set"));
     }
   }
@@ -29,7 +30,7 @@ public class ChatRequestBuilderTest {
       ChatRequest request = new ChatRequestBuilder().onDates(new ArrayList<>()).build();
 
       Assert.fail("Request built with invalid dates");
-    } catch (IllegalArgumentException e) {
+    } catch (HttpError e) {
       assertThat(e.getMessage(), is("No dates selected"));
     }
   }
@@ -41,7 +42,7 @@ public class ChatRequestBuilderTest {
           new ChatRequestBuilder().withGroupSize(MIN_PARTICIPANTS, MAX_PARTICIPANTS + 1).build();
 
       Assert.fail("Request built with invalid max participant size");
-    } catch (IllegalArgumentException e) {
+    } catch (HttpError e) {
       assertThat(e.getMessage(), is("Invalid participants range"));
     }
   }
@@ -53,7 +54,7 @@ public class ChatRequestBuilderTest {
           new ChatRequestBuilder().withGroupSize(MIN_PARTICIPANTS - 1, MAX_PARTICIPANTS).build();
 
       Assert.fail("Request built with invalid min participant size");
-    } catch (IllegalArgumentException e) {
+    } catch (HttpError e) {
       assertThat(e.getMessage(), is("Invalid participants range"));
     }
   }
@@ -64,7 +65,7 @@ public class ChatRequestBuilderTest {
       ChatRequest request = new ChatRequestBuilder().withMaxChatLength(0).build();
 
       Assert.fail("Request built with invalid chat duration");
-    } catch (IllegalArgumentException e) {
+    } catch (HttpError e) {
       assertThat(e.getMessage(), is("Invalid chat duration"));
     }
   }

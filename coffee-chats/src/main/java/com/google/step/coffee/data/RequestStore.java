@@ -13,7 +13,7 @@ public class RequestStore {
     this.datastore = DatastoreServiceFactory.getDatastoreService();
   }
 
-  public void addRequest(ChatRequest request, User user) {
+  public void addRequest(ChatRequest request, String userId) {
     Entity reqEntity = new Entity("ChatRequest");
     reqEntity.setProperty("tags", request.getTags());
     reqEntity.setProperty("dates", request.getDates());
@@ -21,7 +21,7 @@ public class RequestStore {
     reqEntity.setProperty("maxPeople", request.getMaxPeople());
     reqEntity.setProperty("randomMatch", request.shouldMatchRandom());
     reqEntity.setProperty("matchRecent", request.shouldMatchRecents());
-    reqEntity.setProperty("userId", user.getUserId());
+    reqEntity.setProperty("userId", userId);
 
     datastore.put(reqEntity);
   }
