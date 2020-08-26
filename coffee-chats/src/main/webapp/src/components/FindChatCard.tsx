@@ -65,10 +65,10 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   const classes = useStyles();
 
   const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
-  const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}))
+  const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}));
 
   const [expanded, setExpanded] = useState(false);
-  const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)))
+  const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)));
   const [numPeopleRange, setNumPeopleRange] = useState([1, 1]);
   const [duration, setDuration] = useState(30);
   const [matchRandom, setMatchRandom] = useState(false);
@@ -87,11 +87,11 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       numPeopleRange[0] >= MIN_PARTICIPANTS &&
       numPeopleRange[1] <= MAX_PARTICIPANTS
     }
-  }
+  };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
-  }
+  };
 
   const chatRequestClick = async () => {
     if (!loading && validParamters()) {
@@ -106,7 +106,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
         setSuccess(false);
       }, 2500);
     }
-  }
+  };
 
   return (
     <Card>
@@ -238,4 +238,4 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       </Snackbar>
     </Card>
   )
-}
+};

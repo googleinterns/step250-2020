@@ -1,4 +1,4 @@
-const chatRequestURL = '/api/chat-request'
+const chatRequestURL = '/api/chat-request';
 
 const STATUS_OK = 200;
 
@@ -21,8 +21,8 @@ export const submitChatRequest = async (interests: string[], dates: Date[],
   
   data.append('tags', interests.toString());
   data.append('dates', dates.map(d => +d).toString());
-  data.append('minPeople', numPeopleRange[0].toString())
-  data.append('maxPeople', numPeopleRange[1].toString())
+  data.append('minPeople', numPeopleRange[0].toString());
+  data.append('maxPeople', numPeopleRange[1].toString());
   data.append('duration', duration.toString());
   data.append('matchRandom', randomMatch.toString());
   data.append('matchRecents', matchRecents.toString());
@@ -33,7 +33,7 @@ export const submitChatRequest = async (interests: string[], dates: Date[],
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: data.toString()
-  }
+  };
 
   try {
     const response = await fetch(chatRequestURL, options);
@@ -43,4 +43,4 @@ export const submitChatRequest = async (interests: string[], dates: Date[],
     console.log('Chat request failed: ' + reason.toString());
     return false;
   }
-}
+};
