@@ -17,6 +17,7 @@ public class ChatRequestBuilder {
   private int duration = 30;
   private boolean matchRandom = false;
   private boolean matchRecents = true;
+  private String userId = "";
 
   /**
    * Construct ChatRequest from the given state set by the builder methods. Must have at least one
@@ -28,7 +29,8 @@ public class ChatRequestBuilder {
     if (dates.isEmpty()) {
       throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "At least one date must be set");
     }
-    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents);
+
+    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
   }
 
   /**
@@ -113,6 +115,11 @@ public class ChatRequestBuilder {
    */
   public ChatRequestBuilder willMatchWithRecents(boolean matchRecent) {
     this.matchRecents = matchRecent;
+    return this;
+  }
+
+  public ChatRequestBuilder forUser(String userId) {
+    this.userId = userId;
     return this;
   }
 }

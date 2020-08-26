@@ -52,9 +52,10 @@ public class ChatRequestServlet extends JsonServlet {
         .withMaxChatLength(duration)
         .willMatchRandomlyOnFail(matchRandom)
         .willMatchWithRecents(matchRecents)
+        .forUser(UserManager.getCurrentUserId())
         .build();
 
-    requestStore.addRequest(chatRequest, UserManager.getCurrentUserId());
+    requestStore.addRequest(chatRequest);
 
     return "Success";
   }
