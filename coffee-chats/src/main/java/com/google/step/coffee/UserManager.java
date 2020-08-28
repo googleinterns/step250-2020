@@ -29,7 +29,7 @@ public class UserManager {
    * Returns the URL that the user can follow to log out
    */
   public static String getLogoutUrl() {
-    return getUserService().createLogoutURL("/");
+    return getLoginUrl("/");
   }
 
   /**
