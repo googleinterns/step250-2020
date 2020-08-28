@@ -1,5 +1,8 @@
-package com.google.step.coffee;
+package com.google.step.coffee.servlets;
 
+import com.google.step.coffee.HttpError;
+import com.google.step.coffee.HttpRedirect;
+import com.google.step.coffee.JsonServlet;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -31,6 +34,14 @@ public class JsonServletTest {
     @Override
     public Object get(HttpServletRequest request) throws IOException, HttpError {
       throw new HttpError(403, "No access for you!");
+    }
+  }
+
+  private static class RedirectingServlet extends JsonServlet {
+
+    @Override
+    public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
+      throw new HttpRedirect("/redirected-url");
     }
   }
 
@@ -88,5 +99,19 @@ public class JsonServletTest {
     JSONAssert.assertEquals(
         "{\"errorCode\": 403, \"message\": \"No access for you!\"}",
         stringWriter.toString(), JSONCompareMode.STRICT);
+  }
+
+  @Test
+  public void ensureRedirectResponse() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    (new RedirectingServlet()).doPost(request, response);
+
+    verify(response).sendRedirect("/redirected-url");
   }
 }
