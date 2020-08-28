@@ -14,7 +14,7 @@ public class UserManager {
    * Returns the URL to which the user will be redirected if not logged in
    */
   public static String getLoginUrl() {
-    return getUserService().createLoginURL("/");
+    return getLoginUrl("/");
   }
 
   /**
