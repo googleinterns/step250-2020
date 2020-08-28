@@ -1,7 +1,5 @@
 package com.google.step.coffee.servlets;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.step.coffee.HttpError;
 import com.google.step.coffee.HttpRedirect;
 import com.google.step.coffee.JsonServlet;
@@ -22,14 +20,20 @@ import javax.servlet.http.HttpServletRequest;
 @WebServlet("/api/chat-request")
 public class ChatRequestServlet extends JsonServlet {
 
-  private TagStore tagStore = new TagStore();
   private RequestStore requestStore = new RequestStore();
 
   @Override
   public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
-
     UserManager.enforceUserLogin(request);
 
+    ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
+
+    requestStore.addRequest(chatRequest);
+
+    return "Success";
+  }
+
+  private ChatRequest buildChatRequestFromHttpRequest(HttpServletRequest request) throws HttpError {
     List<String> tags = getParameterValues("tags", request);
     List<String> dateStrings = getParameterValues("dates", request);
     int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
@@ -43,9 +47,7 @@ public class ChatRequestServlet extends JsonServlet {
         .map(Date::new)
         .collect(Collectors.toList());
 
-    tagStore.addTags(tags);
-
-    ChatRequest chatRequest = new ChatRequestBuilder()
+    return new ChatRequestBuilder()
         .withTags(tags)
         .onDates(dates)
         .withGroupSize(minPeople, maxPeople)
@@ -54,12 +56,7 @@ public class ChatRequestServlet extends JsonServlet {
         .willMatchWithRecents(matchRecents)
         .forUser(UserManager.getCurrentUserId())
         .build();
-
-    requestStore.addRequest(chatRequest);
-
-    return "Success";
   }
-
 
   private String getParameterOrDefault(String name, HttpServletRequest req, String defaultValue) {
     String paramString = req.getParameter(name);

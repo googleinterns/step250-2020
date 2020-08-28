@@ -15,9 +15,12 @@ import java.util.List;
 
 public class RequestStore {
   private DatastoreService datastore;
+  private TagStore tagStore;
+
 
   public RequestStore() {
     this.datastore = DatastoreServiceFactory.getDatastoreService();
+    this.tagStore = new TagStore();
   }
 
   public void addRequest(ChatRequest request) {
@@ -32,6 +35,7 @@ public class RequestStore {
     reqEntity.setProperty("userId", request.getUserId());
 
     datastore.put(reqEntity);
+    tagStore.addTags(request.getTags());
   }
 
   public List<ChatRequest> getUnmatchedRequests() {

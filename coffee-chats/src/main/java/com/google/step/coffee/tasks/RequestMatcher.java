@@ -15,7 +15,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+/**
+ * Servlet triggered as cron job to match current chat requests together. Triggered periodically by
+ * fetch.
+ */
 @WebServlet("/tasks/request-matching")
 public class RequestMatcher extends HttpServlet {
 
@@ -29,6 +32,12 @@ public class RequestMatcher extends HttpServlet {
     matchRequests(requestList, requestStore);
   }
 
+  /**
+   * Take current list of chat requests and store any matched requests into datastore.
+   *
+   * @param requestList list of currently un-matched chat requests from datastore.
+   * @param requestStore interface to datastore to handle requests.
+   */
   private void matchRequests(List<ChatRequest> requestList, RequestStore requestStore) {
     // Implement naive matching, matching consecutive requests together
     for (int i = 0; (i + 1) < requestList.size(); i += 2) {
@@ -52,12 +61,16 @@ public class RequestMatcher extends HttpServlet {
     }
   }
 
+  /**
+   * Given matched requests, find availability for both users on the selected dates.
+   * */
   private TimeSlot findSharedTimeSlot(ChatRequest req1, ChatRequest req2) {
     List<Date> commonDays = new ArrayList<>(req1.getDates());
     commonDays.retainAll(req2.getDates());
 
     for (Date day : commonDays) {
       // Use calendar API and fetch availability
+      // Currently use placeholder value of midday
       ZonedDateTime midDay = day.toInstant()
           .atZone(ZoneId.systemDefault())
           .withHour(12);
