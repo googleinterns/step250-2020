@@ -37,6 +37,19 @@ export function useFetch(url: string, initial: any = null): [any, () => void] {
 }
 
 /**
+ * A hook that fetches JSON data from a URL using a GET request.
+ * Unlike useFetch it doesn't return a function that forces the data to be fetched again.
+ *
+ * @param url: URL to fetch data from
+ * @param initial: Initial value, returned when no data was fetched yet
+ * @returns JSON-decoded data
+ */
+export function useFetchOnce(url: string, initial: any = null): any {
+  const [data, updateData] = useFetch(url, initial);
+  return data;
+}
+
+/**
  * Sends a POST request to the specified URL, passing specified data as parameters
  *
  * @param url: URL to send the POST request to

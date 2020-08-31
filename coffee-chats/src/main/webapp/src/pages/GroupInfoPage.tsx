@@ -1,12 +1,12 @@
 import React from "react";
 import {useParams} from "react-router-dom";
 import {Box, Button, Card, CardActions, CardContent, Container, Typography} from "@material-ui/core";
-import {useFetch} from "../util/fetch";
+import {useFetchOnce} from "../util/fetch";
 import {Group} from "../entity/Group";
 
 export function GroupInfoPage() {
   const {groupId} = useParams();
-  const group: Group = useFetch(`/api/groupInfo?id=${groupId}`)[0];
+  const group: Group = useFetchOnce(`/api/groupInfo?id=${groupId}`);
 
   if (group == null) {
     return null;

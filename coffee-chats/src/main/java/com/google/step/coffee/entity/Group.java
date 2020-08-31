@@ -27,8 +27,8 @@ public abstract class Group {
   public static Group fromEntity(Entity entity) {
     return Group.builder()
         .setId(KeyFactory.keyToString(entity.getKey()))
-        .setName((String)entity.getProperty("name"))
-        .setDescription((String)entity.getProperty("description"))
+        .setName((String) entity.getProperty("name"))
+        .setDescription((String) entity.getProperty("description"))
         .build();
   }
 }
