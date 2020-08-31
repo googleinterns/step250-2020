@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.*;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.*;
@@ -26,7 +27,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("goodbye")).thenReturn(null);
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredParameter("goodbye");
+    try {
+      jsonServletRequest.getRequiredParameter("goodbye");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("No value specified for parameter 'goodbye'"));
+      throw err;
+    }
   }
 
   @Test
@@ -48,7 +55,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(null);
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getKeyFromParameter("id", "foo");
+    try {
+      jsonServletRequest.getKeyFromParameter("id", "foo");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("No value specified for parameter 'id'"));
+      throw err;
+    }
   }
 
   @Test(expected = HttpError.class)
@@ -59,7 +72,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(key));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getKeyFromParameter("id", "bar");
+    try {
+      jsonServletRequest.getKeyFromParameter("id", "bar");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("Invalid value for parameter 'id'"));
+      throw err;
+    }
   }
 
   @Test(expected = HttpError.class)
@@ -68,7 +87,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn("this is not a valid key");
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getKeyFromParameter("id", "bar");
+    try {
+      jsonServletRequest.getKeyFromParameter("id", "bar");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("Invalid value for parameter 'id'"));
+      throw err;
+    }
   }
 
   @Test
@@ -92,7 +117,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(null);
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getEntityFromParameter("id", "foo");
+    try {
+      jsonServletRequest.getEntityFromParameter("id", "foo");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("No value specified for parameter 'id'"));
+      throw err;
+    }
   }
 
   @Test(expected = HttpError.class)
@@ -103,7 +134,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(key));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getEntityFromParameter("id", "foo");
+    try {
+      jsonServletRequest.getEntityFromParameter("id", "foo");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_NOT_FOUND));
+      assertThat(err.getMessage(), equalTo("Requested foo doesn't exist"));
+      throw err;
+    }
   }
 
   @Test(expected = HttpError.class)
@@ -112,7 +149,13 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn("this is not a valid key");
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getEntityFromParameter("id", "foo");
+    try {
+      jsonServletRequest.getEntityFromParameter("id", "foo");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("Invalid value for parameter 'id'"));
+      throw err;
+    }
   }
 
   @Test(expected = HttpError.class)
@@ -125,6 +168,12 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(entity.getKey()));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getEntityFromParameter("id", "bar");
+    try {
+      jsonServletRequest.getEntityFromParameter("id", "bar");
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_BAD_REQUEST));
+      assertThat(err.getMessage(), equalTo("Invalid value for parameter 'id'"));
+      throw err;
+    }
   }
 }
