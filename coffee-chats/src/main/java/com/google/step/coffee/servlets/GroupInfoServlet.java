@@ -14,6 +14,6 @@ public class GroupInfoServlet extends JsonServlet {
   @Override
   public Object get(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
-    return Group.fromEntity(request.getRequiredEntity("id", "group"));
+    return Group.fromEntity(request.getEntityFromParameter("id", "group"));
   }
 }

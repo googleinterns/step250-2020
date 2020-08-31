@@ -41,7 +41,7 @@ public class JsonServletRequest extends HttpServletRequestWrapper {
    * @return decoded key
    * @throws HttpError if key doesn't exist or is of the wrong kind
    */
-  public Key getRequiredKey(String parameterName, String kind) throws HttpError {
+  public Key getKeyFromParameter(String parameterName, String kind) throws HttpError {
     String encoded = getRequiredParameter(parameterName);
 
     try {
@@ -62,8 +62,8 @@ public class JsonServletRequest extends HttpServletRequestWrapper {
    * @return the entity object
    * @throws HttpError if key is invalid or the entity doesn't exist
    */
-  public Entity getRequiredEntity(String parameterName, String kind) throws HttpError {
-    Key key = getRequiredKey(parameterName, kind);
+  public Entity getEntityFromParameter(String parameterName, String kind) throws HttpError {
+    Key key = getKeyFromParameter(parameterName, kind);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     try {

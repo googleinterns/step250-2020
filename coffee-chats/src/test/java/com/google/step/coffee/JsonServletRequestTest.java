@@ -30,7 +30,7 @@ public class JsonServletRequestTest extends TestHelper {
   }
 
   @Test
-  public void testGetRequiredKeyExists() throws Exception {
+  public void testGetKeyFromParameterExists() throws Exception {
     Key key = KeyFactory.createKey("foo", 12345);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -38,41 +38,41 @@ public class JsonServletRequestTest extends TestHelper {
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
     assertThat(
-        jsonServletRequest.getRequiredKey("id", "foo"),
+        jsonServletRequest.getKeyFromParameter("id", "foo"),
         equalTo(key));
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredKeyDoesNotExist() throws Exception {
+  public void testGetKeyFromParameterDoesNotExist() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn(null);
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredKey("id", "foo");
+    jsonServletRequest.getKeyFromParameter("id", "foo");
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredKeyWrongKind() throws Exception {
+  public void testGetKeyFromParameterWrongKind() throws Exception {
     Key key = KeyFactory.createKey("foo", 12345);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(key));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredKey("id", "bar");
+    jsonServletRequest.getKeyFromParameter("id", "bar");
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredKeyInvalidKey() throws Exception {
+  public void testGetKeyFromParameterInvalidKey() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn("this is not a valid key");
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredKey("id", "bar");
+    jsonServletRequest.getKeyFromParameter("id", "bar");
   }
 
   @Test
-  public void testGetRequiredEntityExists() throws Exception {
+  public void testGetEntityFromParameterExists() throws Exception {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = new Entity("foo");
     datastore.put(entity);
@@ -82,41 +82,41 @@ public class JsonServletRequestTest extends TestHelper {
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
     assertThat(
-        jsonServletRequest.getRequiredEntity("id", "foo"),
+        jsonServletRequest.getEntityFromParameter("id", "foo"),
         equalTo(entity));
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredEntityParameterDoesNotExist() throws Exception {
+  public void testGetEntityFromParameterParameterDoesNotExist() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn(null);
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredEntity("id", "foo");
+    jsonServletRequest.getEntityFromParameter("id", "foo");
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredEntityDoesNotExist() throws Exception {
+  public void testGetEntityFromParameterDoesNotExist() throws Exception {
     Key key = KeyFactory.createKey("foo", 12345);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(key));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredEntity("id", "foo");
+    jsonServletRequest.getEntityFromParameter("id", "foo");
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredEntityInvalidKey() throws Exception {
+  public void testGetEntityFromParameterInvalidKey() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn("this is not a valid key");
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredEntity("id", "foo");
+    jsonServletRequest.getEntityFromParameter("id", "foo");
   }
 
   @Test(expected = HttpError.class)
-  public void testGetRequiredEntityWrongKind() throws Exception {
+  public void testGetEntityFromParameterWrongKind() throws Exception {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = new Entity("foo");
     datastore.put(entity);
@@ -125,6 +125,6 @@ public class JsonServletRequestTest extends TestHelper {
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(entity.getKey()));
 
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
-    jsonServletRequest.getRequiredEntity("id", "bar");
+    jsonServletRequest.getEntityFromParameter("id", "bar");
   }
 }
