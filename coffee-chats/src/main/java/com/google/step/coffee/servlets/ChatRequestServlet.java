@@ -23,7 +23,7 @@ public class ChatRequestServlet extends JsonServlet {
   private RequestStore requestStore = new RequestStore();
 
   @Override
-  public Object post(HttpServletRequest request) throws IOException, HttpError {
+  public Object post(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
 
     List<String> tags = getParameterValues("tags", request);
