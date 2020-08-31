@@ -55,14 +55,14 @@ export function useFetchOnce(url: string, initial: any = null): any {
  * @param url: URL to send the POST request to
  * @param data: Data to pass as urlencoded parameters
  */
-export async function postData(url: string, data: Map<string, string>) {
+export function postData(url: string, data: Map<string, string>): Promise<Response> {
   const requestBody = new URLSearchParams();
 
   data.forEach((value, key) => {
     requestBody.append(key, value);
   });
 
-  await fetch(url, {
+  return fetch(url, {
     "method": "POST",
     body: requestBody,
     headers: {
