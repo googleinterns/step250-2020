@@ -45,7 +45,7 @@ export function useFetch(url: string, initial: any = null): [any, () => void] {
  * @returns JSON-decoded data
  */
 export function useFetchOnce(url: string, initial: any = null): any {
-  const [data, updateData] = useFetch(url, initial);
+  const [data] = useFetch(url, initial);
   return data;
 }
 
