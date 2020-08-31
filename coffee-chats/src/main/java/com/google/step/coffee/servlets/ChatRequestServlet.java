@@ -2,10 +2,7 @@ package com.google.step.coffee.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.step.coffee.HttpError;
-import com.google.step.coffee.HttpRedirect;
-import com.google.step.coffee.JsonServlet;
-import com.google.step.coffee.UserManager;
+import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.data.TagStore;
 import com.google.step.coffee.entity.ChatRequest;
@@ -26,9 +23,8 @@ public class ChatRequestServlet extends JsonServlet {
   private RequestStore requestStore = new RequestStore();
 
   @Override
-  public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
-
-    UserManager.enforceUserLogin(request);
+  public Object post(HttpServletRequest request) throws IOException, HttpError {
+    PermissionChecker.ensureLoggedIn();
 
     List<String> tags = getParameterValues("tags", request);
     List<String> dateStrings = getParameterValues("dates", request);

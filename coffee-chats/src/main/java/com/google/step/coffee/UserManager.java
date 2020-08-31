@@ -62,11 +62,4 @@ public class UserManager {
   public static boolean isUserLoggedIn() {
     return getUserService().isUserLoggedIn();
   }
-
-  public static void enforceUserLogin(HttpServletRequest request) throws HttpRedirect {
-    if (!isUserLoggedIn()) {
-      String refererURL = request.getHeader("referer");
-      throw new HttpRedirect(getLoginUrl(refererURL));
-    }
-  }
 }
