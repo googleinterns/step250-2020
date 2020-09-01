@@ -6,6 +6,7 @@ import {ConnectBackCard} from "../components/ConnectBackCard";
 import {FindChatCard} from "../components/FindChatCard";
 import {capitaliseEachWord} from "../util/stringUtils";
 import {fetchTags} from "../util/tagsRequest";
+import {CalAuthDialog} from "../components/CalAuthDialog";
 
 export function MainPage() {
   const CHATS_VIEW = 0;
@@ -15,6 +16,8 @@ export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
 
   const [currView, setCurrView] = useState(CHATS_VIEW);
+  const [authLink, setAuthLink] = useState("");
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   useEffect(() => {
     const initFetchTags = (async () => {
@@ -22,6 +25,10 @@ export function MainPage() {
     });
     initFetchTags();
   }, []);
+
+  const submitAuthRequest = () => {
+    window.location.href = authLink;
+  };
 
   return (
       <Box mt={4}>
@@ -104,13 +111,23 @@ export function MainPage() {
           <Box mt={2}>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <FindChatCard interests={tags} />
+                <FindChatCard
+                  interests={tags}
+                  setAuthLink={setAuthLink}
+                  setAuthDialogOpen={setAuthDialogOpen}
+                />
               </Grid>
               <Grid item md={4}>
                 <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />
               </Grid>
             </Grid>
           </Box>
+
+          <CalAuthDialog
+            submitAuthRequest={submitAuthRequest}
+            open={authDialogOpen}
+            setOpen={setAuthDialogOpen}
+          />
         </Container>
       </Box>
   );
