@@ -1,13 +1,6 @@
 import React from "react";
 
-/**
- * A hook that fetches JSON data from a URL using a GET request
- *
- * @param url: URL to fetch data from
- * @param initial: Initial value, returned when no data was fetched yet
- * @returns a pair: data and function that causes the data to be fetched again when called
- */
-export function useFetch(url: string, initial: any = null): [any, () => void] {
+function useFetchImpl<T>(url: string, initial: T): [T, () => void, (arg: T) => void] {
   const [data, setData] = React.useState(initial);
   const [forceUpdate, setForceUpdate] = React.useState(0);
   const requestId = React.useRef(0);
@@ -33,7 +26,19 @@ export function useFetch(url: string, initial: any = null): [any, () => void] {
 
   return [data, () => {
     setForceUpdate(forceUpdate + 1);
-  }];
+  }, setData];
+}
+
+/**
+ * A hook that fetches JSON data from a URL using a GET request
+ *
+ * @param url: URL to fetch data from
+ * @param initial: Initial value, returned when no data was fetched yet
+ * @returns a pair: data and function that causes the data to be fetched again when called
+ */
+export function useFetch(url: string, initial: any = null): [any, () => void] {
+  const [data, forceUpdate] = useFetchImpl(url, initial);
+  return [data, forceUpdate];
 }
 
 /**
@@ -47,6 +52,11 @@ export function useFetch(url: string, initial: any = null): [any, () => void] {
 export function useFetchOnce(url: string, initial: any = null): any {
   const [data] = useFetch(url, initial);
   return data;
+}
+
+export function useStatefulFetch<T>(url: string, initial: T | null = null): [T | null, (arg: T) => void] {
+  const [data,, setData] = useFetchImpl(url, initial);
+  return [data, setData];
 }
 
 /**
