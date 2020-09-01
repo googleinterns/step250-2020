@@ -3,7 +3,6 @@ package com.google.step.coffee;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.step.coffee.entity.User;
-import javax.servlet.http.HttpServletRequest;
 
 public class UserManager {
   private static UserService getUserService() {
@@ -61,12 +60,5 @@ public class UserManager {
    */
   public static boolean isUserLoggedIn() {
     return getUserService().isUserLoggedIn();
-  }
-
-  public static void enforceUserLogin(HttpServletRequest request) throws HttpRedirect {
-    if (!isUserLoggedIn()) {
-      String refererURL = request.getHeader("referer");
-      throw new HttpRedirect(getLoginUrl(refererURL));
-    }
   }
 }
