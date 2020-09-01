@@ -2,7 +2,7 @@ import React from "react";
 import {useParams} from "react-router-dom";
 import {Group} from "../entity/Group";
 import {postData, useStatefulFetch} from "../util/fetch";
-import {Box, Button, Container, Icon, Snackbar, TextField} from "@material-ui/core";
+import {Box, Button, Container, Icon, Snackbar, TextField, Typography} from "@material-ui/core";
 
 export function GroupEditPage() {
   const {groupId} = useParams();
@@ -56,11 +56,17 @@ export function GroupEditPage() {
             onChange={(e) => setGroup({...group, description: e.target.value})}
           />
 
+          <Typography variant="body2" color="textSecondary">
+            Markdown is supported
+          </Typography>
+
+          <Box mt={1}>
           <Button
               variant="contained"
               color="primary"
               startIcon={<Icon>save</Icon>}
               onClick={submit}>Save</Button>
+          </Box>
         </Container>
       </Box>
   )
