@@ -3,6 +3,7 @@ package com.google.step.coffee;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.step.coffee.entity.User;
+import javax.servlet.http.HttpServletRequest;
 
 public class UserManager {
   private static UserService getUserService() {
@@ -13,7 +14,15 @@ public class UserManager {
    * Returns the URL to which the user will be redirected if not logged in
    */
   public static String getLoginUrl() {
-    return getUserService().createLoginURL("/");
+    return getLoginUrl("/");
+  }
+
+  /**
+   * Returns the URL to which the user will be redirected if not logged in, returning to
+   * <code>originURL</code> when log in is completed.
+   */
+  public static String getLoginUrl(String originURL) {
+    return getUserService().createLoginURL(originURL);
   }
 
   /**
@@ -52,5 +61,12 @@ public class UserManager {
    */
   public static boolean isUserLoggedIn() {
     return getUserService().isUserLoggedIn();
+  }
+
+  public static void enforceUserLogin(HttpServletRequest request) throws HttpRedirect {
+    if (!isUserLoggedIn()) {
+      String refererURL = request.getHeader("referer");
+      throw new HttpRedirect(getLoginUrl(refererURL));
+    }
   }
 }

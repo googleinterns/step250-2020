@@ -19,7 +19,7 @@ import java.io.IOException;
 */
 abstract public class JsonServlet extends HttpServlet {
   protected interface JsonHttpHandler {
-    Object handle(JsonServletRequest request) throws IOException, HttpError;
+    Object handle(JsonServletRequest request) throws IOException, HttpError, HttpRedirect;
   }
 
   private static String stringify(Object object, boolean onlyExposed) {
@@ -33,14 +33,14 @@ abstract public class JsonServlet extends HttpServlet {
     return gson.toJson(object);
   }
 
-  public Object get(JsonServletRequest request) throws IOException, HttpError {
+  public Object get(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
     throw new HttpError(
         HttpServletResponse.SC_METHOD_NOT_ALLOWED,
         "GET method is not allowed for this endpoint"
     );
   }
 
-  public Object post(JsonServletRequest request) throws IOException, HttpError {
+  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect{
     throw new HttpError(
         HttpServletResponse.SC_METHOD_NOT_ALLOWED,
         "POST method is not allowed for this endpoint"
@@ -57,6 +57,8 @@ abstract public class JsonServlet extends HttpServlet {
     } catch (HttpError httpError) {
       response.setStatus(httpError.getErrorCode());
       response.getWriter().write(stringify(httpError, true));
+    } catch (HttpRedirect httpRedirect) {
+      response.sendRedirect(httpRedirect.getRedirectURL());
     }
   }
 

@@ -1,48 +1,59 @@
 package com.google.step.coffee.servlets;
 
+import com.google.step.coffee.*;
+import com.google.step.coffee.data.RequestStore;
+import com.google.step.coffee.data.TagStore;
+import com.google.step.coffee.entity.ChatRequest;
+import com.google.step.coffee.entity.ChatRequestBuilder;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/api/chat-request")
-public class ChatRequestServlet extends HttpServlet {
+public class ChatRequestServlet extends JsonServlet {
 
-  private static final int MAX_PARTICIPANTS = 4;
+  private TagStore tagStore = new TagStore();
+  private RequestStore requestStore = new RequestStore();
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
 
-    List<String> tags = getParameterValues("tags", req);
-    List<String> dateStrings = getParameterValues("dates", req);
-    int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", req, "1"));
-    int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", req, "1"));
-    int duration = Integer.parseInt(getParameterOrDefault("duration", req, "30"));
-    boolean randomMatch = Boolean.parseBoolean(getParameterOrDefault("randomMatch", req, "false"));
-    boolean pastMatched = Boolean.parseBoolean(getParameterOrDefault("pastMatched", req, "true"));
+    UserManager.enforceUserLogin(request);
 
-    if (dateStrings.isEmpty()) {
-      resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      return;
-    }
+    List<String> tags = getParameterValues("tags", request);
+    List<String> dateStrings = getParameterValues("dates", request);
+    int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
+    int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
+    int duration = Integer.parseInt(getParameterOrDefault("duration", request, "30"));
+    boolean matchRandom = Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
+    boolean matchRecents = Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
 
-    List<LocalDateTime> dates = dateStrings.stream()
+    List<Date> dates = dateStrings.stream()
         .map(Long::parseLong)
-        .map(epochSecond -> LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC))
+        .map(Date::new)
         .collect(Collectors.toList());
 
-    resp.setStatus(HttpServletResponse.SC_OK);
+    tagStore.addTags(tags);
+
+    ChatRequest chatRequest = new ChatRequestBuilder()
+        .withTags(tags)
+        .onDates(dates)
+        .withGroupSize(minPeople, maxPeople)
+        .withMaxChatLength(duration)
+        .willMatchRandomlyOnFail(matchRandom)
+        .willMatchWithRecents(matchRecents)
+        .build();
+
+    requestStore.addRequest(chatRequest, UserManager.getCurrentUserId());
+
+    return "Success";
   }
+
 
   private String getParameterOrDefault(String name, HttpServletRequest req, String defaultValue) {
     String paramString = req.getParameter(name);
