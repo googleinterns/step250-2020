@@ -54,6 +54,14 @@ export function useFetchOnce(url: string, initial: any = null): any {
   return data;
 }
 
+/**
+ * A hook that fetches JSON data from a URL using a GET request.
+ * It fetches the data once and returns a state, like the useState hook does.
+ *
+ * @param url: URL to fetch data from
+ * @param initial: Initial value, returned when no data was fetched yet
+ * @returns a pair: data and setter function for this data.
+ */
 export function useStatefulFetch<T>(url: string, initial: T | null = null): [T | null, (arg: T) => void] {
   const [data,, setData] = useFetchImpl(url, initial);
   return [data, setData];
