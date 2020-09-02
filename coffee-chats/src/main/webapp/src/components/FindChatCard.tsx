@@ -70,7 +70,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   const [expanded, setExpanded] = useState(false);
   const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)));
   const [numPeopleRange, setNumPeopleRange] = useState([1, 1]);
-  const [duration, setDuration] = useState(30);
+  const [durationMins, setDurationMins] = useState(30);
   const [matchRandom, setMatchRandom] = useState(false);
   const [matchRecents, setMatchRecents] = useState(true);
 
@@ -99,7 +99,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
       setLoading(true);
 
       setExpanded(false);
-      setSuccess(await submitChatRequest(interests, dates, numPeopleRange, duration, matchRandom, matchRecents));
+      setSuccess(await submitChatRequest(interests, dates, numPeopleRange,
+        durationMins, matchRandom, matchRecents));
       setLoading(false);
 
       setTimeout(() => {
@@ -183,8 +184,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
                     <Select
                       labelId="select-chat-duration-label"
                       variant="filled"
-                      value={duration}
-                      onChange={(event: ChangeEvent<{ value: unknown }>) => setDuration(parseInt(event.target.value as string))}
+                      value={durationMins}
+                      onChange={(event: ChangeEvent<{ value: unknown }>) => setDurationMins(parseInt(event.target.value as string))}
                       className="input-field"
                     >
                       {[15, 30, 45, 60].map((num) => (

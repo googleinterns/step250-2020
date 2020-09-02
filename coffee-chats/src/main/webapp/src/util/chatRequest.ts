@@ -10,12 +10,12 @@ const STATUS_OK = 200;
  * @param interests - Array of user inputted tags they prefer to speak about.
  * @param dates - Array of dates user wants to speak on.
  * @param numPeopleRange - Array of two numbers with the range of number of participants.
- * @param duration - Duration of the requested chat.
+ * @param durationMins - Duration of the requested chat in minutes.
  * @param matchRandom - Boolean to still match if no interest matches are found.
  * @param matchRecents - Boolean to still match with people spoken to recently.
  */
 export const submitChatRequest = async (interests: string[], dates: Date[],
-    numPeopleRange: number[], duration: number, matchRandom: boolean, 
+    numPeopleRange: number[], durationMins: number, matchRandom: boolean, 
     matchRecents: boolean) => {
   const data = new URLSearchParams();
   
@@ -23,7 +23,7 @@ export const submitChatRequest = async (interests: string[], dates: Date[],
   data.append('dates', dates.map(d => +d).toString());
   data.append('minPeople', numPeopleRange[0].toString());
   data.append('maxPeople', numPeopleRange[1].toString());
-  data.append('duration', duration.toString());
+  data.append('durationMins', durationMins.toString());
   data.append('matchRandom', matchRandom.toString());
   data.append('matchRecents', matchRecents.toString());
   

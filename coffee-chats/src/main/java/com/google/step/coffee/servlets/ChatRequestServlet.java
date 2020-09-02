@@ -37,7 +37,7 @@ public class ChatRequestServlet extends JsonServlet {
     List<String> dateStrings = getParameterValues("dates", request);
     int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
     int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
-    int duration = Integer.parseInt(getParameterOrDefault("duration", request, "30"));
+    int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
     boolean matchRandom = Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
     boolean matchRecents = Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
 
@@ -50,7 +50,7 @@ public class ChatRequestServlet extends JsonServlet {
         .withTags(tags)
         .onDates(dates)
         .withGroupSize(minPeople, maxPeople)
-        .withMaxChatLength(duration)
+        .withMaxChatLength(durationMins)
         .willMatchRandomlyOnFail(matchRandom)
         .willMatchWithRecents(matchRecents)
         .forUser(UserManager.getCurrentUserId())

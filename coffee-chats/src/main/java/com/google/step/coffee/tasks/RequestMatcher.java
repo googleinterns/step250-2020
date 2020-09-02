@@ -4,6 +4,7 @@ import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.TimeSlot;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class RequestMatcher extends HttpServlet {
       ZonedDateTime midDay = day.toInstant()
           .atZone(ZoneId.systemDefault())
           .withHour(12);
-      int duration = Math.min(req1.getDuration(), req2.getDuration());
+      Duration duration = Duration.ofMinutes(Math.min(req1.getDuration(), req2.getDuration()));
 
       return new TimeSlot(midDay, duration);
     }
