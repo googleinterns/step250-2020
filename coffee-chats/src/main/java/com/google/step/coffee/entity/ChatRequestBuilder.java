@@ -1,10 +1,9 @@
 package com.google.step.coffee.entity;
 
-import com.google.step.coffee.HttpError;
+import com.google.step.coffee.InvalidEntityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 public class ChatRequestBuilder {
   /* Maximum number of total participants, including the user who requested the chat. */
@@ -25,9 +24,9 @@ public class ChatRequestBuilder {
    *
    * @return ChatRequest object with the given internal state set of builder object.
    */
-  public ChatRequest build() throws HttpError {
+  public ChatRequest build() throws InvalidEntityException {
     if (dates.isEmpty()) {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "At least one date must be set");
+      throw new InvalidEntityException("At least one date must be set");
     }
 
     return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
@@ -50,12 +49,12 @@ public class ChatRequestBuilder {
    * @param dates List of Date objects for each day given in user's request.
    * @return ChatRequestBuilder object with internal state set to given dates.
    */
-  public ChatRequestBuilder onDates(List<Date> dates) throws HttpError {
+  public ChatRequestBuilder onDates(List<Date> dates) throws InvalidEntityException {
     if (!dates.isEmpty()) {
       this.dates = dates;
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "No dates selected");
+      throw new InvalidEntityException("No dates selected");
     }
   }
 
@@ -68,13 +67,13 @@ public class ChatRequestBuilder {
    * @return ChatRequestBuilder object with internal state set with given minimum and maximum number
    * of users to match with.
    */
-  public ChatRequestBuilder withGroupSize(int minPeople, int maxPeople) throws HttpError {
+  public ChatRequestBuilder withGroupSize(int minPeople, int maxPeople) throws InvalidEntityException {
     if (minPeople > 0 && minPeople <= maxPeople && maxPeople < MAX_PARTICIPANTS) {
       this.minPeople = minPeople;
       this.maxPeople = maxPeople;
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid participants range");
+      throw new InvalidEntityException("Invalid participants range");
     }
   }
 
@@ -84,12 +83,12 @@ public class ChatRequestBuilder {
    * @param duration positive int representing maximum duration of chat in minutes.
    * @return ChatRequestBuilder object with internal state set to given maximum chat duration.
    */
-  public ChatRequestBuilder withMaxChatLength(int duration) throws HttpError {
+  public ChatRequestBuilder withMaxChatLength(int duration) throws InvalidEntityException {
     if (duration > 0) {
       this.duration = duration;
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid chat duration");
+      throw new InvalidEntityException("Invalid chat duration");
     }
   }
 

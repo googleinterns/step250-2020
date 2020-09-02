@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.step.coffee.InvalidEntityException;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.TimeSlot;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/** Abstraction to access chat requests from DataStore instance. */
 public class RequestStore {
   private DatastoreService datastore;
   private TagStore tagStore;
@@ -45,16 +47,21 @@ public class RequestStore {
     List<ChatRequest> unmatchedRequests = new ArrayList<>();
 
     for (Entity entity : results.asIterable()) {
-      ChatRequest request = getRequestFromEntity(entity);
+      try {
+        ChatRequest request = getRequestFromEntity(entity);
 
+        unmatchedRequests.add(request);
+      } catch (InvalidEntityException e) {
+        System.out.println("Can not construct chat request from entity: " + e.getMessage());
 
-      unmatchedRequests.add(request);
+        removeRequests(entity.getKey());
+      }
     }
 
     return unmatchedRequests;
   }
 
-  private ChatRequest getRequestFromEntity(Entity entity) {
+  private ChatRequest getRequestFromEntity(Entity entity) throws InvalidEntityException {
     ChatRequest request = new ChatRequestBuilder()
         .withTags((List<String>) entity.getProperty("tags"))
         .onDates((List<Date>) entity.getProperty("dates"))

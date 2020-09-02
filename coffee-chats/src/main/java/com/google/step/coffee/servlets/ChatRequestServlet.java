@@ -5,7 +5,6 @@ import com.google.step.coffee.HttpRedirect;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.UserManager;
 import com.google.step.coffee.data.RequestStore;
-import com.google.step.coffee.data.TagStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import java.io.IOException;
