@@ -1,12 +1,10 @@
 package com.google.step.coffee.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
 import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.PermissionChecker;
+import com.google.step.coffee.data.GroupStore;
 import com.google.step.coffee.entity.Group;
 
 import javax.servlet.annotation.WebServlet;
@@ -14,23 +12,31 @@ import java.io.IOException;
 
 @WebServlet("/api/groupInfo")
 public class GroupInfoServlet extends JsonServlet {
-  @Override
-  public Object get(JsonServletRequest request) throws IOException, HttpError {
+  private GroupStore groupStore = new GroupStore();
+
+  private Group getGroup(JsonServletRequest request) throws HttpError {
+    // TODO(tsarn): also check that the user has write access to the group
     PermissionChecker.ensureLoggedIn();
+
     return Group.fromEntity(request.getEntityFromParameter("id", "group"));
   }
 
   @Override
+  public Object get(JsonServletRequest request) throws IOException, HttpError {
+    return getGroup(request);
+  }
+
+  @Override
   public Object post(JsonServletRequest request) throws IOException, HttpError {
-    // TODO(tsarn): also check that the user has write access to the group
-    PermissionChecker.ensureLoggedIn();
+    Group prevGroup = getGroup(request);
+    Group group = Group.builder()
+        .setId(prevGroup.id())
+        .setName(request.getRequiredParameter("name"))
+        .setDescription(request.getRequiredParameter("description"))
+        .setOwnerId(prevGroup.ownerId())
+        .build();
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-    Entity entity = request.getEntityFromParameter("id", "group");
-    entity.setProperty("name", request.getRequiredParameter("name"));
-    entity.setProperty("description", request.getRequiredParameter("description"));
-    datastore.put(entity);
+    groupStore.put(group);
 
     return null;
   }

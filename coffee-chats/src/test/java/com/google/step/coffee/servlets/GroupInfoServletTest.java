@@ -34,6 +34,7 @@ public class GroupInfoServletTest extends TestHelper {
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 
     assertThat(getGroupByKey(groupEntity.getKey()), equalTo(
@@ -41,6 +42,7 @@ public class GroupInfoServletTest extends TestHelper {
             .setId(KeyFactory.keyToString(groupEntity.getKey()))
             .setName("foo")
             .setDescription("bar")
+            .setOwnerId("test_user")
             .build()
     ));
   }
@@ -52,12 +54,14 @@ public class GroupInfoServletTest extends TestHelper {
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(groupEntity.getKey()));
     when(request.getParameter("name")).thenReturn("updated foo");
     when(request.getParameter("description")).thenReturn("updated bar");
+    when(request.getParameter("ownerId")).thenReturn("updated test_user");
     JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
     new GroupInfoServlet().post(jsonServletRequest);
 
@@ -68,6 +72,7 @@ public class GroupInfoServletTest extends TestHelper {
             .setId(KeyFactory.keyToString(groupEntity.getKey()))
             .setName("updated foo")
             .setDescription("updated bar")
+            .setOwnerId("test_user")
             .build()
     ));
   }

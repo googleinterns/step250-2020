@@ -38,6 +38,7 @@ public class GroupListServletTest extends TestHelper {
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 
     assertThat(getGroupList(), equalTo(Collections.singletonList(
@@ -45,6 +46,7 @@ public class GroupListServletTest extends TestHelper {
             .setId(KeyFactory.keyToString(groupEntity.getKey()))
             .setName("foo")
             .setDescription("bar")
+            .setOwnerId("test_user")
             .build()
     )));
   }
