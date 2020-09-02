@@ -13,7 +13,7 @@ public class ChatRequestBuilder {
   private List<Date> dates = new ArrayList<>();
   private int minPeople = 1;
   private int maxPeople = 4;
-  private int duration = 30;
+  private int durationMins = 30;
   private boolean matchRandom = false;
   private boolean matchRecents = true;
   private String userId = "";
@@ -29,7 +29,7 @@ public class ChatRequestBuilder {
       throw new InvalidEntityException("At least one date must be set");
     }
 
-    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
+    return new ChatRequest(tags, dates, minPeople, maxPeople, durationMins, matchRandom, matchRecents, userId);
   }
 
   /**
@@ -80,12 +80,12 @@ public class ChatRequestBuilder {
   /**
    * Set maximum duration of chat length for user's request.
    *
-   * @param duration positive int representing maximum duration of chat in minutes.
+   * @param durationMins positive int representing maximum duration of chat in minutes.
    * @return ChatRequestBuilder object with internal state set to given maximum chat duration.
    */
-  public ChatRequestBuilder withMaxChatLength(int duration) throws InvalidEntityException {
-    if (duration > 0) {
-      this.duration = duration;
+  public ChatRequestBuilder withMaxChatLength(int durationMins) throws InvalidEntityException {
+    if (durationMins > 0) {
+      this.durationMins = durationMins;
       return this;
     } else {
       throw new InvalidEntityException("Invalid chat duration");
