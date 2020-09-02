@@ -55,6 +55,11 @@ public class UserManager {
     return User.builder().setId(userId).build();
   }
 
+  /** Returns an AppEngine User object for the current user. */
+  public static com.google.appengine.api.users.User getCurrentGAEUser() {
+    return getUserService().getCurrentUser();
+  }
+
   /**
    * Returns <code>true</code> iff the user is logged in
    */

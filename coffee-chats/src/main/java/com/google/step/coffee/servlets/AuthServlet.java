@@ -4,6 +4,7 @@ import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.PermissionChecker;
 import com.google.step.coffee.UserManager;
+import com.google.step.coffee.data.UserStore;
 import com.google.step.coffee.entity.User;
 
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,8 @@ import java.io.IOException;
 
 @WebServlet("/api/auth")
 public class AuthServlet extends JsonServlet {
+  private UserStore userStore = new UserStore();
+
   private static class Response {
     private String logoutUrl;
     private User user;
@@ -33,6 +36,11 @@ public class AuthServlet extends JsonServlet {
   @Override
   public Object get(HttpServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
+
+    if (!userStore.hasUserInfo(UserManager.getCurrentUserId())) {
+      userStore.addNewUser(UserManager.getCurrentGAEUser());
+    }
+
     return new Response();
   }
 }
