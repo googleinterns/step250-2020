@@ -1,7 +1,5 @@
 package com.google.step.coffee.servlets;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.data.TagStore;

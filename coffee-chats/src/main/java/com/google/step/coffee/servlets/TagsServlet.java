@@ -6,7 +6,6 @@ import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.data.TagStore;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
 
 @WebServlet("/api/tags")
 public class TagsServlet extends JsonServlet {
