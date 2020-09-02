@@ -5,18 +5,33 @@ import {useRenderLink} from "./LinkComponents";
 import ReactMarkdown from "react-markdown";
 
 interface GroupCardProps {
+  children: React.ReactNode;
   group: Group;
+  clickable: boolean;
 }
 
-export function GroupCard({group}: GroupCardProps) {
+export function GroupCard({group, children, clickable}: GroupCardProps) {
+  const inner = (<React.Fragment>
+    <CardContent>
+      <Typography variant="h5">{group.name}</Typography>
+      <ReactMarkdown source={group.description} />
+    </CardContent>
+    {children}
+  </React.Fragment>);
+
+  const link = useRenderLink(`/group/${group.id}`);
+
   return (
       <Card>
-        <CardActionArea component={useRenderLink(`/group/${group.id}`)}>
-          <CardContent>
-            <Typography variant="h5">{group.name}</Typography>
-            <ReactMarkdown source={group.description} />
-          </CardContent>
-        </CardActionArea>
+        {clickable ?
+        <CardActionArea component={link}>
+          {inner}
+        </CardActionArea> : inner}
       </Card>
   );
 }
+
+GroupCard.defaultProps = {
+  children: null,
+  clickable: true
+};
