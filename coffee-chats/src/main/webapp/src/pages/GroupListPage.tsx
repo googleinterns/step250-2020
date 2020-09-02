@@ -1,25 +1,57 @@
 import React from "react";
-import {Box, Container, Grid, TextField} from "@material-ui/core";
+import {Box, Container, Fab, Grid, Icon, TextField} from "@material-ui/core";
 import {GroupCard} from "../components/GroupCard";
+import {makeStyles} from "@material-ui/core/styles";
+import {GroupCreateDialog} from "../components/GroupCreateDialog";
+import {useFetch} from "../util/fetch";
+import {Group} from "../entity/Group";
+
+const useStyles = makeStyles((theme) => ({
+  extendedIcon: {
+    marginRight: theme.spacing(.5),
+  },
+  shrink: {
+    flexGrow: 0
+  }
+}));
 
 export function GroupListPage() {
+  const classes = useStyles();
+  const [groups, updateGroups]: [Group[], () => void] = useFetch("/api/groupList", []);
+  const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+
   return (
-      <Box mt={4}>
-        <Container maxWidth="md">
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Search your groups"/>
+      <React.Fragment>
+        <GroupCreateDialog
+            open={createDialogOpen}
+            setOpen={setCreateDialogOpen}
+            onSubmit={updateGroups} />
+        <Box mt={4}>
+          <Container maxWidth="md">
+            <Grid container spacing={2}>
+              <Grid item xs>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Search your groups"/>
+              </Grid>
+              <Grid item xs className={classes.shrink}>
+                <Fab
+                    variant="extended"
+                    color="primary"
+                    onClick={() => setCreateDialogOpen(true)}>
+                  <Icon className={classes.extendedIcon}>add</Icon>
+                  create
+                </Fab>
+              </Grid>
+              {groups.map(group =>
+                  <Grid item xs={12} key={group.id}>
+                    <GroupCard group={group} />
+                  </Grid>
+              )}
             </Grid>
-            {["Board Games Dublin", "Book Club", "Mountain Climbers @ Home"].map(name =>
-                <Grid item xs={12}>
-                  <GroupCard name={name}/>
-                </Grid>
-            )}
-          </Grid>
-        </Container>
-      </Box>
+          </Container>
+        </Box>
+      </React.Fragment>
   );
 }

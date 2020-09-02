@@ -1,5 +1,7 @@
 package com.google.step.coffee.entity;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
@@ -20,5 +22,13 @@ public abstract class Group {
     abstract public Builder setName(String value);
     abstract public Builder setDescription(String value);
     abstract public Group build();
+  }
+
+  public static Group fromEntity(Entity entity) {
+    return Group.builder()
+        .setId(KeyFactory.keyToString(entity.getKey()))
+        .setName((String) entity.getProperty("name"))
+        .setDescription((String) entity.getProperty("description"))
+        .build();
   }
 }
