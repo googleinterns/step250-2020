@@ -26,7 +26,7 @@ export function GroupDeleteDialog({group, open, setOpen}: GroupDeleteDialogProps
 
   return (
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Delete group &ldquo; {group.name} &rdquo;</DialogTitle>
+        <DialogTitle>Delete group &ldquo;{group.name}&rdquo;</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete the group?
