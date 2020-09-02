@@ -26,6 +26,7 @@ public class AuthServlet extends JsonServlet {
     }
   }
 
+  @Override
   public Object get(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
     return new Response();
