@@ -33,7 +33,13 @@ public class UserStore {
     Filter filter = new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, key);
     Query query = new Query("UserInfo").setFilter(filter);
 
-    return (String) datastore.prepare(query).asSingleEntity().getProperty("email");
+    Entity entity = datastore.prepare(query).asSingleEntity();
+
+    if (entity == null) {
+      throw new IllegalArgumentException("No UserInfo stored for userId " + userId);
+    }
+
+    return (String) entity.getProperty("email");
   }
 
   public boolean hasUserInfo(String userId) {
