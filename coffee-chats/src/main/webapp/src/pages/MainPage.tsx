@@ -131,4 +131,4 @@ export function MainPage() {
         </Container>
       </Box>
   );
-}
+};

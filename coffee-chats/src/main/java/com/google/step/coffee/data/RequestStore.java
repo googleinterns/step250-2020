@@ -16,6 +16,7 @@ import java.util.List;
 
 /** Abstraction to access chat requests from DataStore instance. */
 public class RequestStore {
+
   private DatastoreService datastore;
   private TagStore tagStore;
 
@@ -61,6 +62,23 @@ public class RequestStore {
     return unmatchedRequests;
   }
 
+  public void removeRequests(Key... requestKeys) {
+    datastore.delete(requestKeys);
+  }
+
+  public void addMatchedRequest(ChatRequest resolvedRequest, TimeSlot slot,
+      List<String> participantIds, List<String> commonTags) {
+    Entity entity = new Entity("MatchedRequest");
+    entity.setProperty("userId", resolvedRequest.getUserId());
+    entity.setProperty("tags", resolvedRequest.getTags());
+    entity.setProperty("datetime", Date.from(slot.getZonedDatetimeStart().toInstant()));
+    entity.setProperty("duration", slot.getDuration().toMinutes());
+    entity.setProperty("participants", participantIds);
+    entity.setProperty("commonTags", commonTags);
+
+    datastore.put(entity);
+  }
+
   private ChatRequest getRequestFromEntity(Entity entity) throws InvalidEntityException {
     ChatRequest request = new ChatRequestBuilder()
         .withTags((List<String>) entity.getProperty("tags"))
@@ -76,22 +94,5 @@ public class RequestStore {
     request.setRequestId(entity.getKey().getId());
 
     return request;
-  }
-
-  public void removeRequests(Key ...requestKeys) {
-    datastore.delete(requestKeys);
-  }
-
-  public void addMatchedRequest(ChatRequest resolvedRequest, TimeSlot slot,
-      List<String> participantIds, List<String> commonTags) {
-    Entity entity = new Entity("MatchedRequest");
-    entity.setProperty("userId", resolvedRequest.getUserId());
-    entity.setProperty("tags", resolvedRequest.getTags());
-    entity.setProperty("datetime", Date.from(slot.getZonedDatetimeStart().toInstant()));
-    entity.setProperty("duration", slot.getDuration().toMinutes());
-    entity.setProperty("participants", participantIds);
-    entity.setProperty("commonTags", commonTags);
-
-    datastore.put(entity);
   }
 }

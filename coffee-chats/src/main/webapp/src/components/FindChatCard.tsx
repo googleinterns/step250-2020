@@ -60,7 +60,7 @@ interface FindChatCardProps {
   interests: string[],
   setAuthLink: (link: string) => void,
   setAuthDialogOpen: (open: boolean) => void
-}
+};
 
 export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLink, setAuthDialogOpen}) => {
   
@@ -87,7 +87,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
     } else {
       return numPeopleRange[0] <= numPeopleRange[1] &&
       numPeopleRange[0] >= MIN_PARTICIPANTS &&
-      numPeopleRange[1] <= MAX_PARTICIPANTS
+      numPeopleRange[1] <= MAX_PARTICIPANTS;
     }
   };
 
@@ -104,7 +104,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
   };
 
   const calendarAuth = async () => {
-    const response = await submitCalAuthRequest()
+    const response = await submitCalAuthRequest();
 
     if (!response.authorised) {
       setAuthLink(response.authLink);
@@ -112,7 +112,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
     }
 
     return response;
-  }
+  };
 
   const chatRequestSend = async () => {
     if (!loading && validParamters()) {
@@ -128,7 +128,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
         setSuccess(false);
       }, 2500);
     }
-  }
+  };
 
   return (
     <Card>

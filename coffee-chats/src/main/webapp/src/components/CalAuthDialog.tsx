@@ -5,12 +5,12 @@ interface CalAuthDialogProps {
   submitAuthRequest: () => void,
   open: boolean,
   setOpen: (open: boolean) => void
-}
+};
 
 export const CalAuthDialog: React.FC<CalAuthDialogProps> = ({submitAuthRequest, open, setOpen}) => {  
   const dialogClose = () => {
     setOpen(false);
-  }
+  };
   
   return (
     <Dialog
@@ -39,4 +39,4 @@ export const CalAuthDialog: React.FC<CalAuthDialogProps> = ({submitAuthRequest, 
       </DialogContent>
     </Dialog>
   )
-}
+};

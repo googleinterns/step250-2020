@@ -7,6 +7,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 /** Utility class holding common tools for Google API usage and authorisation. */
 public class APIUtils {
+
   public static final String APPLICATION_NAME = "Coffee Chats";
   public static final HttpTransport HTTP_TRANSPORT = new UrlFetchTransport();
   public static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();

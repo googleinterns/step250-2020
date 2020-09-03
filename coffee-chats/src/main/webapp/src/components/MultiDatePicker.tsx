@@ -7,8 +7,7 @@ import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 interface MultiDatePickerProps {
   dates: Date[],
   setDates: (dates: Date[]) => void,
-}
-
+};
 
 export const MultiDatePicker: React.FC<MultiDatePickerProps> = ({dates, setDates}) => {
 
@@ -23,9 +22,9 @@ export const MultiDatePicker: React.FC<MultiDatePickerProps> = ({dates, setDates
         if (foundIndex >= 0) {
           const newDates = [...dates];
           newDates.splice(foundIndex, 1);
-          setDates(newDates)
+          setDates(newDates);
         } else {
-          setDates([...dates, day as Date])
+          setDates([...dates, day as Date]);
         }
       },
 

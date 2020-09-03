@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /** Provide tools for authorising permissions to Google APIs. */
 public class OAuthService {
+
   private static final String CREDENTIALS_FILEPATH = "/client_secret.json";
 
   private static GoogleClientSecrets clientSecrets = null;
