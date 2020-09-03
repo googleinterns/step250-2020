@@ -1,9 +1,6 @@
 package com.google.step.coffee.servlets;
 
-import com.google.step.coffee.HttpError;
-import com.google.step.coffee.HttpRedirect;
-import com.google.step.coffee.JsonServlet;
-import com.google.step.coffee.UserManager;
+import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
@@ -22,7 +19,8 @@ public class ChatRequestServlet extends JsonServlet {
   private RequestStore requestStore = new RequestStore();
 
   @Override
-  public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
+  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
+
     UserManager.enforceUserLogin(request);
 
     ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
