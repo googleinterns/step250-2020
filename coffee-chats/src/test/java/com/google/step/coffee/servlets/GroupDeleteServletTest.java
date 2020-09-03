@@ -28,17 +28,17 @@ public class GroupDeleteServletTest extends TestHelper {
 
     Entity groupEntity1 = new Entity("group");
     groupEntity1.setProperty("name", "foo");
-    groupEntity1.setProperty("description", "foo's desc");
+    groupEntity1.setProperty("description", new Text("foo's desc"));
     datastore.put(groupEntity1);
 
     Entity groupEntity2 = new Entity("group");
     groupEntity2.setProperty("name", "bar");
-    groupEntity2.setProperty("description", "bar's desc");
+    groupEntity2.setProperty("description", new Text("bar's desc"));
     datastore.put(groupEntity2);
 
     Entity groupEntity3 = new Entity("group");
     groupEntity3.setProperty("name", "baz");
-    groupEntity3.setProperty("description", "baz's desc");
+    groupEntity3.setProperty("description", new Text("baz's desc"));
     datastore.put(groupEntity3);
 
     deleteGroup(groupEntity2.getKey());

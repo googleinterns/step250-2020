@@ -33,7 +33,7 @@ public class GroupInfoServletTest extends TestHelper {
 
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
-    groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("description", new Text("bar"));
     groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 
@@ -53,7 +53,7 @@ public class GroupInfoServletTest extends TestHelper {
 
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
-    groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("description", new Text("bar"));
     groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 

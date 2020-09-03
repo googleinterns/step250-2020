@@ -3,6 +3,7 @@ package com.google.step.coffee.entity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Text;
 import com.google.auto.value.AutoValue;
 import com.google.step.coffee.Nullable;
 
@@ -34,7 +35,7 @@ public abstract class Group {
     return Group.builder()
         .setId(KeyFactory.keyToString(entity.getKey()))
         .setName((String) entity.getProperty("name"))
-        .setDescription((String) entity.getProperty("description"))
+        .setDescription(((Text) entity.getProperty("description")).getValue())
         .setOwnerId((String) entity.getProperty("ownerId"))
         .build();
   }

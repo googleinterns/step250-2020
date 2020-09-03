@@ -27,7 +27,7 @@ public class GroupStore {
     Key key = group.key();
     Entity entity = key != null ? new Entity(key) : new Entity("group");
     entity.setProperty("name", group.name());
-    entity.setProperty("description", group.description());
+    entity.setProperty("description", new Text(group.description()));
     entity.setProperty("ownerId", group.ownerId());
 
     datastore.put(entity);
