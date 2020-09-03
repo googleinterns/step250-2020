@@ -17,15 +17,27 @@ public class GroupStore {
   }
 
   public Group create(String name) {
-    return put(Group.builder()
+    Group group = put(Group.builder()
         .setName(name)
         .setDescription("")
         .setOwnerId(UserManager.getCurrentUserId())
         .build());
+
+    updateMembershipStatus(group, UserManager.getCurrentUser(), GroupMembership.Status.ADMINISTRATOR);
+
+    return group;
   }
 
   public void delete(Key key) {
     datastore.delete(key);
+
+    Query query = new Query("groupMembership")
+        .setFilter(new Query.FilterPredicate(
+            "group", Query.FilterOperator.EQUAL, key));
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      datastore.delete(entity.getKey());
+    }
   }
 
   public Group put(Group group) {
@@ -58,6 +70,23 @@ public class GroupStore {
     }
 
     return members;
+  }
+
+  public List<Group> getUserGroups(User user) {
+    List<Group> groups = new ArrayList<>();
+
+    Query query = new Query("groupMembership")
+        .setFilter(new Query.FilterPredicate(
+            "user", Query.FilterOperator.EQUAL, user.id()));
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      Key groupKey = (Key) entity.getProperty("group");
+      try {
+        groups.add(Group.fromEntity(datastore.get(groupKey)));
+      } catch (EntityNotFoundException ignored) {}
+    }
+
+    return groups;
   }
 
   private Entity getMembershipEntity(Group group, User user) {
