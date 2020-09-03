@@ -2,11 +2,11 @@ package com.google.step.coffee.servlets;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.step.coffee.JsonServlet;
+import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.OAuthService;
 import com.google.step.coffee.UserManager;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Manage and check user authorisation for scopes for Google Calendar API in
@@ -31,7 +31,7 @@ public class AuthCalendarServlet extends JsonServlet {
   }
 
   @Override
-  public Object get(HttpServletRequest request) throws IOException {
+  public Object get(JsonServletRequest request) throws IOException {
     CalAuthResponse responseData;
     Credential credentials = OAuthService.getCredentials(UserManager.getCurrentUserId());
 
