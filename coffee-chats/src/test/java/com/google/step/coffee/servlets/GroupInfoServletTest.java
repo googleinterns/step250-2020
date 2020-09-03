@@ -8,6 +8,7 @@ import com.google.step.coffee.entity.Group;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,6 +74,41 @@ public class GroupInfoServletTest extends TestHelper {
             .setName("updated foo")
             .setDescription("updated bar")
             .setOwnerId("test_user")
+            .build()
+    ));
+  }
+
+  @Test
+  public void testUpdateNoPermissions() throws Exception {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity groupEntity = new Entity("group");
+    groupEntity.setProperty("name", "foo");
+    groupEntity.setProperty("description", new Text("bar"));
+    groupEntity.setProperty("ownerId", "another_user");
+    datastore.put(groupEntity);
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter("id")).thenReturn(KeyFactory.keyToString(groupEntity.getKey()));
+    when(request.getParameter("name")).thenReturn("updated foo");
+    when(request.getParameter("description")).thenReturn("updated bar");
+    JsonServletRequest jsonServletRequest = new JsonServletRequest(request);
+
+    try {
+      new GroupInfoServlet().post(jsonServletRequest);
+      assertThat("HttpError not thrown", false);
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_FORBIDDEN));
+    }
+
+    groupEntity = datastore.get(groupEntity.getKey());
+
+    assertThat(Group.fromEntity(groupEntity), equalTo(
+        Group.builder()
+            .setId(KeyFactory.keyToString(groupEntity.getKey()))
+            .setName("foo")
+            .setDescription("bar")
+            .setOwnerId("another_user")
             .build()
     ));
   }
