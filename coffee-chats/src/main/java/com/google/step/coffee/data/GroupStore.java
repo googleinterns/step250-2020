@@ -40,8 +40,7 @@ public class GroupStore {
     return Group.fromEntity(entity);
   }
 
-  public static List<GroupMembership> getMembers(Group group) {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+  public List<GroupMembership> getMembers(Group group) {
     List<GroupMembership> members = new ArrayList<>();
 
     Query query = new Query("groupMembership")
@@ -50,14 +49,51 @@ public class GroupStore {
 
     for (Entity entity : datastore.prepare(query).asIterable()) {
       members.add(GroupMembership.builder()
-          .setKind(GroupMembership.Kind.valueOf((String) entity.getProperty("kind")))
+          .setStatus(GroupMembership.Status.valueOf((String) entity.getProperty("status")))
           .setGroup(group)
           .setUser(User.builder()
-              .setId((String) entity.getProperty("userId"))
+              .setId((String) entity.getProperty("user"))
               .build())
           .build());
     }
 
     return members;
+  }
+
+  private Entity getMembershipEntity(Group group, User user) {
+    Query query = new Query("groupMembership")
+        .setFilter(Query.CompositeFilterOperator.and(
+            new Query.FilterPredicate(
+                "group", Query.FilterOperator.EQUAL, group.key()
+            ),
+            new Query.FilterPredicate(
+                "user", Query.FilterOperator.EQUAL, user.id()
+            )
+        ));
+
+    Entity entity = datastore.prepare(query).asSingleEntity();
+
+    if (entity == null) {
+      entity = new Entity("groupMembership");
+      entity.setProperty("group", group.key());
+      entity.setProperty("user", user.id());
+      entity.setProperty("status", GroupMembership.Status.NOT_A_MEMBER.toString());
+    }
+
+    return entity;
+  }
+
+  public GroupMembership.Status getMembershipStatus(Group group, User user) {
+    if (group.ownerId().equals(user.id())) {
+      return GroupMembership.Status.ADMINISTRATOR;
+    }
+
+    Entity entity = getMembershipEntity(group, user);
+    return GroupMembership.Status.valueOf((String) entity.getProperty("status"));
+  }
+
+  public void updateMembershipStatus(Group group, User user, GroupMembership.Status status) {
+    Entity entity = getMembershipEntity(group, user);
+    entity.setProperty("status", status.toString());
   }
 }
