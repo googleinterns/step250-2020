@@ -2,6 +2,7 @@ package com.google.step.coffee.entity;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -13,13 +14,13 @@ public class ChatRequest {
   private List<Date> dates;
   private int minPeople;
   private int maxPeople;
-  private int duration;
+  private Duration duration;
   private boolean matchRandom;
   private boolean matchRecents;
   private String userId;
 
   public ChatRequest(List<String> tags, List<Date> dates, int minPeople, int maxPeople,
-      int duration, boolean matchRandom, boolean matchRecents, String userId) {
+      Duration duration, boolean matchRandom, boolean matchRecents, String userId) {
     this.tags = tags;
     this.dates = dates;
     this.minPeople = minPeople;
@@ -70,9 +71,9 @@ public class ChatRequest {
   /**
    * Get maximum duration user wishes to chat for in minutes.
    *
-   * @return A positive integer, maximum value of 60.
+   * @return A Duration object representing max chat duration, must be positive.
    */
-  public int getDuration() {
+  public Duration getDuration() {
     return duration;
   }
 

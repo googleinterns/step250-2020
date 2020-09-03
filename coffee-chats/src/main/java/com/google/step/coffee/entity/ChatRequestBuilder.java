@@ -1,6 +1,7 @@
 package com.google.step.coffee.entity;
 
 import com.google.step.coffee.InvalidEntityException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ public class ChatRequestBuilder {
   private List<Date> dates = new ArrayList<>();
   private int minPeople = 1;
   private int maxPeople = 4;
-  private int durationMins = 30;
+  private Duration duration = Duration.ofMinutes(30);
   private boolean matchRandom = false;
   private boolean matchRecents = true;
   private String userId = "";
@@ -29,7 +30,7 @@ public class ChatRequestBuilder {
       throw new InvalidEntityException("At least one date must be set");
     }
 
-    return new ChatRequest(tags, dates, minPeople, maxPeople, durationMins, matchRandom, matchRecents, userId);
+    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
   }
 
   /**
@@ -85,7 +86,7 @@ public class ChatRequestBuilder {
    */
   public ChatRequestBuilder withMaxChatLength(int durationMins) throws InvalidEntityException {
     if (durationMins > 0) {
-      this.durationMins = durationMins;
+      this.duration = Duration.ofMinutes(durationMins);
       return this;
     } else {
       throw new InvalidEntityException("Invalid chat duration");

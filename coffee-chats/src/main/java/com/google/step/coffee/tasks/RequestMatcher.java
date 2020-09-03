@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet triggered as cron job to match current chat requests together. Triggered periodically by
  * fetch.
  */
-@WebServlet("/tasks/request-matching")
+@WebServlet("/api/tasks/request-matching")
 public class RequestMatcher extends HttpServlet {
 
   @Override
@@ -76,7 +76,9 @@ public class RequestMatcher extends HttpServlet {
       ZonedDateTime midDay = day.toInstant()
           .atZone(ZoneId.systemDefault())
           .withHour(12);
-      Duration duration = Duration.ofMinutes(Math.min(req1.getDuration(), req2.getDuration()));
+      Duration duration = req1.getDuration().compareTo(req2.getDuration()) < 0 ?
+          req1.getDuration() :
+          req2.getDuration();
 
       return new TimeSlot(midDay, duration);
     }

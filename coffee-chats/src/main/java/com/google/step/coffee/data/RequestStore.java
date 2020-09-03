@@ -31,7 +31,7 @@ public class RequestStore {
     reqEntity.setProperty("dates", request.getDates());
     reqEntity.setProperty("minPeople", request.getMinPeople());
     reqEntity.setProperty("maxPeople", request.getMaxPeople());
-    reqEntity.setProperty("duration", request.getDuration());
+    reqEntity.setProperty("durationMins", request.getDuration().toMinutes());
     reqEntity.setProperty("matchRandom", request.shouldMatchRandom());
     reqEntity.setProperty("matchRecents", request.shouldMatchRecents());
     reqEntity.setProperty("userId", request.getUserId());
@@ -67,7 +67,7 @@ public class RequestStore {
         .onDates((List<Date>) entity.getProperty("dates"))
         .withGroupSize(((Long) entity.getProperty("minPeople")).intValue(),
             ((Long) entity.getProperty("maxPeople")).intValue())
-        .withMaxChatLength(((Long) entity.getProperty("duration")).intValue())
+        .withMaxChatLength(((Long) entity.getProperty("durationMins")).intValue())
         .willMatchRandomlyOnFail((boolean) entity.getProperty("matchRandom"))
         .willMatchWithRecents((boolean) entity.getProperty("matchRecents"))
         .forUser((String) entity.getProperty("userId"))
@@ -88,7 +88,7 @@ public class RequestStore {
     entity.setProperty("userId", resolvedRequest.getUserId());
     entity.setProperty("tags", resolvedRequest.getTags());
     entity.setProperty("datetime", Date.from(slot.getDatetimeStart().toInstant()));
-    entity.setProperty("duration", slot.getDuration());
+    entity.setProperty("durationMins", slot.getDuration().toMinutes());
     entity.setProperty("participants", participantIds);
     entity.setProperty("commonTags", commonTags);
 
