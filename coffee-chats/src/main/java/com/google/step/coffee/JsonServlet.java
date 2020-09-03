@@ -19,7 +19,7 @@ import java.io.IOException;
 */
 abstract public class JsonServlet extends HttpServlet {
   protected interface JsonHttpHandler {
-    Object handle(HttpServletRequest request) throws IOException, HttpError, HttpRedirect;
+    Object handle(JsonServletRequest request) throws IOException, HttpError, HttpRedirect;
   }
 
   private static String stringify(Object object, boolean onlyExposed) {
@@ -33,14 +33,14 @@ abstract public class JsonServlet extends HttpServlet {
     return gson.toJson(object);
   }
 
-  public Object get(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
+  public Object get(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
     throw new HttpError(
         HttpServletResponse.SC_METHOD_NOT_ALLOWED,
         "GET method is not allowed for this endpoint"
     );
   }
 
-  public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect{
+  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect{
     throw new HttpError(
         HttpServletResponse.SC_METHOD_NOT_ALLOWED,
         "POST method is not allowed for this endpoint"
@@ -52,7 +52,7 @@ abstract public class JsonServlet extends HttpServlet {
     response.setContentType("text/json");
 
     try {
-      Object jsonResponse = handler.handle(request);
+      Object jsonResponse = handler.handle(new JsonServletRequest(request));
       response.getWriter().write(stringify(jsonResponse, false));
     } catch (HttpError httpError) {
       response.setStatus(httpError.getErrorCode());

@@ -1,7 +1,7 @@
 import React from "react";
 
 import {AppBar, Grid, Icon, IconButton, List, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
-import {ListItemLink} from "./ListItemLink";
+import {ListItemLink} from "./LinkComponents";
 
 interface NavBarButtonsProps {
   onDrawerOpen: () => void;

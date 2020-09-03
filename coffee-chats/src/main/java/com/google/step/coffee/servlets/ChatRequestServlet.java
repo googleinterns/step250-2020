@@ -1,13 +1,9 @@
 package com.google.step.coffee.servlets;
 
-import com.google.step.coffee.HttpError;
-import com.google.step.coffee.JsonServlet;
-import com.google.step.coffee.PermissionChecker;
-import com.google.step.coffee.UserManager;
+import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
-import com.google.step.coffee.OAuthService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +21,7 @@ public class ChatRequestServlet extends JsonServlet {
   private RequestStore requestStore = new RequestStore();
 
   @Override
-  public Object post(HttpServletRequest request) throws IOException, HttpError {
+  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
     PermissionChecker.ensureLoggedIn();
 
     if (OAuthService.userHasAuthorised(UserManager.getCurrentUserId())) {
@@ -46,8 +42,10 @@ public class ChatRequestServlet extends JsonServlet {
     int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
     int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
     int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
-    boolean matchRandom = Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
-    boolean matchRecents = Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
+    boolean matchRandom =
+        Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
+    boolean matchRecents =
+        Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
 
     List<Date> dates = dateStrings.stream()
         .map(Long::parseLong)

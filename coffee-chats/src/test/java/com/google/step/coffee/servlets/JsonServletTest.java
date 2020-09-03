@@ -3,6 +3,7 @@ package com.google.step.coffee.servlets;
 import com.google.step.coffee.HttpError;
 import com.google.step.coffee.HttpRedirect;
 import com.google.step.coffee.JsonServlet;
+import com.google.step.coffee.JsonServletRequest;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.verify;
 public class JsonServletTest {
   private static class GetTestServlet extends JsonServlet {
     @Override
-    public Object get(HttpServletRequest request) throws IOException, HttpError {
+    public Object get(JsonServletRequest request) throws IOException, HttpError {
       List<String> response = new ArrayList<>();
       response.add("hello");
       response.add("world");
@@ -32,15 +33,14 @@ public class JsonServletTest {
 
   private static class ErrorThrowingServlet extends JsonServlet {
     @Override
-    public Object get(HttpServletRequest request) throws IOException, HttpError {
+    public Object get(JsonServletRequest request) throws IOException, HttpError {
       throw new HttpError(403, "No access for you!");
     }
   }
 
   private static class RedirectingServlet extends JsonServlet {
-
     @Override
-    public Object post(HttpServletRequest request) throws IOException, HttpError, HttpRedirect {
+    public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
       throw new HttpRedirect("/redirected-url");
     }
   }
