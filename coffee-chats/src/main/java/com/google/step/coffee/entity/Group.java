@@ -5,7 +5,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 import com.google.auto.value.AutoValue;
-import com.google.step.coffee.Nullable;
+import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class Group {
