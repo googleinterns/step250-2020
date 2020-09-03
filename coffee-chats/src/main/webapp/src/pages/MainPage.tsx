@@ -5,8 +5,7 @@ import {Autocomplete, createFilterOptions} from '@material-ui/lab'
 import {ConnectBackCard} from "../components/ConnectBackCard";
 import {FindChatCard} from "../components/FindChatCard";
 import {capitaliseEachWord} from "../util/stringUtils";
-import {fetchTags} from "../requests/tags";
-
+import {fetchTags} from "../util/tagsRequest";
 
 export function MainPage() {
   const CHATS_VIEW = 0;
@@ -105,7 +104,7 @@ export function MainPage() {
           <Box mt={2}>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <FindChatCard interests={tags}/>
+                <FindChatCard interests={tags} />
               </Grid>
               <Grid item md={4}>
                 <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />

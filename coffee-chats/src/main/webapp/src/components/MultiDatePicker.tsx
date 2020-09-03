@@ -21,8 +21,8 @@ export const MultiDatePicker: React.FC<MultiDatePickerProps> = ({dates, setDates
 
         // Toggle selection of day appearing in selected dates array
         if (foundIndex >= 0) {
-          const newDates = [...dates]
-          newDates.splice(foundIndex, 1)
+          const newDates = [...dates];
+          newDates.splice(foundIndex, 1);
           setDates(newDates)
         } else {
           setDates([...dates, day as Date])
@@ -31,7 +31,7 @@ export const MultiDatePicker: React.FC<MultiDatePickerProps> = ({dates, setDates
 
       selected: dates.find(d => isSameDay(d, day as Date)) != null
     });
-  }
+  };
 
   return (
     <div className="datePicker">
@@ -45,4 +45,4 @@ export const MultiDatePicker: React.FC<MultiDatePickerProps> = ({dates, setDates
       />
     </div>
   )
-}
+};

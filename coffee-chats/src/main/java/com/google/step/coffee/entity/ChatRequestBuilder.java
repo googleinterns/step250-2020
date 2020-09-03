@@ -1,10 +1,10 @@
 package com.google.step.coffee.entity;
 
-import com.google.step.coffee.HttpError;
+import com.google.step.coffee.InvalidEntityException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 public class ChatRequestBuilder {
   /* Maximum number of total participants, including the user who requested the chat. */
@@ -14,9 +14,10 @@ public class ChatRequestBuilder {
   private List<Date> dates = new ArrayList<>();
   private int minPeople = 1;
   private int maxPeople = 4;
-  private int duration = 30;
+  private Duration duration = Duration.ofMinutes(30);
   private boolean matchRandom = false;
   private boolean matchRecents = true;
+  private String userId = "";
 
   /**
    * Construct ChatRequest from the given state set by the builder methods. Must have at least one
@@ -24,11 +25,12 @@ public class ChatRequestBuilder {
    *
    * @return ChatRequest object with the given internal state set of builder object.
    */
-  public ChatRequest build() throws HttpError {
+  public ChatRequest build() throws InvalidEntityException {
     if (dates.isEmpty()) {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "At least one date must be set");
+      throw new InvalidEntityException("At least one date must be set");
     }
-    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents);
+
+    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
   }
 
   /**
@@ -48,12 +50,12 @@ public class ChatRequestBuilder {
    * @param dates List of Date objects for each day given in user's request.
    * @return ChatRequestBuilder object with internal state set to given dates.
    */
-  public ChatRequestBuilder onDates(List<Date> dates) throws HttpError {
+  public ChatRequestBuilder onDates(List<Date> dates) throws InvalidEntityException {
     if (!dates.isEmpty()) {
       this.dates = dates;
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "No dates selected");
+      throw new InvalidEntityException("No dates selected");
     }
   }
 
@@ -66,28 +68,28 @@ public class ChatRequestBuilder {
    * @return ChatRequestBuilder object with internal state set with given minimum and maximum number
    * of users to match with.
    */
-  public ChatRequestBuilder withGroupSize(int minPeople, int maxPeople) throws HttpError {
+  public ChatRequestBuilder withGroupSize(int minPeople, int maxPeople) throws InvalidEntityException {
     if (minPeople > 0 && minPeople <= maxPeople && maxPeople < MAX_PARTICIPANTS) {
       this.minPeople = minPeople;
       this.maxPeople = maxPeople;
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid participants range");
+      throw new InvalidEntityException("Invalid participants range");
     }
   }
 
   /**
    * Set maximum duration of chat length for user's request.
    *
-   * @param duration positive int representing maximum duration of chat in minutes.
+   * @param durationMins positive int representing maximum duration of chat in minutes.
    * @return ChatRequestBuilder object with internal state set to given maximum chat duration.
    */
-  public ChatRequestBuilder withMaxChatLength(int duration) throws HttpError {
-    if (duration > 0) {
-      this.duration = duration;
+  public ChatRequestBuilder withMaxChatLength(int durationMins) throws InvalidEntityException {
+    if (durationMins > 0) {
+      this.duration = Duration.ofMinutes(durationMins);
       return this;
     } else {
-      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid chat duration");
+      throw new InvalidEntityException("Invalid chat duration");
     }
   }
 
@@ -113,6 +115,11 @@ public class ChatRequestBuilder {
    */
   public ChatRequestBuilder willMatchWithRecents(boolean matchRecent) {
     this.matchRecents = matchRecent;
+    return this;
+  }
+
+  public ChatRequestBuilder forUser(String userId) {
+    this.userId = userId;
     return this;
   }
 }
