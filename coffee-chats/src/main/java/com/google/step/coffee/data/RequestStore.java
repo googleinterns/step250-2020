@@ -87,8 +87,8 @@ public class RequestStore {
     Entity entity = new Entity("MatchedRequest");
     entity.setProperty("userId", resolvedRequest.getUserId());
     entity.setProperty("tags", resolvedRequest.getTags());
-    entity.setProperty("datetime", Date.from(slot.getDatetimeStart().toInstant()));
-    entity.setProperty("duration", slot.getDuration());
+    entity.setProperty("datetime", Date.from(slot.getZonedDatetimeStart().toInstant()));
+    entity.setProperty("duration", slot.getDuration().toMinutes());
     entity.setProperty("participants", participantIds);
     entity.setProperty("commonTags", commonTags);
 

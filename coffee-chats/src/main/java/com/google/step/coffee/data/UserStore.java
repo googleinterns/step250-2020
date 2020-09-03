@@ -28,6 +28,14 @@ public class UserStore {
     datastore.put(entity);
   }
 
+  public String getEmail(String userId) {
+    Key key = KeyFactory.createKey("UserInfo", userId);
+    Filter filter = new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, key);
+    Query query = new Query("UserInfo").setFilter(filter);
+
+    return (String) datastore.prepare(query).asSingleEntity().getProperty("email");
+  }
+
   public boolean hasUserInfo(String userId) {
     Key key = KeyFactory.createKey("UserInfo", userId);
     Filter filter = new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, key);
