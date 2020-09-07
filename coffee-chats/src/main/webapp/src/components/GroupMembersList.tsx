@@ -1,15 +1,14 @@
 import React from "react";
-import {Member} from "../entity/Member";
-import {
-  Avatar, Box, Card, CardContent, Icon, IconButton, List, ListItem,
-  ListItemAvatar, ListItemSecondaryAction, ListItemText, Typography
-} from "@material-ui/core";
+import {Member, MembershipStatus} from "../entity/Member";
+import {Box, Card, CardContent, List, Typography} from "@material-ui/core";
+import {GroupMemberListItem} from "./GroupMemberListItem";
 
 interface GroupMembersListProps {
   members: Member[];
+  status: MembershipStatus;
 }
 
-export function GroupMembersList({members}: GroupMembersListProps) {
+export function GroupMembersList({members, status}: GroupMembersListProps) {
   return (
       <Box mt={2}>
         <Card>
@@ -20,17 +19,7 @@ export function GroupMembersList({members}: GroupMembersListProps) {
 
             <List>
               {members.map(member => (
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar src={`https://api.adorable.io/avatars/64/${member.user.id}.png`} />
-                  </ListItemAvatar>
-                  <ListItemText primary={`<User id="${member.user.id}">`} secondary={member.status} />
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="manage">
-                      <Icon>more_vert</Icon>
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                  <GroupMemberListItem member={member} status={status} />
               ))}
             </List>
           </CardContent>

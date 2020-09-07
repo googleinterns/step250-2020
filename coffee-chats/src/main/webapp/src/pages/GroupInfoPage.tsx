@@ -7,7 +7,7 @@ import {useRenderLink} from "../components/LinkComponents";
 import {GroupCard} from "../components/GroupCard";
 import {GroupDeleteDialog} from "../components/GroupDeleteDialog";
 import {GroupMembersList} from "../components/GroupMembersList";
-import {Member} from "../entity/Member";
+import {Member, MembershipStatus} from "../entity/Member";
 import {AuthState, AuthStateContext} from "../entity/AuthState";
 
 export function GroupInfoPage() {
@@ -24,13 +24,12 @@ export function GroupInfoPage() {
 
   const status = members.find(member => member.user.id === authState.user.id)?.status || "NOT_A_MEMBER";
 
-  const joinGroup = async () => {
-    await postData(`/api/groupJoin?id=${groupId}`, new Map());
-    updateMembers();
-  };
-
-  const leaveGroup = async () => {
-    await postData(`/api/groupLeave?id=${groupId}`, new Map());
+  const setMembershipStatus = async (status: MembershipStatus) => {
+    const data = new Map();
+    data.set("id", groupId);
+    data.set("user", authState.user.id);
+    data.set("status", status);
+    await postData(`/api/groupMembers`, data);
     updateMembers();
   };
 
@@ -48,15 +47,15 @@ export function GroupInfoPage() {
               }
 
               {(status === "REGULAR_MEMBER" || status === "ADMINISTRATOR") ?
-                  <Button onClick={() => leaveGroup()} color="secondary">Leave</Button> : null
+                  <Button onClick={() => setMembershipStatus("NOT_A_MEMBER")} color="secondary">Leave</Button> : null
               }
 
               {(status === "NOT_A_MEMBER") ?
-                  <Button onClick={() => joinGroup()}>Join</Button> : null
+                  <Button onClick={() => setMembershipStatus("REGULAR_MEMBER")}>Join</Button> : null
               }
             </CardActions>
           </GroupCard>
-          <GroupMembersList members={members} />
+          <GroupMembersList members={members} status={status} />
         </Container>
       </Box>
   )
