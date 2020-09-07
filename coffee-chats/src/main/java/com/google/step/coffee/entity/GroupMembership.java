@@ -7,7 +7,8 @@ public abstract class GroupMembership {
   public enum Status {
     NOT_A_MEMBER,
     REGULAR_MEMBER,
-    ADMINISTRATOR
+    ADMINISTRATOR,
+    OWNER
   }
 
   public abstract Status status();

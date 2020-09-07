@@ -23,7 +23,7 @@ public class GroupStore {
         .setOwnerId(UserManager.getCurrentUserId())
         .build());
 
-    updateMembershipStatus(group, UserManager.getCurrentUser(), GroupMembership.Status.ADMINISTRATOR);
+    updateMembershipStatus(group, UserManager.getCurrentUser(), GroupMembership.Status.OWNER);
 
     return group;
   }
@@ -114,7 +114,7 @@ public class GroupStore {
 
   public GroupMembership.Status getMembershipStatus(Group group, User user) {
     if (group.ownerId().equals(user.id())) {
-      return GroupMembership.Status.ADMINISTRATOR;
+      return GroupMembership.Status.OWNER;
     }
 
     Entity entity = getMembershipEntity(group, user);

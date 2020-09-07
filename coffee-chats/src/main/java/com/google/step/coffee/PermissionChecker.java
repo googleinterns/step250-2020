@@ -31,7 +31,7 @@ public class PermissionChecker {
   public static void ensureCanManageGroup(Group group) throws HttpError {
     ensureLoggedIn();
     GroupMembership.Status status = new GroupStore().getMembershipStatus(group, UserManager.getCurrentUser());
-    if (status != GroupMembership.Status.ADMINISTRATOR) {
+    if (status != GroupMembership.Status.ADMINISTRATOR && status != GroupMembership.Status.OWNER) {
       throw new HttpError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
     }
   }
