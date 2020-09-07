@@ -123,7 +123,13 @@ public class GroupStore {
 
   public void updateMembershipStatus(Group group, User user, GroupMembership.Status status) {
     Entity entity = getMembershipEntity(group, user);
-    entity.setProperty("status", status.toString());
-    datastore.put(entity);
+    if (status == GroupMembership.Status.NOT_A_MEMBER) {
+      if (entity.getKey() != null) {
+        datastore.delete(entity.getKey());
+      }
+    } else {
+      entity.setProperty("status", status.toString());
+      datastore.put(entity);
+    }
   }
 }

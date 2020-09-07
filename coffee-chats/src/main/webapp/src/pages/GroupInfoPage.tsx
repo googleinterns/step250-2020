@@ -29,6 +29,11 @@ export function GroupInfoPage() {
     updateMembers();
   };
 
+  const leaveGroup = async () => {
+    await postData(`/api/groupLeave?id=${groupId}`, new Map());
+    updateMembers();
+  };
+
   return (
       <Box mt={4}>
         <GroupDeleteDialog group={group} open={deleteDialogOpen} setOpen={setDeleteDialogOpen} />
@@ -43,7 +48,7 @@ export function GroupInfoPage() {
               }
 
               {(status == "REGULAR_MEMBER" || status == "ADMINISTRATOR") ?
-                  <Button color="secondary">Leave</Button> : null
+                  <Button onClick={() => leaveGroup()} color="secondary">Leave</Button> : null
               }
 
               {(status == "NOT_A_MEMBER") ?
