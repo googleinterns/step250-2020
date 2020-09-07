@@ -34,11 +34,20 @@ public class CalendarUtils {
    *
    * @param userId String of user's id whose calendar to add event into.
    * @param event Event to add into user's calendar.
+   */
+  public static void addEvent(String userId, Event event) {
+    addEvent(getCalendarService(userId), userId, event, true);
+  }
+
+  /**
+   * Adds given event to user's primary calendar using provided calendar service.
+   *
+   * @param service Calendar service to use to insert event.
+   * @param userId String of user's id whose calendar to add event into.
+   * @param event Event to add into user's calendar.
    * @param retry boolean of whether to retry adding event on failure.
    */
-  public static void addEvent(String userId, Event event, boolean retry) {
-    Calendar service = getCalendarService(userId);
-
+  public static void addEvent(Calendar service, String userId, Event event, boolean retry) {
     try {
       service.events().insert("primary", event).setConferenceDataVersion(1).execute();
     } catch (IOException e) {
@@ -46,7 +55,7 @@ public class CalendarUtils {
 
       if (retry) {
         System.out.println("Retrying...");
-        addEvent(userId, event, false);
+        addEvent(service, userId, event, false);
       }
     }
   }

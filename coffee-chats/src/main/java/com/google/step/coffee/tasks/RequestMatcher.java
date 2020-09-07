@@ -70,7 +70,7 @@ public class RequestMatcher extends HttpServlet {
 
     for (ChatRequest req : reqs) {
       requestStore.addMatchedRequest(req, meetingSlot, participantIds, commonTags);
-      CalendarUtils.addEvent(req.getUserId(), event, true);
+      CalendarUtils.addEvent(req.getUserId(), event);
     }
   }
 
