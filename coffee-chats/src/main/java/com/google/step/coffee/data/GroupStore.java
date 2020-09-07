@@ -23,6 +23,10 @@ public class GroupStore {
     datastore.delete(key);
   }
 
+  /**
+   * Saves the group to the database. Returns a <code>Group</code>
+   * that has its id set, which the group passed to the function might not.
+   */
   public Group put(Group group) {
     Key key = group.key();
     Entity entity = key != null ? new Entity(key) : new Entity("group");
