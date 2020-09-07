@@ -20,8 +20,8 @@ public class UserStoreTest extends TestHelper {
   @Test
   public void addingNewUserHasCorrectEmail() {
     User user = mock(User.class);
-    when(user.getUserId()).thenReturn("id1234test");
-    when(user.getEmail()).thenReturn("test-user@example.com");
+    when(user.getUserId()).thenReturn(testUserId);
+    when(user.getEmail()).thenReturn(testEmail);
 
     userStore.addNewUser(user);
 
@@ -41,8 +41,8 @@ public class UserStoreTest extends TestHelper {
   @Test
   public void addingUserCreatesCheckableEntry() {
     User user = mock(User.class);
-    when(user.getUserId()).thenReturn("id1234test");
-    when(user.getEmail()).thenReturn("test-user@example.com");
+    when(user.getUserId()).thenReturn(testUserId);
+    when(user.getEmail()).thenReturn(testEmail);
 
     userStore.addNewUser(user);
 

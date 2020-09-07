@@ -3,6 +3,7 @@ package com.google.step.coffee.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions.Builder;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -30,16 +31,14 @@ public class UserStore {
 
   public String getEmail(String userId) {
     Key key = KeyFactory.createKey("UserInfo", userId);
-    Filter filter = new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, key);
-    Query query = new Query("UserInfo").setFilter(filter);
 
-    Entity entity = datastore.prepare(query).asSingleEntity();
+    try {
+      Entity entity = datastore.get(key);
 
-    if (entity == null) {
+      return (String) entity.getProperty("email");
+    } catch (EntityNotFoundException e) {
       throw new IllegalArgumentException("No UserInfo stored for userId " + userId);
     }
-
-    return (String) entity.getProperty("email");
   }
 
   public boolean hasUserInfo(String userId) {
