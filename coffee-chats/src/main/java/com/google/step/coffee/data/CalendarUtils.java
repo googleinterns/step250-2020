@@ -28,13 +28,18 @@ public class CalendarUtils {
       CalendarScopes.CALENDAR_READONLY, CalendarScopes.CALENDAR_EVENTS);
 
   /** Add given event to user's primary calendar. */
-  public static void addEvent(String userId, Event event) {
+  public static void addEvent(String userId, Event event, boolean retry) {
     Calendar service = getCalendarService(userId);
 
     try {
       service.events().insert("primary", event).setConferenceDataVersion(1).execute();
     } catch (IOException e) {
       System.out.println("Event could not be created: " + e.getMessage());
+
+      if (retry) {
+        System.out.println("Retrying...");
+        addEvent(userId, event, false);
+      }
     }
   }
 
