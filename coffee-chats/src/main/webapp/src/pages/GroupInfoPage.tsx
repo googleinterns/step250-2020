@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import {Box, Button, CardActions, Container} from "@material-ui/core";
-import {useFetchOnce} from "../util/fetch";
+import {postData, useFetch, useFetchOnce} from "../util/fetch";
 import {Group} from "../entity/Group";
 import {useRenderLink} from "../components/LinkComponents";
 import {GroupCard} from "../components/GroupCard";
@@ -15,7 +15,7 @@ export function GroupInfoPage() {
   const {groupId} = useParams();
   const editLink = useRenderLink(`/group/${groupId}/edit`);
   const group: Group = useFetchOnce(`/api/groupInfo?id=${groupId}`);
-  const members: Member[] = useFetchOnce(`/api/groupMembers?id=${groupId}`);
+  const [members, updateMembers]: [Member[], () => void] = useFetch(`/api/groupMembers?id=${groupId}`);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (group == null || members == null) {
@@ -23,6 +23,11 @@ export function GroupInfoPage() {
   }
 
   const status = members.find(member => member.user.id == authState.user.id)?.status || "NOT_A_MEMBER";
+
+  const joinGroup = async () => {
+    await postData(`/api/groupJoin?id=${groupId}`, new Map());
+    updateMembers();
+  };
 
   return (
       <Box mt={4}>
@@ -37,8 +42,12 @@ export function GroupInfoPage() {
                   </React.Fragment> : null
               }
 
-              {(status == "MEMBER" || status == "ADMINISTRATOR") ?
+              {(status == "REGULAR_MEMBER" || status == "ADMINISTRATOR") ?
                   <Button color="secondary">Leave</Button> : null
+              }
+
+              {(status == "NOT_A_MEMBER") ?
+                  <Button onClick={() => joinGroup()}>Join</Button> : null
               }
             </CardActions>
           </GroupCard>
