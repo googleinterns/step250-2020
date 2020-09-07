@@ -19,9 +19,8 @@ public class ChatRequestServlet extends JsonServlet {
   private RequestStore requestStore = new RequestStore();
 
   @Override
-  public Object post(JsonServletRequest request) throws IOException, HttpError, HttpRedirect {
-
-    UserManager.enforceUserLogin(request);
+  public Object post(JsonServletRequest request) throws IOException, HttpError {
+    PermissionChecker.ensureLoggedIn();
 
     ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
 

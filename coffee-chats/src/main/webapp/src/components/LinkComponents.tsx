@@ -4,8 +4,9 @@ import {ListItem, ListItemText} from "@material-ui/core";
 
 export function useRenderLink(to: string) {
   return React.useMemo(
-      () => React.forwardRef(itemProps => <Link to={to} {...itemProps} />),
-      [to],
+      () => React.forwardRef<HTMLAnchorElement, React.ComponentPropsWithoutRef<"a">>((props, ref) => (
+          <Link to={to} ref={ref} {...props} />)
+      ), [to]
   );
 }
 

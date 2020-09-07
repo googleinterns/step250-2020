@@ -31,7 +31,7 @@ public class GroupCreateServletTest extends TestHelper {
 
       Entity entity = new Entity("group");
       entity.setProperty("name", name);
-      entity.setProperty("description", "");
+      entity.setProperty("description", new Text(""));
       entity.setProperty("ownerId", "test_user");
       expected.add(entity);
     }

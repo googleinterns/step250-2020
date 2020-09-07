@@ -9,6 +9,7 @@ import {useFetchOnce} from "./util/fetch";
 import {AuthState} from "./entity/AuthState";
 import {GroupListPage} from "./pages/GroupListPage";
 import {GroupInfoPage} from "./pages/GroupInfoPage";
+import {GroupEditPage} from "./pages/GroupEditPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
@@ -24,6 +25,10 @@ function App() {
         <Switch>
           <Route path="/groups">
             <GroupListPage/>
+          </Route>
+
+          <Route path="/group/:groupId/edit">
+            <GroupEditPage/>
           </Route>
 
           <Route path="/group/:groupId">
