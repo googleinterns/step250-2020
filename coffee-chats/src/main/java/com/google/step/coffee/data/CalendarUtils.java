@@ -20,14 +20,22 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** Utilities to access Google Calendar API for an authorised user. */
+/**
+ * Utilities to access Google Calendar API for an authorised user.
+ */
 public class CalendarUtils {
   private static final UserStore userStore = new UserStore();
 
   public static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_SETTINGS_READONLY,
       CalendarScopes.CALENDAR_READONLY, CalendarScopes.CALENDAR_EVENTS);
 
-  /** Add given event to user's primary calendar. */
+  /**
+   * Adds given event to user's primary calendar.
+   *
+   * @param userId String of user's id whose calendar to add event into.
+   * @param event Event to add into user's calendar.
+   * @param retry boolean of whether to retry adding event on failure.
+   */
   public static void addEvent(String userId, Event event, boolean retry) {
     Calendar service = getCalendarService(userId);
 
@@ -43,7 +51,13 @@ public class CalendarUtils {
     }
   }
 
-  /** Create an event with video conferencing for given participants at selected time slot. */
+  /**
+   * Creates an event with video conferencing for given participants at selected time slot.
+   *
+   * @param timeSlot TimeSlot of when the event has been scheduled for.
+   * @param participantIds List of user Ids for all users to be invited to the event.
+   * @param commonTags List of tags which are shared by all participants.
+   */
   public static Event createEvent(TimeSlot timeSlot, List<String> participantIds,
       List<String> commonTags) {
     List<EventAttendee> attendees = getAttendees(participantIds);
