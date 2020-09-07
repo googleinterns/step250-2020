@@ -22,7 +22,7 @@ export function GroupInfoPage() {
     return null;
   }
 
-  const status = members.find(member => member.user.id == authState.user.id)?.status || "NOT_A_MEMBER";
+  const status = members.find(member => member.user.id === authState.user.id)?.status || "NOT_A_MEMBER";
 
   const joinGroup = async () => {
     await postData(`/api/groupJoin?id=${groupId}`, new Map());
@@ -40,18 +40,18 @@ export function GroupInfoPage() {
         <Container maxWidth="md">
           <GroupCard group={group} clickable={false}>
             <CardActions>
-              {(status == "ADMINISTRATOR" || status == "OWNER") ?
+              {(status === "ADMINISTRATOR" || status === "OWNER") ?
                   <React.Fragment>
                     <Button component={editLink}>Edit</Button>
                     <Button onClick={() => setDeleteDialogOpen(true)} color="secondary">Delete</Button>
                   </React.Fragment> : null
               }
 
-              {(status == "REGULAR_MEMBER" || status == "ADMINISTRATOR") ?
+              {(status === "REGULAR_MEMBER" || status === "ADMINISTRATOR") ?
                   <Button onClick={() => leaveGroup()} color="secondary">Leave</Button> : null
               }
 
-              {(status == "NOT_A_MEMBER") ?
+              {(status === "NOT_A_MEMBER") ?
                   <Button onClick={() => joinGroup()}>Join</Button> : null
               }
             </CardActions>

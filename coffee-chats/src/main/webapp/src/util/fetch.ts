@@ -25,7 +25,7 @@ function useFetchImpl<T>(url: string, initial: T): [T, () => void, (arg: T) => v
         setData(json);
       }
     })();
-  }, [url, forceUpdate]);
+  }, [url, forceUpdate, initial]);
 
   return [data, () => {
     setForceUpdate(forceUpdate + 1);
