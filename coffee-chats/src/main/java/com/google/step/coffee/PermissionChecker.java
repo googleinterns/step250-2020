@@ -51,6 +51,11 @@ public class PermissionChecker {
       throw new HttpError(HttpServletResponse.SC_FORBIDDEN, "Cannot change the owner's permissions");
     }
 
+    if (curStatus == GroupMembership.Status.ADMINISTRATOR && activeUserStatus != GroupMembership.Status.OWNER) {
+      // Only the owner can kick/demote admins
+      throw new HttpError(HttpServletResponse.SC_FORBIDDEN, "Cannot change the user's permissions");
+    }
+
     if (activeUserStatus == GroupMembership.Status.ADMINISTRATOR && status != GroupMembership.Status.NOT_A_MEMBER) {
       // An administrator can not promote others, only kick users from the group or leave
       throw new HttpError(HttpServletResponse.SC_FORBIDDEN, "Cannot change the user's permissions");
