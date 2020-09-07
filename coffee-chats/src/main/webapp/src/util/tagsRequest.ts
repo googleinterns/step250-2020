@@ -10,4 +10,4 @@ export const fetchTags = () => {
     console.log("Tag fetch failed: " + reason.toString());
     return [];
   })
-}
+};

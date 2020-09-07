@@ -2,7 +2,6 @@ package com.google.step.coffee.servlets;
 
 import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
-import com.google.step.coffee.data.TagStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import java.io.IOException;
@@ -17,18 +16,25 @@ import javax.servlet.http.HttpServletRequest;
 @WebServlet("/api/chat-request")
 public class ChatRequestServlet extends JsonServlet {
 
-  private TagStore tagStore = new TagStore();
   private RequestStore requestStore = new RequestStore();
 
   @Override
   public Object post(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
 
+    ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
+
+    requestStore.addRequest(chatRequest);
+
+    return "Success";
+  }
+
+  private ChatRequest buildChatRequestFromHttpRequest(HttpServletRequest request) throws HttpError {
     List<String> tags = getParameterValues("tags", request);
     List<String> dateStrings = getParameterValues("dates", request);
     int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
     int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
-    int duration = Integer.parseInt(getParameterOrDefault("duration", request, "30"));
+    int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
     boolean matchRandom = Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
     boolean matchRecents = Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
 
@@ -37,22 +43,16 @@ public class ChatRequestServlet extends JsonServlet {
         .map(Date::new)
         .collect(Collectors.toList());
 
-    tagStore.addTags(tags);
-
-    ChatRequest chatRequest = new ChatRequestBuilder()
+    return new ChatRequestBuilder()
         .withTags(tags)
         .onDates(dates)
         .withGroupSize(minPeople, maxPeople)
-        .withMaxChatLength(duration)
+        .withMaxChatLength(durationMins)
         .willMatchRandomlyOnFail(matchRandom)
         .willMatchWithRecents(matchRecents)
+        .forUser(UserManager.getCurrentUserId())
         .build();
-
-    requestStore.addRequest(chatRequest, UserManager.getCurrentUserId());
-
-    return "Success";
   }
-
 
   private String getParameterOrDefault(String name, HttpServletRequest req, String defaultValue) {
     String paramString = req.getParameter(name);

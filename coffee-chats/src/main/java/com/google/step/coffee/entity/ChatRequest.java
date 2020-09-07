@@ -1,21 +1,26 @@
 package com.google.step.coffee.entity;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
 /** Represents a request made by a user for a chat on given topics. */
 public class ChatRequest {
 
+  private long requestId;
   private List<String> tags;
   private List<Date> dates;
   private int minPeople;
   private int maxPeople;
-  private int duration;
+  private Duration duration;
   private boolean matchRandom;
   private boolean matchRecents;
+  private String userId;
 
   public ChatRequest(List<String> tags, List<Date> dates, int minPeople, int maxPeople,
-      int duration, boolean matchRandom, boolean matchRecents) {
+      Duration duration, boolean matchRandom, boolean matchRecents, String userId) {
     this.tags = tags;
     this.dates = dates;
     this.minPeople = minPeople;
@@ -23,6 +28,7 @@ public class ChatRequest {
     this.duration = duration;
     this.matchRandom = matchRandom;
     this.matchRecents = matchRecents;
+    this.userId = userId;
   }
 
   /**
@@ -65,9 +71,9 @@ public class ChatRequest {
   /**
    * Get maximum duration user wishes to chat for in minutes.
    *
-   * @return A positive integer, maximum value of 60.
+   * @return A Duration object representing max chat duration, must be positive.
    */
-  public int getDuration() {
+  public Duration getDuration() {
     return duration;
   }
 
@@ -88,5 +94,17 @@ public class ChatRequest {
    */
   public boolean shouldMatchRecents() {
     return matchRecents;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setRequestId(long requestId) {
+    this.requestId = requestId;
+  }
+
+  public Key getRequestKey() {
+    return KeyFactory.createKey("ChatRequest", requestId);
   }
 }
