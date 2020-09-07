@@ -24,10 +24,10 @@ export function GroupInfoPage() {
 
   const status = members.find(member => member.user.id === authState.user.id)?.status || "NOT_A_MEMBER";
 
-  const setMembershipStatus = async (status: MembershipStatus) => {
+  const setMembershipStatus = async (status: MembershipStatus, user = authState.user) => {
     const data = new Map();
     data.set("id", groupId);
-    data.set("user", authState.user.id);
+    data.set("user", user.id);
     data.set("status", status);
     await postData(`/api/groupMembers`, data);
     updateMembers();
@@ -55,7 +55,11 @@ export function GroupInfoPage() {
               }
             </CardActions>
           </GroupCard>
-          <GroupMembersList members={members} status={status} />
+          <GroupMembersList
+              members={members}
+              status={status}
+              setMembershipStatus={setMembershipStatus}
+          />
         </Container>
       </Box>
   )

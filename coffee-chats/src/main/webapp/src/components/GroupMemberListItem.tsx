@@ -4,10 +4,12 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import {Member, MembershipStatus} from "../entity/Member";
+import {User} from "../entity/User";
 
 interface GroupMemberListItemProps {
   member: Member;
   status: MembershipStatus;
+  setMembershipStatus: (status: MembershipStatus, user: User) => Promise<void>;
 }
 
 function convertMembershipStatus(status: MembershipStatus): string {
@@ -23,9 +25,14 @@ function convertMembershipStatus(status: MembershipStatus): string {
   }
 }
 
-export function GroupMemberListItem({member, status}: GroupMemberListItemProps) {
+export function GroupMemberListItem({member, status, setMembershipStatus}: GroupMemberListItemProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const menuButtonRef = React.useRef(null);
+
+  const setMembership = (status: MembershipStatus) => {
+    setMenuOpen(false);
+    return setMembershipStatus(status, member.user);
+  };
 
   return (
       <ListItem>
@@ -49,10 +56,10 @@ export function GroupMemberListItem({member, status}: GroupMemberListItemProps) 
               >
                 {(status === "OWNER") ?
                     (member.status !== "ADMINISTRATOR") ?
-                        <MenuItem>Promote to admin</MenuItem> :
-                        <MenuItem>Demote to regular user</MenuItem> : null}
+                        <MenuItem onClick={() => setMembership("ADMINISTRATOR")}>Promote to admin</MenuItem> :
+                        <MenuItem onClick={() => setMembership("REGULAR_MEMBER")}>Demote to regular member</MenuItem> : null}
 
-                <MenuItem>Remove from group</MenuItem>
+                <MenuItem onClick={() => setMembership("NOT_A_MEMBER")}>Remove from group</MenuItem>
               </Menu>
             </ListItemSecondaryAction> : null}
       </ListItem>
