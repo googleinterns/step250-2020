@@ -3,14 +3,17 @@ import "./FindChatCard.css";
 import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
   Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
-  Snackbar, Box, Chip} from "@material-ui/core";
+  Snackbar, Box, Chip, List, IconButton} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import {addWeeks, startOfWeek, addDays} from "date-fns";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {green} from "@material-ui/core/colors";
 import {submitChatRequest, submitCalAuthRequest} from "../util/chatRequest";
+import {DatetimeRangeListItem} from "./DatetimeRangeListItem";
+import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -75,6 +78,46 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
   const [durationMins, setDurationMins] = useState(30);
   const [matchRandom, setMatchRandom] = useState(false);
   const [matchRecents, setMatchRecents] = useState(true);
+
+  const [startDates, setStartDates] = useState<MaterialUiPickersDate[]>([null]);
+  const [endDates, setEndDates] = useState<MaterialUiPickersDate[]>([null]);
+  const [numRanges, setNumRanges] = useState(1);
+  
+  const setStartDate = (i: number) => {
+    return (start: MaterialUiPickersDate) => {
+      let newStarts = [...startDates];
+      newStarts[i] = start;
+      setStartDates(newStarts);
+    }
+  };
+
+  const setEndDate = (i: number) => {
+    return (end: MaterialUiPickersDate) => {
+      let newEnds = [...endDates];
+      newEnds[i] = end;
+      setEndDates(newEnds);
+    }
+  };
+
+  const addDateRange = () => {
+    setStartDates([...startDates, null]);
+    setEndDates([...endDates, null]);
+    setNumRanges(numRanges + 1);
+  }
+
+  const removeDateRange = (i: number) => {
+    return () => {
+      let newStarts = [...startDates];
+      newStarts.splice(i, 1);
+  
+      let newEnds = [...endDates];
+      newEnds.splice(i, 1);
+  
+      setStartDates(newStarts);
+      setEndDates(newEnds);
+      setNumRanges(numRanges - 1);
+    }
+  }
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -142,6 +185,27 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
             <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip} key={tag}/>  
           )}
         </Box>
+
+        <Grid container alignItems="center">
+          <Grid item xs={12} md={4}>
+            <Typography>
+              Select when to chat (note your calendar will be taken to account to ensure availability):
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <List dense>
+              {Array.from(Array(numRanges).keys()).map((num) => (
+                <DatetimeRangeListItem
+                  selectedDates={{dateStart: startDates[num], dateEnd: endDates[num]}}
+                  setSelectedDateStart={setStartDate(num)}
+                  setSelectedDateEnd={setEndDate(num)}
+                  btnAction={(num === numRanges - 1) ? addDateRange : removeDateRange(num)}
+                  isLast={num === numRanges - 1}
+                />
+              ))}
+            </List>
+          </Grid>
+        </Grid>
       </CardContent>
 
       <CardActions className={classes.actions}>
@@ -174,9 +238,11 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
           <Grid container justify="space-around" alignItems="center" spacing={4}>
             <Grid item md={6}>
                 <Typography>
-                  Select available dates:
+                  Select available date ranges:
                 </Typography>
                 <MultiDatePicker dates={dates} setDates={setDates}/>
+
+                
             </Grid>
 
             <Grid item md={6}>
