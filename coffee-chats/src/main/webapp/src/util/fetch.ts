@@ -16,8 +16,11 @@ function useFetchImpl<T>(url: string, initial: T): [T, () => void, (arg: T) => v
         return;
       }
 
-      if (!response.ok && json.loginUrl) {
-        window.location.href = json.loginUrl;
+      if (!response.ok) {
+        setData(initial);
+        if (json.loginUrl) {
+          window.location.href = json.loginUrl;
+        }
       } else {
         setData(json);
       }

@@ -2,13 +2,15 @@ import React from "react";
 
 import {AppBar, Grid, Icon, IconButton, List, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
 import {ListItemLink} from "./LinkComponents";
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 
 interface NavBarButtonsProps {
   onDrawerOpen: () => void;
-  logoutUrl: string;
 }
 
-function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
+function NavBarButtons({onDrawerOpen}: NavBarButtonsProps) {
+  const authState: AuthState = React.useContext(AuthStateContext);
+
   return (
       <Grid justify="space-between" container>
         <Grid item>
@@ -31,7 +33,7 @@ function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
 
             <Grid item>
               <Tooltip title="Log out">
-                <IconButton edge="end" aria-label="Log out" href={logoutUrl}>
+                <IconButton edge="end" aria-label="Log out" href={authState.logoutUrl}>
                   <Icon>exit_to_app</Icon>
                 </IconButton>
               </Tooltip>
@@ -53,18 +55,14 @@ function DrawerButtons() {
   );
 }
 
-interface NavBarProps {
-  logoutUrl: string;
-}
-
-export function NavBar({logoutUrl}: NavBarProps) {
+export function NavBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
       <React.Fragment>
         <AppBar position="static" style={{ background: "transparent", boxShadow: "none"}}>
           <Toolbar>
-            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} logoutUrl={logoutUrl} />
+            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} />
           </Toolbar>
         </AppBar>
         <SwipeableDrawer
