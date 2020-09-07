@@ -76,6 +76,16 @@ public class PermissionCheckerTest extends TestHelper {
   }
 
   @Test
+  public void testAdminCanLeaveGroup() {
+    assert doGroupTest(ADMINISTRATOR, NOT_A_MEMBER);
+  }
+
+  @Test
+  public void testOwnerCannotLeaveGroup() {
+    assert !doGroupTest(OWNER, NOT_A_MEMBER);
+  }
+
+  @Test
   public void testCannotJoinGroupAsAdmin() {
     assert !doGroupTest(NOT_A_MEMBER, ADMINISTRATOR);
     assert !doGroupTest(NOT_A_MEMBER, OWNER);
@@ -85,6 +95,7 @@ public class PermissionCheckerTest extends TestHelper {
   public void testCannotPromoteThemselves() {
     assert !doGroupTest(REGULAR_MEMBER, ADMINISTRATOR);
     assert !doGroupTest(REGULAR_MEMBER, OWNER);
+    assert !doGroupTest(ADMINISTRATOR, OWNER);
   }
 
   @Test
