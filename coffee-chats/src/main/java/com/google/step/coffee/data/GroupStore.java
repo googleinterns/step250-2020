@@ -50,6 +50,7 @@ public class GroupStore {
     entity.setProperty("name", group.name());
     entity.setProperty("description", new Text(group.description()));
     entity.setProperty("ownerId", group.ownerId());
+    entity.setProperty("tags", group.tags());
 
     datastore.put(entity);
 

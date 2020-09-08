@@ -38,6 +38,7 @@ public class GroupListServletTest extends TestHelper {
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", new Text("bar"));
     groupEntity.setProperty("ownerId", "test_user");
+    groupEntity.setProperty("tags", new ArrayList<>());
     datastore.put(groupEntity);
 
     Entity membershipEntity = new Entity("groupMembership");
@@ -64,6 +65,7 @@ public class GroupListServletTest extends TestHelper {
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", new Text("bar"));
     groupEntity.setProperty("ownerId", "not_a_test_user");
+    groupEntity.setProperty("tags", new ArrayList<>());
     datastore.put(groupEntity);
 
     assertThat(getGroupList(), equalTo(new ArrayList<>()));

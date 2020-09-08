@@ -24,6 +24,7 @@ export function TagsInput({label, tags, setTags}: TagsInputProps) {
   return (
       <Autocomplete
           multiple
+          value={tags}
           options={tagOptions}
           freeSolo
           autoHighlight
