@@ -115,6 +115,18 @@ public class GroupStore {
     return groups;
   }
 
+  public List<Group> getAllGroups() {
+    List<Group> groups = new ArrayList<>();
+
+    Query query = new Query("group");
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      groups.add(Group.fromEntity(entity));
+    }
+
+    return groups;
+  }
+
   private Entity getMembershipEntity(Group group, User user) {
     Query query = new Query("groupMembership")
         .setFilter(Query.CompositeFilterOperator.and(

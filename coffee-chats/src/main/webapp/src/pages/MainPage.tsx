@@ -9,6 +9,7 @@ import {GroupCard} from "../components/GroupCard";
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
   const groups: Group[] = useFetchOnce(`/api/groupSearch?tags=${JSON.stringify(tags)}`) || [];
+  const allGroups: Group[] = useFetchOnce(`/api/groupList?all=true`) || [];
 
   return (
       <Box mt={4}>
@@ -23,6 +24,7 @@ export function MainPage() {
                   tags={tags}
                   setTags={setTags}
                   label="What do you want to chat about?"
+                  suggestGroups={allGroups}
               />
             </Grid>
 
