@@ -4,6 +4,7 @@ import com.google.step.coffee.*;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
+import com.google.step.coffee.entity.DateRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,8 @@ public class ChatRequestServlet extends JsonServlet {
 
   private ChatRequest buildChatRequestFromHttpRequest(HttpServletRequest request) throws HttpError {
     List<String> tags = getParameterValues("tags", request);
-    List<String> dateStrings = getParameterValues("dates", request);
+    List<String> startDateStrings = getParameterValues("startDates", request);
+    List<String> endDateStrings = getParameterValues("endDates", request);
     int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
     int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
     int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
@@ -47,14 +49,23 @@ public class ChatRequestServlet extends JsonServlet {
     boolean matchRecents =
         Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
 
-    List<Date> dates = dateStrings.stream()
+    List<Date> startDates = startDateStrings.stream()
         .map(Long::parseLong)
         .map(Date::new)
         .collect(Collectors.toList());
 
+    List<Date> endDates = endDateStrings.stream()
+        .map(Long::parseLong)
+        .map(Date::new)
+        .collect(Collectors.toList());
+
+    if (startDates.size() != endDates.size()) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Mismatched date ranges");
+    }
+
     return new ChatRequestBuilder()
         .withTags(tags)
-        .onDates(dates)
+        .onDates(startDates, endDates)
         .withGroupSize(minPeople, maxPeople)
         .withMaxChatLength(durationMins)
         .willMatchRandomlyOnFail(matchRandom)

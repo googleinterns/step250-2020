@@ -3,17 +3,16 @@ import { ListItem, ListItemSecondaryAction, IconButton, Grid } from '@material-u
 import { DateTimePicker } from '@material-ui/pickers';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
 
 interface DatetimeRangeListItemProps {
   selectedDates: {dateStart: MaterialUiPickersDate, dateEnd: MaterialUiPickersDate},
   setSelectedDateStart: (date: MaterialUiPickersDate) => void,
   setSelectedDateEnd: (date: MaterialUiPickersDate) => void,
   btnAction: () => void,
-  isLast: boolean
+  onlyRange: boolean
 }
 
-export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({selectedDates, setSelectedDateStart, setSelectedDateEnd, btnAction, isLast}) => {
+export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({selectedDates, setSelectedDateStart, setSelectedDateEnd, btnAction, onlyRange}) => {
   const {dateStart, dateEnd} = selectedDates;
 
   return (
@@ -21,8 +20,8 @@ export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({sel
       <Grid container spacing={1}>
         <Grid item xs={12} sm={6}>
           <DateTimePicker
-            autoOk
             clearable
+            ampm={false}
             variant="dialog"
             inputVariant="outlined"
             label="Start"
@@ -36,8 +35,8 @@ export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({sel
 
         <Grid item xs={12} sm={6}>
           <DateTimePicker
-            autoOk
             clearable
+            ampm={false}
             variant="dialog"
             inputVariant="outlined"
             label="End"
@@ -50,14 +49,13 @@ export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({sel
         </Grid>
       </Grid>
 
-      <ListItemSecondaryAction>
-        <IconButton edge="end" aria-label="delete" onClick={btnAction}>
-          {isLast ?
-            <AddIcon /> :
+      {!onlyRange &&
+        <ListItemSecondaryAction>
+          <IconButton edge="end" aria-label="delete" onClick={btnAction}>
             <DeleteIcon />
-          }
-        </IconButton>
-      </ListItemSecondaryAction>
+          </IconButton>
+        </ListItemSecondaryAction>
+      }
     </ListItem>
   )
 };

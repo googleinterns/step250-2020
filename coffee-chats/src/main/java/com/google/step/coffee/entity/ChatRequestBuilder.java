@@ -11,7 +11,7 @@ public class ChatRequestBuilder {
   private static final int MAX_PARTICIPANTS = 5;
 
   private List<String> tags = new ArrayList<>();
-  private List<Date> dates = new ArrayList<>();
+  private List<DateRange> dateRanges = new ArrayList<>();
   private int minPeople = 1;
   private int maxPeople = 4;
   private Duration duration = Duration.ofMinutes(30);
@@ -26,11 +26,12 @@ public class ChatRequestBuilder {
    * @return ChatRequest object with the given internal state set of builder object.
    */
   public ChatRequest build() throws InvalidEntityException {
-    if (dates.isEmpty()) {
-      throw new InvalidEntityException("At least one date must be set");
+    if (dateRanges.isEmpty()) {
+      throw new InvalidEntityException("At least one date range must be set");
     }
 
-    return new ChatRequest(tags, dates, minPeople, maxPeople, duration, matchRandom, matchRecents, userId);
+    return new ChatRequest(tags, dateRanges, minPeople, maxPeople, duration, matchRandom,
+        matchRecents, userId);
   }
 
   /**
@@ -47,15 +48,32 @@ public class ChatRequestBuilder {
   /**
    * Set dates to consider in scheduling of user's request.
    *
-   * @param dates List of Date objects for each day given in user's request.
+   * @param dateRanges List of DateRanges (start, end) for each date range given in user's request.
    * @return ChatRequestBuilder object with internal state set to given dates.
    */
-  public ChatRequestBuilder onDates(List<Date> dates) throws InvalidEntityException {
-    if (!dates.isEmpty()) {
-      this.dates = dates;
+  public ChatRequestBuilder onDates(List<DateRange> dateRanges) throws InvalidEntityException {
+    if (!dateRanges.isEmpty()) {
+      this.dateRanges = dateRanges;
       return this;
     } else {
-      throw new InvalidEntityException("No dates selected");
+      throw new InvalidEntityException("No date ranges selected");
+    }
+  }
+
+  /**
+   * Set dates to consider in scheduling of user's request.
+   *
+   * @param startDates List of starting Date objects for each of user's selected date ranges.
+   * @param endDates List of ending Date objects for each of user's selected date ranges.
+   * @return ChatRequestBuilder object with internal state set to given dates.
+   */
+  public ChatRequestBuilder onDates(List<Date> startDates, List<Date> endDates) throws InvalidEntityException {
+    if (!startDates.isEmpty() && !endDates.isEmpty()) {
+      this.dateRanges = DateRange.combineLists(startDates, endDates);
+
+      return this;
+    } else {
+      throw new InvalidEntityException("No date ranges selected");
     }
   }
 

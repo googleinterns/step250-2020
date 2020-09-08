@@ -1,4 +1,5 @@
 import {CalAuthState} from "../entity/AuthState";
+import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const calAuthURL = 'api/auth/calendar';
 const chatRequestURL = '/api/chat-request';
@@ -25,19 +26,22 @@ export const submitCalAuthRequest = async () => {
  * indicate whether the chat request has been fulfilled yet).
  * 
  * @param interests - Array of user inputted tags they prefer to speak about.
- * @param dates - Array of dates user wants to speak on.
+ * @param startDates - Array of starting datetimes user wants to speak on.
+ * @param endDates - Array of ending datetimes user wants to speak on.
  * @param numPeopleRange - Array of two numbers with the range of number of participants.
  * @param durationMins - Duration of the requested chat in minutes.
  * @param matchRandom - Boolean to still match if no interest matches are found.
  * @param matchRecents - Boolean to still match with people spoken to recently.
  */
-export const submitChatRequest = async (interests: string[], dates: Date[],
-    numPeopleRange: number[], durationMins: number, matchRandom: boolean, 
+export const submitChatRequest = async (interests: string[],
+    startDates: MaterialUiPickersDate[], endDates: MaterialUiPickersDate[],
+    numPeopleRange: number[], durationMins: number, matchRandom: boolean,
     matchRecents: boolean) => {
   const data = new URLSearchParams();
   
   data.append('tags', interests.toString());
-  data.append('dates', dates.map(d => +d).toString());
+  data.append('startDates', startDates.map(d => d!).map(d => +d).toString());
+  data.append('endDates', endDates.map(d => d!).map(d => +d).toString());
   data.append('minPeople', numPeopleRange[0].toString());
   data.append('maxPeople', numPeopleRange[1].toString());
   data.append('durationMins', durationMins.toString());

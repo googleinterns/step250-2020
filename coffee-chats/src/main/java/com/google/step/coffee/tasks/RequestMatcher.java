@@ -4,6 +4,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
+import com.google.step.coffee.entity.DateRange;
 import com.google.step.coffee.entity.TimeSlot;
 import java.io.IOException;
 import java.time.Duration;
@@ -11,7 +12,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -76,13 +76,13 @@ public class RequestMatcher extends HttpServlet {
 
   /** Given matched requests, find availability for both users on the selected dates. */
   private TimeSlot findSharedTimeSlot(ChatRequest req1, ChatRequest req2) {
-    List<Date> commonDays = new ArrayList<>(req1.getDates());
-    commonDays.retainAll(req2.getDates());
+    List<DateRange> commonDays = new ArrayList<>(req1.getDateRanges());
+    commonDays.retainAll(req2.getDateRanges());
 
-    for (Date day : commonDays) {
+    for (DateRange day : commonDays) {
       // Use calendar API and fetch availability
       // Currently use placeholder value of midday UTC
-      ZonedDateTime midDay = day.toInstant()
+      ZonedDateTime midDay = day.getStart().toInstant()
           .atZone(ZoneId.systemDefault())
           .withHour(12);
       Duration duration = req1.getDuration().compareTo(req2.getDuration()) < 0 ?

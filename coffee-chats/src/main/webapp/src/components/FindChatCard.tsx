@@ -3,7 +3,7 @@ import "./FindChatCard.css";
 import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
   Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
-  Snackbar, Box, Chip, List, IconButton} from "@material-ui/core";
+  Snackbar, Box, Chip, List} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
@@ -69,12 +69,10 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
   
   const classes = useStyles();
 
-  const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
   const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}));
 
   const [expanded, setExpanded] = useState(false);
-  const [dates, setDates] = useState(Array.from(Array(5).keys()).map((i: number) => addDays(startOfNextWeek, i)));
-  const [numPeopleRange, setNumPeopleRange] = useState([1, 1]);
+  const [numPeopleRange, setNumPeopleRange] = useState([1, 4]);
   const [durationMins, setDurationMins] = useState(30);
   const [matchRandom, setMatchRandom] = useState(false);
   const [matchRecents, setMatchRecents] = useState(true);
@@ -124,14 +122,16 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
   const [invalidDates, setInvalidDates] = useState(false);
 
   const validParamters = () => {
-    if (dates.length === 0) {
-      setInvalidDates(true);
-      return false;
-    } else {
-      return numPeopleRange[0] <= numPeopleRange[1] &&
-      numPeopleRange[0] >= MIN_PARTICIPANTS &&
-      numPeopleRange[1] <= MAX_PARTICIPANTS;
+    for (let i = 0; i < numRanges; i++) {
+      if ((startDates[i] === null) || (endDates[i] === null)) {
+        setInvalidDates(true);
+        return false;
+      }
     }
+
+    return numPeopleRange[0] <= numPeopleRange[1] &&
+        numPeopleRange[0] >= MIN_PARTICIPANTS &&
+        numPeopleRange[1] <= MAX_PARTICIPANTS;
   };
 
   const handleExpandClick = () => {
@@ -163,8 +163,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
       setLoading(true);
 
       setExpanded(false);
-      setSuccess(await submitChatRequest(interests, dates, numPeopleRange,
-        durationMins, matchRandom, matchRecents));
+      setSuccess(await submitChatRequest(interests, startDates, endDates,
+        numPeopleRange, durationMins, matchRandom, matchRecents));
       setLoading(false);
 
       setTimeout(() => {
@@ -177,16 +177,19 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
     <Card>
       <CardHeader title="Find a chat" />
       <CardContent>
-        <Typography>
-          Find someone to chat to about {(interests.length > 0) ? ':' : 'anything.'}
-        </Typography>
-        <Box mt={1}>
-          {interests.map((tag) => 
-            <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip} key={tag}/>  
-          )}
-        </Box>
 
         <Grid container alignItems="center">
+          <Grid item xs={12} md={4}>
+            <Typography>
+              Find someone to chat to about {(interests.length > 0) ? ':' : 'anything.'}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            {interests.map((tag) => 
+              <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip} key={tag}/>  
+            )}
+          </Grid>
+          
           <Grid item xs={12} md={4}>
             <Typography>
               Select when to chat (note your calendar will be taken to account to ensure availability):
@@ -199,11 +202,19 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
                   selectedDates={{dateStart: startDates[num], dateEnd: endDates[num]}}
                   setSelectedDateStart={setStartDate(num)}
                   setSelectedDateEnd={setEndDate(num)}
-                  btnAction={(num === numRanges - 1) ? addDateRange : removeDateRange(num)}
-                  isLast={num === numRanges - 1}
+                  btnAction={removeDateRange(num)}
+                  onlyRange={numRanges === 1}
+                  key={num}
                 />
               ))}
             </List>
+            <Button
+              variant="text"
+              onClick={addDateRange}
+            >
+              Add Range
+              <AddIcon />
+            </Button>
           </Grid>
         </Grid>
       </CardContent>
@@ -236,15 +247,6 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
         <CardContent className="more-options-content">
 
           <Grid container justify="space-around" alignItems="center" spacing={4}>
-            <Grid item md={6}>
-                <Typography>
-                  Select available date ranges:
-                </Typography>
-                <MultiDatePicker dates={dates} setDates={setDates}/>
-
-                
-            </Grid>
-
             <Grid item md={6}>
               <Grid container direction="column" spacing={4}>
                 
@@ -321,7 +323,13 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
 
       <Snackbar open={invalidDates} autoHideDuration={3000} onClose={() => setInvalidDates(false)}>
         <MuiAlert elevation={6} variant="filled" onClose={() => setInvalidDates(false)} severity="error">
-          Please select at least one date.
+          Please enter a start and end date/time for each range.
+        </MuiAlert>
+      </Snackbar>
+
+      <Snackbar open={success} autoHideDuration={3000}>
+        <MuiAlert elevation={6} variant="filled" severity="success">
+          Request created!
         </MuiAlert>
       </Snackbar>
     </Card>

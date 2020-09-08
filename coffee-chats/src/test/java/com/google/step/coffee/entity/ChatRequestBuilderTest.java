@@ -20,7 +20,7 @@ public class ChatRequestBuilderTest {
 
       Assert.fail("Request built with no dates being set");
     } catch (HttpError e) {
-      assertThat(e.getMessage(), is("At least one date must be set"));
+      assertThat(e.getMessage(), is("At least one date range must be set"));
     }
   }
 
@@ -31,7 +31,7 @@ public class ChatRequestBuilderTest {
 
       Assert.fail("Request built with invalid dates");
     } catch (HttpError e) {
-      assertThat(e.getMessage(), is("No dates selected"));
+      assertThat(e.getMessage(), is("No date ranges selected"));
     }
   }
 
