@@ -19,33 +19,21 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
 import org.junit.Test;
 
 public class CalendarUtilsTest extends TestHelper {
 
-  private final TimeSlot timeslot = new TimeSlot(ZonedDateTime.now(), Duration.ofMinutes(30));
-  private final List<String> participantIds = new ArrayList<>();
-  private final List<String> commonTags = new ArrayList<>();
   private final String testUser1Id = "1111";
   private final String testUser2Id = "2222";
   private final String testUser3Id = "3333";
 
-  @Before
-  public void setParticipantIds() {
-    participantIds.add(testUser1Id);
-    participantIds.add(testUser2Id);
-    participantIds.add(testUser3Id);
-  }
-
-  @Before
-  public void setCommonTags() {
-    commonTags.add("Football");
-    commonTags.add("Photography");
-  }
-
   @Test
   public void eventDescriptionContainsCommonTags() {
+    final TimeSlot timeslot = new TimeSlot(ZonedDateTime.now(), Duration.ofMinutes(30));
+    final List<String> participantIds = new ArrayList<>();
+    final List<String> commonTags = new ArrayList<>();
+
+    setUpEventInfo(participantIds, commonTags);
     addTestUsersInfo();
 
     Event event = CalendarUtils.createEvent(timeslot, participantIds, commonTags);
@@ -92,6 +80,15 @@ public class CalendarUtilsTest extends TestHelper {
 
     verify(events, times(2)).insert("primary", event);
     verify(insertReturn, times(1)).execute();
+  }
+
+  private void setUpEventInfo(List<String> participantIds, List<String> commonTags) {
+    participantIds.add(testUser1Id);
+    participantIds.add(testUser2Id);
+    participantIds.add(testUser3Id);
+
+    commonTags.add("Football");
+    commonTags.add("Photography");
   }
 
   private void addTestUsersInfo() {
