@@ -1,27 +1,14 @@
-import React, {useState, ChangeEvent, useEffect} from "react";
-import {Box, Container, Grid, Icon, IconButton, TextField, Tooltip, Typography,
-  Tabs, Tab, Chip} from "@material-ui/core";
-import {Autocomplete, createFilterOptions} from '@material-ui/lab'
+import React, {useState, ChangeEvent} from "react";
+import {Box, Container, Grid, Icon, IconButton, Tooltip, Typography, Tabs, Tab} from "@material-ui/core";
 import {ConnectBackCard} from "../components/ConnectBackCard";
 import {FindChatCard} from "../components/FindChatCard";
-import {capitaliseEachWord} from "../util/stringUtils";
-import {fetchTags} from "../util/tagsRequest";
+import {TagsInput} from "../components/TagsInput";
 
 export function MainPage() {
   const CHATS_VIEW = 0;
-  
-  const filter = createFilterOptions<string>();
-  const [tagOptions, setTagOptions] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
 
   const [currView, setCurrView] = useState(CHATS_VIEW);
-
-  useEffect(() => {
-    const initFetchTags = (async () => {
-      setTagOptions(await fetchTags());
-    });
-    initFetchTags();
-  }, []);
+  const [tags, setTags] = useState<string[]>([]);
 
   return (
       <Box mt={4}>
@@ -46,41 +33,13 @@ export function MainPage() {
 
           <Grid container alignItems="center" justify="space-around" spacing={1}>
             <Grid item xs={10} sm={11}>
-              <Autocomplete 
-                multiple
-                options={tagOptions}
-                freeSolo
-                autoHighlight
-                onChange={(_event: any, newValue: string[]) => {
-                  setTags(newValue);
-                }}
-                renderTags={(value: string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField 
-                    {...params}
-                    variant="outlined"
-                    label={currView === CHATS_VIEW ?
-                      'What do you want to chat about?' :
-                      'What are you interested in?'
-                    }
-                  />
-                )}
-                filterOptions={(options, params) => {
-                  const filtered = filter(options, params);
-                  const currInput = capitaliseEachWord(params.inputValue);
-          
-                  // Suggest the creation of a new tag
-                  if (params.inputValue !== '' && !options.includes(currInput)) {
-                    filtered.push(currInput);
-                  }
-
-                  return filtered;
-                }}
-              />
+              <TagsInput
+                  tags={tags}
+                  setTags={setTags}
+                  label={currView === CHATS_VIEW ?
+                  'What do you want to chat about?' :
+                  'What are you interested in?'
+              } />
             </Grid>
 
             <Grid item xs={2} sm={1}>
