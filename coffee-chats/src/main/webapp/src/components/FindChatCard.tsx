@@ -3,13 +3,11 @@ import "./FindChatCard.css";
 import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
   createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
   Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
-  Snackbar, Box, Chip, List} from "@material-ui/core";
+  Snackbar, Chip, List} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
-import {addWeeks, startOfWeek, addDays} from "date-fns";
-import {MultiDatePicker} from "./MultiDatePicker";
 import {green} from "@material-ui/core/colors";
 import {submitChatRequest, submitCalAuthRequest} from "../util/chatRequest";
 import {DatetimeRangeListItem} from "./DatetimeRangeListItem";
@@ -55,7 +53,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const MONDAY = 1;
 const MIN_PARTICIPANTS = 1;
 const MAX_PARTICIPANTS = 4;
 

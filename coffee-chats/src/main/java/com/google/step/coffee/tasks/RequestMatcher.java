@@ -8,12 +8,9 @@ import com.google.step.coffee.entity.DateRange;
 import com.google.step.coffee.entity.TimeSlot;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -94,23 +91,5 @@ public class RequestMatcher extends HttpServlet {
      } else {
        return new TimeSlot(rangeOptions.get(0).getStart(), minDuration);
      }
-
-//    List<DateRange> commonDays = new ArrayList<>(req1.getDateRanges());
-//    commonDays.retainAll(req2.getDateRanges());
-//
-//    for (DateRange day : commonDays) {
-//      // Use calendar API and fetch availability
-//      // Currently use placeholder value of midday UTC
-//      ZonedDateTime midDay = day.getStart().toInstant()
-//          .atZone(ZoneId.systemDefault())
-//          .withHour(12);
-//      Duration duration = req1.getDuration().compareTo(req2.getDuration()) < 0 ?
-//          req1.getDuration() :
-//          req2.getDuration();
-//
-//      return new TimeSlot(midDay, duration);
-//    }
-//
-//    return null;
   }
 }
