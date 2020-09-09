@@ -3,7 +3,6 @@ package com.google.step.coffee;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.step.coffee.entity.User;
-import javax.servlet.http.HttpServletRequest;
 
 public class UserManager {
   private static UserService getUserService() {
@@ -54,6 +53,11 @@ public class UserManager {
     }
 
     return User.builder().setId(userId).build();
+  }
+
+  /** Returns an AppEngine User object for the current user. */
+  public static com.google.appengine.api.users.User getCurrentGAEUser() {
+    return getUserService().getCurrentUser();
   }
 
   /**

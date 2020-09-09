@@ -14,8 +14,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/** Abstraction to access chat requests from DataStore instance. */
+/**
+ * Abstraction to access chat requests from DataStore instance.
+ */
 public class RequestStore {
+
   private DatastoreService datastore;
   private TagStore tagStore;
 
@@ -25,6 +28,9 @@ public class RequestStore {
     this.tagStore = new TagStore();
   }
 
+  /**
+   * Adds ChatRequest object into datastore, adding any new tags into datastore too.
+   */
   public void addRequest(ChatRequest request) {
     Entity reqEntity = new Entity("ChatRequest");
     reqEntity.setProperty("tags", request.getTags());
@@ -40,6 +46,11 @@ public class RequestStore {
     tagStore.addTags(request.getTags());
   }
 
+  /**
+   * Retrieves unmatched ChatRequest objects stored within datastore.
+   *
+   * @return List of ChatRequest objects that have not been matched.
+   */
   public List<ChatRequest> getUnmatchedRequests() {
     Query query = new Query("ChatRequest");
     PreparedQuery results = datastore.prepare(query);
@@ -61,6 +72,36 @@ public class RequestStore {
     return unmatchedRequests;
   }
 
+  /**
+   * Removes unmatched chat requests for the given keys.
+   *
+   * @param requestKeys keys of ChatRequest entities to remove.
+   */
+  public void removeRequests(Key... requestKeys) {
+    datastore.delete(requestKeys);
+  }
+
+  /**
+   * Creates new MatchedRequest entity within datastore.
+   *
+   * @param resolvedRequest ChatRequest object of user's original request.
+   * @param slot TimeSlot in which the request's event has been scheduled to.
+   * @param participantIds List of user Ids of all users to be invited to this event.
+   * @param commonTags List of tags that all participants matched on.
+   */
+  public void addMatchedRequest(ChatRequest resolvedRequest, TimeSlot slot,
+      List<String> participantIds, List<String> commonTags) {
+    Entity entity = new Entity("MatchedRequest");
+    entity.setProperty("userId", resolvedRequest.getUserId());
+    entity.setProperty("tags", resolvedRequest.getTags());
+    entity.setProperty("datetime", Date.from(slot.getZonedDatetimeStart().toInstant()));
+    entity.setProperty("duration", slot.getDuration().toMinutes());
+    entity.setProperty("participants", participantIds);
+    entity.setProperty("commonTags", commonTags);
+
+    datastore.put(entity);
+  }
+
   private ChatRequest getRequestFromEntity(Entity entity) throws InvalidEntityException {
     ChatRequest request = new ChatRequestBuilder()
         .withTags((List<String>) entity.getProperty("tags"))
@@ -76,22 +117,5 @@ public class RequestStore {
     request.setRequestId(entity.getKey().getId());
 
     return request;
-  }
-
-  public void removeRequests(Key ...requestKeys) {
-    datastore.delete(requestKeys);
-  }
-
-  public void addMatchedRequest(ChatRequest resolvedRequest, TimeSlot slot,
-      List<String> participantIds, List<String> commonTags) {
-    Entity entity = new Entity("MatchedRequest");
-    entity.setProperty("userId", resolvedRequest.getUserId());
-    entity.setProperty("tags", resolvedRequest.getTags());
-    entity.setProperty("datetime", Date.from(slot.getDatetimeStart().toInstant()));
-    entity.setProperty("durationMins", slot.getDuration().toMinutes());
-    entity.setProperty("participants", participantIds);
-    entity.setProperty("commonTags", commonTags);
-
-    datastore.put(entity);
   }
 }

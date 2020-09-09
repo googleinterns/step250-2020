@@ -5,11 +5,14 @@ import {TagsInput} from "../components/TagsInput";
 import {Group} from "../entity/Group";
 import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
 import {GroupCard} from "../components/GroupCard";
+import {CalAuthDialog} from "../components/CalAuthDialog";
 
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
+  const [authLink, setAuthLink] = useState("");
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const groups = useFetch<Group[]>("/api/groupList?all=true");
-
+  
   if (hasFetchFailed(groups)) {
     return getFetchErrorPage(groups);
   }
@@ -19,6 +22,10 @@ export function MainPage() {
   const suggestGroups = groups.value.filter(group =>
       group.tags.filter(tag => tagsSet.has(tag)).length > 0
   );
+
+  const submitAuthRequest = () => {
+    window.location.href = authLink;
+  };
 
   return (
       <Box mt={4}>
@@ -50,7 +57,11 @@ export function MainPage() {
           <Box mt={2}>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <FindChatCard interests={tags}/>
+                <FindChatCard
+                  interests={tags}
+                  setAuthLink={setAuthLink}
+                  setAuthDialogOpen={setAuthDialogOpen}
+                />
               </Grid>
               {suggestGroups.map(group =>
                   <Grid item md={4} key={group.id}>
@@ -59,7 +70,13 @@ export function MainPage() {
               )}
             </Grid>
           </Box>
+
+          <CalAuthDialog
+            submitAuthRequest={submitAuthRequest}
+            open={authDialogOpen}
+            setOpen={setAuthDialogOpen}
+          />
         </Container>
       </Box>
   );
-}
+};

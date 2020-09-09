@@ -1,5 +1,7 @@
 package com.google.step.coffee.tasks;
 
+import com.google.api.services.calendar.model.Event;
+import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.TimeSlot;
@@ -49,30 +51,37 @@ public class RequestMatcher extends HttpServlet {
       TimeSlot meetingSlot = findSharedTimeSlot(req1, req2);
 
       if (meetingSlot != null) {
-        requestStore.removeRequests(req1.getRequestKey(), req2.getRequestKey());
-
         List<String> commonTags = new ArrayList<>(req1.getTags());
         commonTags.retainAll(req2.getTags());
 
         List<String> participantIds = new ArrayList<>();
         Collections.addAll(participantIds, req1.getUserId(), req2.getUserId());
 
-        requestStore.addMatchedRequest(req1, meetingSlot, participantIds, commonTags);
-        requestStore.addMatchedRequest(req2, meetingSlot, participantIds, commonTags);
+        createMatchingRequests(requestStore, participantIds, meetingSlot, commonTags, req1, req2);
+
+        requestStore.removeRequests(req1.getRequestKey(), req2.getRequestKey());
       }
     }
   }
 
-  /**
-   * Given matched requests, find availability for both users on the selected dates.
-   * */
+  private void createMatchingRequests(RequestStore requestStore, List<String> participantIds,
+      TimeSlot meetingSlot, List<String> commonTags, ChatRequest ...reqs) {
+    Event event = CalendarUtils.createEvent(meetingSlot, participantIds, commonTags);
+
+    for (ChatRequest req : reqs) {
+      requestStore.addMatchedRequest(req, meetingSlot, participantIds, commonTags);
+      CalendarUtils.addEvent(req.getUserId(), event);
+    }
+  }
+
+  /** Given matched requests, find availability for both users on the selected dates. */
   private TimeSlot findSharedTimeSlot(ChatRequest req1, ChatRequest req2) {
     List<Date> commonDays = new ArrayList<>(req1.getDates());
     commonDays.retainAll(req2.getDates());
 
     for (Date day : commonDays) {
       // Use calendar API and fetch availability
-      // Currently use placeholder value of midday
+      // Currently use placeholder value of midday UTC
       ZonedDateTime midDay = day.toInstant()
           .atZone(ZoneId.systemDefault())
           .withHour(12);
