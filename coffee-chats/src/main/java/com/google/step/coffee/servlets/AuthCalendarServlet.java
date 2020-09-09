@@ -33,12 +33,11 @@ public class AuthCalendarServlet extends JsonServlet {
   @Override
   public Object get(JsonServletRequest request) throws IOException {
     CalAuthResponse responseData;
-    Credential credentials = OAuthService.getCredentials(UserManager.getCurrentUserId());
 
-    if (credentials != null) {
-      responseData = new CalAuthResponse(true);
-    } else {
+    if (OAuthService.userHasAuthorised(UserManager.getCurrentUserId())) {
       responseData = new CalAuthResponse(false, OAuthService.getAuthURL(request));
+    } else {
+      responseData = new CalAuthResponse(true);
     }
 
     return responseData;

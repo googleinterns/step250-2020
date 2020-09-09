@@ -1,9 +1,6 @@
 package com.google.step.coffee.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.TestHelper;
 import com.google.step.coffee.entity.Group;
@@ -37,7 +34,8 @@ public class GroupListServletTest extends TestHelper {
 
     Entity groupEntity = new Entity("group");
     groupEntity.setProperty("name", "foo");
-    groupEntity.setProperty("description", "bar");
+    groupEntity.setProperty("description", new Text("bar"));
+    groupEntity.setProperty("ownerId", "test_user");
     datastore.put(groupEntity);
 
     assertThat(getGroupList(), equalTo(Collections.singletonList(
@@ -45,6 +43,7 @@ public class GroupListServletTest extends TestHelper {
             .setId(KeyFactory.keyToString(groupEntity.getKey()))
             .setName("foo")
             .setDescription("bar")
+            .setOwnerId("test_user")
             .build()
     )));
   }

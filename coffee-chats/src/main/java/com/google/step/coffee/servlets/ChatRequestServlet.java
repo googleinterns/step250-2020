@@ -40,13 +40,11 @@ public class ChatRequestServlet extends JsonServlet {
     List<String> tags = getParameterValues("tags", request);
     List<String> startDateStrings = getParameterValues("startDates", request);
     List<String> endDateStrings = getParameterValues("endDates", request);
-    int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
-    int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
-    int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
-    boolean matchRandom =
-        Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
-    boolean matchRecents =
-        Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
+    int minPeople = parseIntParam("minPeople", request);
+    int maxPeople = parseIntParam("maxPeople", request);
+    int durationMins = parseIntParam("durationMins", request);
+    boolean matchRandom = parseBooleanParam("matchRandom", request, "false");
+    boolean matchRecents = parseBooleanParam("matchRecents", request, "true");
 
     List<Date> startDates = startDateStrings.stream()
         .map(Long::parseLong)
@@ -78,6 +76,15 @@ public class ChatRequestServlet extends JsonServlet {
     return (paramString != null) ? paramString : defaultValue;
   }
 
+  private String getParameter(String name, HttpServletRequest req) throws HttpError {
+    String paramString = req.getParameter(name);
+    if (paramString != null) {
+      return paramString;
+    } else {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter: " + name);
+    }
+  }
+
   private List<String> getParameterValues(String name, HttpServletRequest req) {
     String paramString = req.getParameter(name);
     if (paramString == null || paramString.equals("")) {
@@ -85,5 +92,22 @@ public class ChatRequestServlet extends JsonServlet {
     }
 
     return Arrays.asList(paramString.split(","));
+  }
+
+  private Integer parseIntParam(String name, HttpServletRequest req) throws HttpError {
+    String paramString = getParameter(name, req);
+
+    try {
+      return Integer.parseInt(paramString);
+    } catch (NumberFormatException e) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST,
+          "Invalid integer parameter: " + name);
+    }
+  }
+
+  private boolean parseBooleanParam(String name, HttpServletRequest req, String defaultValue) {
+    String paramString = getParameterOrDefault(name, req, defaultValue);
+
+    return Boolean.parseBoolean(paramString);
   }
 }

@@ -28,25 +28,53 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** Utilities to access Google Calendar API for an authorised user. */
+/**
+ * Utilities to access Google Calendar API for an authorised user.
+ */
 public class CalendarUtils {
   private static final UserStore userStore = new UserStore();
 
   public static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_SETTINGS_READONLY,
       CalendarScopes.CALENDAR_READONLY, CalendarScopes.CALENDAR_EVENTS);
 
-  /** Add given event to user's primary calendar. */
+  /**
+   * Adds given event to user's primary calendar.
+   *
+   * @param userId String of user's id whose calendar to add event into.
+   * @param event Event to add into user's calendar.
+   */
   public static void addEvent(String userId, Event event) {
-    Calendar service = getCalendarService(userId);
+    addEvent(getCalendarService(userId), userId, event, true);
+  }
 
+  /**
+   * Adds given event to user's primary calendar using provided calendar service.
+   *
+   * @param service Calendar service to use to insert event.
+   * @param userId String of user's id whose calendar to add event into.
+   * @param event Event to add into user's calendar.
+   * @param retry boolean of whether to retry adding event on failure.
+   */
+  public static void addEvent(Calendar service, String userId, Event event, boolean retry) {
     try {
       service.events().insert("primary", event).setConferenceDataVersion(1).execute();
     } catch (IOException e) {
       System.out.println("Event could not be created: " + e.getMessage());
+
+      if (retry) {
+        System.out.println("Retrying...");
+        addEvent(service, userId, event, false);
+      }
     }
   }
 
-  /** Create an event with video conferencing for given participants at selected time slot. */
+  /**
+   * Creates an event with video conferencing for given participants at selected time slot.
+   *
+   * @param timeSlot TimeSlot of when the event has been scheduled for.
+   * @param participantIds List of user Ids for all users to be invited to the event.
+   * @param commonTags List of tags which are shared by all participants.
+   */
   public static Event createEvent(TimeSlot timeSlot, List<String> participantIds,
       List<String> commonTags) {
     List<EventAttendee> attendees = getAttendees(participantIds);
@@ -71,6 +99,14 @@ public class CalendarUtils {
         .setEnd(new EventDateTime().setDateTime(timeSlot.getDatetimeEnd()));
   }
 
+  /**
+   * Fetches ranges of time for which user is busy on primary calendar between given dates.
+   *
+   * @param userId Id of user who's primary calendar is being checked.
+   * @param start Start time for which to check calendar for.
+   * @param end End time for which to check calendar for.
+   * @return List of time periods coinciding with events on user's calendar.
+   */
   public List<TimePeriod> getFreeBusy(String userId, DateTime start, DateTime end) {
     Calendar service = getCalendarService(userId);
 
