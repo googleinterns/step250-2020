@@ -46,15 +46,22 @@ public class ChatRequestServlet extends JsonServlet {
     boolean matchRandom = parseBooleanParam("matchRandom", request, "false");
     boolean matchRecents = parseBooleanParam("matchRecents", request, "true");
 
-    List<Date> startDates = startDateStrings.stream()
-        .map(Long::parseLong)
-        .map(Date::new)
-        .collect(Collectors.toList());
+    List<Date> startDates;
+    List<Date> endDates;
 
-    List<Date> endDates = endDateStrings.stream()
-        .map(Long::parseLong)
-        .map(Date::new)
-        .collect(Collectors.toList());
+    try {
+       startDates = startDateStrings.stream()
+          .map(Long::parseLong)
+          .map(Date::new)
+          .collect(Collectors.toList());
+
+      endDates = endDateStrings.stream()
+          .map(Long::parseLong)
+          .map(Date::new)
+          .collect(Collectors.toList());
+    } catch (NumberFormatException e) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date timestamp.");
+    }
 
     if (startDates.size() != endDates.size()) {
       throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Mismatched date ranges");
