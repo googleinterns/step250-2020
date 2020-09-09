@@ -39,19 +39,19 @@ export function GroupInfoPage() {
         <Container maxWidth="md">
           <GroupCard group={group} clickable={false}>
             <CardActions>
-              {(status === "ADMINISTRATOR" || status === "OWNER") ?
+              {(status === "ADMINISTRATOR" || status === "OWNER") &&
                   <React.Fragment>
                     <Button component={editLink}>Edit</Button>
                     <Button onClick={() => setDeleteDialogOpen(true)} color="secondary">Delete</Button>
-                  </React.Fragment> : null
+                  </React.Fragment>
               }
 
-              {(status === "REGULAR_MEMBER" || status === "ADMINISTRATOR") ?
-                  <Button onClick={() => setMembershipStatus("NOT_A_MEMBER")} color="secondary">Leave</Button> : null
+              {(status === "REGULAR_MEMBER" || status === "ADMINISTRATOR") &&
+                  <Button onClick={() => setMembershipStatus("NOT_A_MEMBER")} color="secondary">Leave</Button>
               }
 
-              {(status === "NOT_A_MEMBER") ?
-                  <Button onClick={() => setMembershipStatus("REGULAR_MEMBER")}>Join</Button> : null
+              {(status === "NOT_A_MEMBER") &&
+                  <Button onClick={() => setMembershipStatus("REGULAR_MEMBER")}>Join</Button>
               }
             </CardActions>
           </GroupCard>

@@ -37,10 +37,10 @@ export function GroupMemberListItem({member, status, setMembershipStatus}: Group
   return (
       <ListItem>
         <ListItemAvatar>
-          <Avatar src={`https://api.adorable.io/avatars/64/${member.user.id}.png`} />
+          <Avatar src={`https://api.adorable.io/avatars/64/${member.user.id}.png`}/>
         </ListItemAvatar>
-        <ListItemText primary={`<User id="${member.user.id}">`} secondary={convertMembershipStatus(member.status)} />
-        { (((status === "ADMINISTRATOR" && member.status === "REGULAR_MEMBER") || status === "OWNER") && member.status !== "OWNER") ?
+        <ListItemText primary={`<User id="${member.user.id}">`} secondary={convertMembershipStatus(member.status)}/>
+        {(((status === "ADMINISTRATOR" && member.status === "REGULAR_MEMBER") || status === "OWNER") && member.status !== "OWNER") &&
             <ListItemSecondaryAction>
               <IconButton
                   edge="end"
@@ -54,14 +54,14 @@ export function GroupMemberListItem({member, status, setMembershipStatus}: Group
                   open={menuOpen}
                   onClose={() => setMenuOpen(false)}
               >
-                {(status === "OWNER") ?
-                    (member.status !== "ADMINISTRATOR") ?
-                        <MenuItem onClick={() => setMembership("ADMINISTRATOR")}>Promote to admin</MenuItem> :
-                        <MenuItem onClick={() => setMembership("REGULAR_MEMBER")}>Demote to regular member</MenuItem> : null}
+                {(status === "OWNER") &&
+                ((member.status !== "ADMINISTRATOR") ?
+                    <MenuItem onClick={() => setMembership("ADMINISTRATOR")}>Promote to admin</MenuItem> :
+                    <MenuItem onClick={() => setMembership("REGULAR_MEMBER")}>Demote to regular member</MenuItem>)}
 
                 <MenuItem onClick={() => setMembership("NOT_A_MEMBER")}>Remove from group</MenuItem>
               </Menu>
-            </ListItemSecondaryAction> : null}
+            </ListItemSecondaryAction>}
       </ListItem>
   );
 }
