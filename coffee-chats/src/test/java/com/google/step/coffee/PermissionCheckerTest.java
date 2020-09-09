@@ -2,7 +2,6 @@ package com.google.step.coffee;
 
 import com.google.step.coffee.data.GroupStore;
 import com.google.step.coffee.entity.Group;
-import com.google.step.coffee.entity.GroupMembership;
 import com.google.step.coffee.entity.GroupMembership.Status;
 import com.google.step.coffee.entity.User;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class PermissionCheckerTest extends TestHelper {
     PermissionChecker.ensureLoggedIn();
   }
 
-  private boolean doGroupTest(Status prev, Status cur) {
+  private boolean canChangeOwnMembershipStatus(Status prev, Status cur) {
     GroupStore groupStore = new GroupStore();
 
     Group group = groupStore.put(Group.builder()
@@ -42,7 +41,7 @@ public class PermissionCheckerTest extends TestHelper {
     }
   }
 
-  private boolean doGroupTestOther(Status my, Status prev, Status cur) {
+  private boolean canChangeOthersMembershipStatus(Status my, Status prev, Status cur) {
     GroupStore groupStore = new GroupStore();
 
     Group group = groupStore.put(Group.builder()
@@ -67,71 +66,71 @@ public class PermissionCheckerTest extends TestHelper {
 
   @Test
   public void testCanJoinGroup() {
-    assert doGroupTest(NOT_A_MEMBER, REGULAR_MEMBER);
+    assert canChangeOwnMembershipStatus(NOT_A_MEMBER, REGULAR_MEMBER);
   }
 
   @Test
   public void testCanLeaveGroup() {
-    assert doGroupTest(REGULAR_MEMBER, NOT_A_MEMBER);
+    assert canChangeOwnMembershipStatus(REGULAR_MEMBER, NOT_A_MEMBER);
   }
 
   @Test
   public void testAdminCanLeaveGroup() {
-    assert doGroupTest(ADMINISTRATOR, NOT_A_MEMBER);
+    assert canChangeOwnMembershipStatus(ADMINISTRATOR, NOT_A_MEMBER);
   }
 
   @Test
   public void testOwnerCannotLeaveGroup() {
-    assert !doGroupTest(OWNER, NOT_A_MEMBER);
+    assert !canChangeOwnMembershipStatus(OWNER, NOT_A_MEMBER);
   }
 
   @Test
   public void testCannotJoinGroupAsAdmin() {
-    assert !doGroupTest(NOT_A_MEMBER, ADMINISTRATOR);
-    assert !doGroupTest(NOT_A_MEMBER, OWNER);
+    assert !canChangeOwnMembershipStatus(NOT_A_MEMBER, ADMINISTRATOR);
+    assert !canChangeOwnMembershipStatus(NOT_A_MEMBER, OWNER);
   }
 
   @Test
   public void testCannotPromoteThemselves() {
-    assert !doGroupTest(REGULAR_MEMBER, ADMINISTRATOR);
-    assert !doGroupTest(REGULAR_MEMBER, OWNER);
-    assert !doGroupTest(ADMINISTRATOR, OWNER);
+    assert !canChangeOwnMembershipStatus(REGULAR_MEMBER, ADMINISTRATOR);
+    assert !canChangeOwnMembershipStatus(REGULAR_MEMBER, OWNER);
+    assert !canChangeOwnMembershipStatus(ADMINISTRATOR, OWNER);
   }
 
   @Test
   public void testCannotDemoteThemselves() {
-    assert !doGroupTest(ADMINISTRATOR, REGULAR_MEMBER);
-    assert !doGroupTest(OWNER, ADMINISTRATOR);
-    assert !doGroupTest(OWNER, REGULAR_MEMBER);
+    assert !canChangeOwnMembershipStatus(ADMINISTRATOR, REGULAR_MEMBER);
+    assert !canChangeOwnMembershipStatus(OWNER, ADMINISTRATOR);
+    assert !canChangeOwnMembershipStatus(OWNER, REGULAR_MEMBER);
   }
 
   @Test
   public void testCannotEnrollOtherPeople() {
-    assert !doGroupTestOther(ADMINISTRATOR, NOT_A_MEMBER, REGULAR_MEMBER);
-    assert !doGroupTestOther(OWNER, NOT_A_MEMBER, REGULAR_MEMBER);
-    assert !doGroupTestOther(ADMINISTRATOR, NOT_A_MEMBER, ADMINISTRATOR);
-    assert !doGroupTestOther(OWNER, NOT_A_MEMBER, ADMINISTRATOR);
-    assert !doGroupTestOther(ADMINISTRATOR, NOT_A_MEMBER, OWNER);
-    assert !doGroupTestOther(OWNER, NOT_A_MEMBER, OWNER);
+    assert !canChangeOthersMembershipStatus(ADMINISTRATOR, NOT_A_MEMBER, REGULAR_MEMBER);
+    assert !canChangeOthersMembershipStatus(OWNER, NOT_A_MEMBER, REGULAR_MEMBER);
+    assert !canChangeOthersMembershipStatus(ADMINISTRATOR, NOT_A_MEMBER, ADMINISTRATOR);
+    assert !canChangeOthersMembershipStatus(OWNER, NOT_A_MEMBER, ADMINISTRATOR);
+    assert !canChangeOthersMembershipStatus(ADMINISTRATOR, NOT_A_MEMBER, OWNER);
+    assert !canChangeOthersMembershipStatus(OWNER, NOT_A_MEMBER, OWNER);
   }
 
   @Test
   public void testRegularUsersCannotKickOtherPeople() {
-    assert !doGroupTestOther(REGULAR_MEMBER, REGULAR_MEMBER, NOT_A_MEMBER);
+    assert !canChangeOthersMembershipStatus(REGULAR_MEMBER, REGULAR_MEMBER, NOT_A_MEMBER);
   }
 
   @Test
   public void testRegularUsersCannotPromote() {
-    assert !doGroupTestOther(REGULAR_MEMBER, REGULAR_MEMBER, ADMINISTRATOR);
+    assert !canChangeOthersMembershipStatus(REGULAR_MEMBER, REGULAR_MEMBER, ADMINISTRATOR);
   }
 
   @Test
   public void testAdminsCanKickOtherPeople() {
-    assert doGroupTestOther(ADMINISTRATOR, REGULAR_MEMBER, NOT_A_MEMBER);
+    assert canChangeOthersMembershipStatus(ADMINISTRATOR, REGULAR_MEMBER, NOT_A_MEMBER);
   }
 
   @Test
   public void testAdminsCannotKickAdmins() {
-    assert !doGroupTestOther(ADMINISTRATOR, ADMINISTRATOR, NOT_A_MEMBER);
+    assert !canChangeOthersMembershipStatus(ADMINISTRATOR, ADMINISTRATOR, NOT_A_MEMBER);
   }
 }
