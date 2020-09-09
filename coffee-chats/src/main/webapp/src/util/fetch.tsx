@@ -68,9 +68,11 @@ export function useFetch<T>(url: string): FetchContext<T> {
     result,
     reload: () => setForceUpdate(forceUpdate + 1),
     value: result.data as T,
-    set: (value) => setResult({
-      data: value, ...result
-    })
+    set: (value) => {
+      setResult({
+        ...result, data: value
+      })
+    }
   };
 }
 
