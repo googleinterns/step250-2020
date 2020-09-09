@@ -10,7 +10,7 @@ import clsx from "clsx";
 import {addWeeks, startOfWeek, addDays} from "date-fns";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {green} from "@material-ui/core/colors";
-import {submitChatRequest} from "../util/chatRequest";
+import {submitChatRequest, submitCalAuthRequest} from "../util/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -58,9 +58,11 @@ const MAX_PARTICIPANTS = 4;
 
 interface FindChatCardProps {
   interests: string[],
-}
+  setAuthLink: (link: string) => void,
+  setAuthDialogOpen: (open: boolean) => void
+};
 
-export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
+export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLink, setAuthDialogOpen}) => {
   
   const classes = useStyles();
 
@@ -85,7 +87,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
     } else {
       return numPeopleRange[0] <= numPeopleRange[1] &&
       numPeopleRange[0] >= MIN_PARTICIPANTS &&
-      numPeopleRange[1] <= MAX_PARTICIPANTS
+      numPeopleRange[1] <= MAX_PARTICIPANTS;
     }
   };
 
@@ -94,6 +96,25 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
   };
 
   const chatRequestClick = async () => {
+    const response = await calendarAuth();
+    
+    if (response.authorised) {
+      chatRequestSend();
+    }
+  };
+
+  const calendarAuth = async () => {
+    const response = await submitCalAuthRequest();
+
+    if (!response.authorised) {
+      setAuthLink(response.authLink);
+      setAuthDialogOpen(true);
+    }
+
+    return response;
+  };
+
+  const chatRequestSend = async () => {
     if (!loading && validParamters()) {
       setSuccess(false);
       setLoading(true);
@@ -118,7 +139,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({ interests }) => {
         </Typography>
         <Box mt={1}>
           {interests.map((tag) => 
-            <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip}/>  
+            <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip} key={tag}/>  
           )}
         </Box>
       </CardContent>

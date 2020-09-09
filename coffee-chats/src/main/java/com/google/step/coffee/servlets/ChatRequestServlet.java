@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+/** Servlet to manage user requests for a chat. */
 @WebServlet("/api/chat-request")
 public class ChatRequestServlet extends JsonServlet {
 
@@ -22,21 +24,26 @@ public class ChatRequestServlet extends JsonServlet {
   public Object post(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
 
-    ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
+    if (OAuthService.userHasAuthorised(UserManager.getCurrentUserId())) {
+      ChatRequest chatRequest = buildChatRequestFromHttpRequest(request);
 
-    requestStore.addRequest(chatRequest);
+      requestStore.addRequest(chatRequest);
 
-    return "Success";
+      return "Success";
+    } else {
+      throw new HttpError(HttpServletResponse.SC_UNAUTHORIZED,
+          "Please authorise app to schedule chat");
+    }
   }
 
   private ChatRequest buildChatRequestFromHttpRequest(HttpServletRequest request) throws HttpError {
     List<String> tags = getParameterValues("tags", request);
     List<String> dateStrings = getParameterValues("dates", request);
-    int minPeople = Integer.parseInt(getParameterOrDefault("minPeople", request, "1"));
-    int maxPeople = Integer.parseInt(getParameterOrDefault("maxPeople", request, "1"));
-    int durationMins = Integer.parseInt(getParameterOrDefault("durationMins", request, "30"));
-    boolean matchRandom = Boolean.parseBoolean(getParameterOrDefault("matchRandom", request, "false"));
-    boolean matchRecents = Boolean.parseBoolean(getParameterOrDefault("matchRecents", request, "true"));
+    int minPeople = parseIntParam("minPeople", request);
+    int maxPeople = parseIntParam("maxPeople", request);
+    int durationMins = parseIntParam("durationMins", request);
+    boolean matchRandom = parseBooleanParam("matchRandom", request, "false");
+    boolean matchRecents = parseBooleanParam("matchRecents", request, "true");
 
     List<Date> dates = dateStrings.stream()
         .map(Long::parseLong)
@@ -59,6 +66,15 @@ public class ChatRequestServlet extends JsonServlet {
     return (paramString != null) ? paramString : defaultValue;
   }
 
+  private String getParameter(String name, HttpServletRequest req) throws HttpError {
+    String paramString = req.getParameter(name);
+    if (paramString != null) {
+      return paramString;
+    } else {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter: " + name);
+    }
+  }
+
   private List<String> getParameterValues(String name, HttpServletRequest req) {
     String paramString = req.getParameter(name);
     if (paramString == null || paramString.equals("")) {
@@ -66,5 +82,22 @@ public class ChatRequestServlet extends JsonServlet {
     }
 
     return Arrays.asList(paramString.split(","));
+  }
+
+  private Integer parseIntParam(String name, HttpServletRequest req) throws HttpError {
+    String paramString = getParameter(name, req);
+
+    try {
+      return Integer.parseInt(paramString);
+    } catch (NumberFormatException e) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST,
+          "Invalid integer parameter: " + name);
+    }
+  }
+
+  private boolean parseBooleanParam(String name, HttpServletRequest req, String defaultValue) {
+    String paramString = getParameterOrDefault(name, req, defaultValue);
+
+    return Boolean.parseBoolean(paramString);
   }
 }
