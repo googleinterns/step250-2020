@@ -24,8 +24,6 @@ import org.junit.Test;
 public class CalendarUtilsTest extends TestHelper {
 
   private final String testUser1Id = "1111";
-  private final String testUser2Id = "2222";
-  private final String testUser3Id = "3333";
 
   @Test
   public void eventDescriptionContainsCommonTags() {
@@ -33,8 +31,33 @@ public class CalendarUtilsTest extends TestHelper {
     final List<String> participantIds = new ArrayList<>();
     final List<String> commonTags = new ArrayList<>();
 
-    setUpEventInfo(participantIds, commonTags);
-    addTestUsersInfo();
+    final String testUser2Id = "2222";
+    final String testUser3Id = "3333";
+
+    participantIds.add(testUser1Id);
+    participantIds.add(testUser2Id);
+    participantIds.add(testUser3Id);
+
+    commonTags.add("Football");
+    commonTags.add("Photography");
+
+    User testUser1 = mock(User.class);
+    User testUser2 = mock(User.class);
+    User testUser3 = mock(User.class);
+
+    when(testUser1.getUserId()).thenReturn(testUser1Id);
+    when(testUser1.getEmail()).thenReturn("testUser1@example.com");
+    when(testUser2.getUserId()).thenReturn(testUser2Id);
+    when(testUser2.getEmail()).thenReturn("testUser2@example.com");
+    when(testUser3.getUserId()).thenReturn(testUser3Id);
+    when(testUser3.getEmail()).thenReturn("testUser3@example.com");
+
+    // UserStore entities required as creating event also creates attendants list using emails
+    // retrieved via datastore using userId.
+    UserStore userStore = new UserStore();
+    userStore.addNewUser(testUser1);
+    userStore.addNewUser(testUser2);
+    userStore.addNewUser(testUser3);
 
     Event event = CalendarUtils.createEvent(timeslot, participantIds, commonTags);
 
@@ -80,32 +103,5 @@ public class CalendarUtilsTest extends TestHelper {
 
     verify(events, times(2)).insert("primary", event);
     verify(insertReturn, times(1)).execute();
-  }
-
-  private void setUpEventInfo(List<String> participantIds, List<String> commonTags) {
-    participantIds.add(testUser1Id);
-    participantIds.add(testUser2Id);
-    participantIds.add(testUser3Id);
-
-    commonTags.add("Football");
-    commonTags.add("Photography");
-  }
-
-  private void addTestUsersInfo() {
-    User testUser1 = mock(User.class);
-    User testUser2 = mock(User.class);
-    User testUser3 = mock(User.class);
-
-    when(testUser1.getUserId()).thenReturn(testUser1Id);
-    when(testUser1.getEmail()).thenReturn("testUser1@example.com");
-    when(testUser2.getUserId()).thenReturn(testUser2Id);
-    when(testUser2.getEmail()).thenReturn("testUser2@example.com");
-    when(testUser3.getUserId()).thenReturn(testUser3Id);
-    when(testUser3.getEmail()).thenReturn("testUser3@example.com");
-
-    UserStore userStore = new UserStore();
-    userStore.addNewUser(testUser1);
-    userStore.addNewUser(testUser2);
-    userStore.addNewUser(testUser3);
   }
 }
