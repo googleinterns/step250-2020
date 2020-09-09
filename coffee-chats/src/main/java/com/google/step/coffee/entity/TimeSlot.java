@@ -2,20 +2,51 @@ package com.google.step.coffee.entity;
 
 import com.google.api.client.util.DateTime;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class TimeSlot {
+  public static final TimeSlot EMPTY = new TimeSlot(new Date(0L), Duration.ZERO);
+
   private final ZonedDateTime datetimeStart;
+  private final ZonedDateTime datetimeEnd;
   private final Duration duration;
 
   public TimeSlot(ZonedDateTime datetimeStart, Duration duration) {
     this.datetimeStart = datetimeStart;
+    this.datetimeEnd = datetimeStart.plusMinutes(duration.toMinutes());
     this.duration = duration;
+  }
+
+  public TimeSlot(Date datetimeStart, Duration duration) {
+    this.datetimeStart = ZonedDateTime.ofInstant(datetimeStart.toInstant(), ZoneId.systemDefault());
+    this.datetimeEnd = this.datetimeStart.plusMinutes(duration.toMinutes());
+    this.duration = duration;
+  }
+
+  @Override
+  public int hashCode() {
+    return datetimeStart.hashCode() * duration.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof TimeSlot) {
+      TimeSlot otherSlot = (TimeSlot) obj;
+
+      return datetimeStart.equals(otherSlot.datetimeStart) && duration.equals(otherSlot.duration);
+    }
+
+    return false;
   }
 
   public ZonedDateTime getZonedDatetimeStart() {
     return datetimeStart;
+  }
+
+  public ZonedDateTime getZonedDatetimeEnd() {
+    return datetimeEnd;
   }
 
   public DateTime getDatetimeStart() {
@@ -23,12 +54,14 @@ public class TimeSlot {
   }
 
   public DateTime getDatetimeEnd() {
-    ZonedDateTime end = datetimeStart.plusMinutes(getDuration().toMinutes());
-
-    return new DateTime(Date.from(end.toInstant()));
+    return new DateTime(Date.from(datetimeEnd.toInstant()));
   }
 
   public Duration getDuration() {
     return duration;
+  }
+
+  public boolean isEmpty() {
+    return this.equals(EMPTY);
   }
 }

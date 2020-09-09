@@ -57,6 +57,10 @@ public class DateRange implements Comparable<DateRange> {
     return Duration.between(start.toInstant(), end.toInstant());
   }
 
+  public TimePeriod toTimePeriod() {
+    return new TimePeriod().setStart(this.getDateTimeStart()).setEnd(this.getDateTimeEnd());
+  }
+
   /**
    * Combines two lists of corresponding start and end dates into a list of DateRange objects.
    */

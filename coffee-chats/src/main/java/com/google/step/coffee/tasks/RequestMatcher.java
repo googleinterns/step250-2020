@@ -11,7 +11,9 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -50,7 +52,7 @@ public class RequestMatcher extends HttpServlet {
 
       TimeSlot meetingSlot = findSharedTimeSlot(req1, req2);
 
-      if (meetingSlot != null) {
+      if (!meetingSlot.equals(TimeSlot.EMPTY)) {
         List<String> commonTags = new ArrayList<>(req1.getTags());
         commonTags.retainAll(req2.getTags());
 
@@ -74,24 +76,41 @@ public class RequestMatcher extends HttpServlet {
     }
   }
 
-  /** Given matched requests, find availability for both users on the selected dates. */
-  private TimeSlot findSharedTimeSlot(ChatRequest req1, ChatRequest req2) {
-    List<DateRange> commonDays = new ArrayList<>(req1.getDateRanges());
-    commonDays.retainAll(req2.getDateRanges());
+  /**
+   * Given matched requests, find availability for all users in the selected date ranges.
+   */
+  private TimeSlot findSharedTimeSlot(ChatRequest ...reqs) {
+    AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
 
-    for (DateRange day : commonDays) {
-      // Use calendar API and fetch availability
-      // Currently use placeholder value of midday UTC
-      ZonedDateTime midDay = day.getStart().toInstant()
-          .atZone(ZoneId.systemDefault())
-          .withHour(12);
-      Duration duration = req1.getDuration().compareTo(req2.getDuration()) < 0 ?
-          req1.getDuration() :
-          req2.getDuration();
+    Duration minDuration = Arrays.stream(reqs)
+        .map(ChatRequest::getDuration)
+        .min(Duration::compareTo)
+        .orElse(Duration.ofMinutes(15));
 
-      return new TimeSlot(midDay, duration);
-    }
+     List<DateRange> rangeOptions = scheduler.findAvailableRanges(minDuration);
 
-    return null;
+     if (rangeOptions.isEmpty()) {
+       return TimeSlot.EMPTY;
+     } else {
+       return new TimeSlot(rangeOptions.get(0).getStart(), minDuration);
+     }
+
+//    List<DateRange> commonDays = new ArrayList<>(req1.getDateRanges());
+//    commonDays.retainAll(req2.getDateRanges());
+//
+//    for (DateRange day : commonDays) {
+//      // Use calendar API and fetch availability
+//      // Currently use placeholder value of midday UTC
+//      ZonedDateTime midDay = day.getStart().toInstant()
+//          .atZone(ZoneId.systemDefault())
+//          .withHour(12);
+//      Duration duration = req1.getDuration().compareTo(req2.getDuration()) < 0 ?
+//          req1.getDuration() :
+//          req2.getDuration();
+//
+//      return new TimeSlot(midDay, duration);
+//    }
+//
+//    return null;
   }
 }
