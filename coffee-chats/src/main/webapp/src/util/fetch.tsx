@@ -13,8 +13,8 @@ interface FetchContext<T> {
   result: FetchResult<T>;
 
   reload: () => void; // when called forces the data to be fetched again
-  value: T;
-  set: (arg: T) => void;
+  value: T; // Fetched value, only access this field if the fetch has completed
+  set: (arg: T) => void; // Set a new value without fetching again
 }
 
 /**
@@ -87,6 +87,15 @@ export function hasFetchFailed(...data: FetchContext<any>[]): boolean {
 /**
  * Accepts any number of FetchContexts and returns an appropriate error page,
  * assuming that at least one of them failed or is still loading.
+ *
+ * This function is expected to be used like this:
+ *
+ * const one = useFetch(...);
+ * const other = useFetch(...);
+ *
+ * if (hasFetchFailed(one, other)) {
+ *   return getFetchErrorPage(one, other);
+ * }
  */
 export function getFetchErrorPage(...data: FetchContext<any>[]) {
   const error = data.find(item => item.result.data === null);
