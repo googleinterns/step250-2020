@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -131,7 +132,7 @@ public class DateRange implements Comparable<DateRange> {
 
   @Override
   public int hashCode() {
-    return this.start.hashCode() * this.end.hashCode();
+    return Objects.hash(this.start, this.end);
   }
 
   @Override

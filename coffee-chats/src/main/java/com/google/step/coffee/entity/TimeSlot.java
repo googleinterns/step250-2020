@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Objects;
 
 public class TimeSlot {
   public static final TimeSlot EMPTY = new TimeSlot(new Date(0L), Duration.ZERO);
@@ -27,7 +28,7 @@ public class TimeSlot {
 
   @Override
   public int hashCode() {
-    return datetimeStart.hashCode() * duration.hashCode();
+    return Objects.hash(this.datetimeStart, this.duration);
   }
 
   @Override
