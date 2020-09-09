@@ -44,7 +44,7 @@ public class GroupListServletTest extends TestHelper {
     Entity membershipEntity = new Entity("groupMembership");
     membershipEntity.setProperty("group", groupEntity.getKey());
     membershipEntity.setProperty("user", "test_user");
-    membershipEntity.setProperty("status", GroupMembership.Status.ADMINISTRATOR.toString());
+    membershipEntity.setProperty("status", GroupMembership.Status.OWNER.toString());
     datastore.put(membershipEntity);
 
     assertThat(getGroupList(), equalTo(Collections.singletonList(

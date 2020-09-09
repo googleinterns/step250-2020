@@ -22,6 +22,7 @@ export function GroupMembersList({members, status, setMembershipStatus}: GroupMe
             <List>
               {members.map(member => (
                   <GroupMemberListItem
+                      key={member.user.id}
                       member={member}
                       status={status}
                       setMembershipStatus={setMembershipStatus}

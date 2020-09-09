@@ -1,25 +1,25 @@
 import React from "react";
 import {useParams} from "react-router-dom";
 import {Group} from "../entity/Group";
-import {postData, useStatefulFetch} from "../util/fetch";
+import {getFetchErrorPage, hasFetchFailed, postData, useFetch} from "../util/fetch";
 import {Box, Button, Container, Icon, Snackbar, TextField, Typography} from "@material-ui/core";
 import {TagsInput} from "../components/TagsInput";
 
 export function GroupEditPage() {
   const {groupId} = useParams();
   const infoUrl = `/api/groupInfo?id=${groupId}`;
-  const [group, setGroup] = useStatefulFetch<Group>(infoUrl);
+  const group = useFetch<Group>(infoUrl);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
-  if (group == null) {
-    return null;
+  if (hasFetchFailed(group)) {
+    return getFetchErrorPage(group);
   }
 
   const submit = async () => {
     const data = new Map();
-    data.set("name", group.name);
-    data.set("description", group.description);
-    data.set("tags", JSON.stringify(group.tags));
+    data.set("name", group.value.name);
+    data.set("description", group.value.description);
+    data.set("tags", JSON.stringify(group.value.tags));
     await postData(infoUrl, data);
     setSnackbarOpen(true);
   };
@@ -39,37 +39,37 @@ export function GroupEditPage() {
 
         <Container maxWidth="md">
           <TextField
-            fullWidth
-            margin="normal"
-            label="Group name"
-            variant="outlined"
-            required
-            value={group.name}
-            onChange={(e) => setGroup({...group, name: e.target.value})}
+              fullWidth
+              margin="normal"
+              label="Group name"
+              variant="outlined"
+              required
+              value={group.value.name}
+              onChange={(e) => group.set({...group.value, name: e.target.value})}
           />
 
           <TextField
-            fullWidth
-            multiline
-            margin="normal"
-            label="Description"
-            variant="outlined"
-            value={group.description}
-            onChange={(e) => setGroup({...group, description: e.target.value})}
+              fullWidth
+              multiline
+              margin="normal"
+              label="Description"
+              variant="outlined"
+              value={group.value.description}
+              onChange={(e) => group.set({...group.value, description: e.target.value})}
           />
 
           <Typography variant="body2" color="textSecondary" gutterBottom>
             Markdown is supported
           </Typography>
 
-          <TagsInput label="Tags" tags={group.tags} setTags={(tags) => setGroup({...group, tags})}/>
+          <TagsInput label="Tags" tags={group.value.tags} setTags={(tags) => group.set({...group.value, tags})}/>
 
           <Box mt={1}>
-          <Button
-              variant="contained"
-              color="primary"
-              startIcon={<Icon>save</Icon>}
-              onClick={submit}>Save</Button>
+            <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Icon>save</Icon>}
+                onClick={submit}>Save</Button>
           </Box>
         </Container>
       </Box>

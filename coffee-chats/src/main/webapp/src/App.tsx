@@ -5,7 +5,7 @@ import {NavBar} from "./components/NavBar";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import {HashRouter as Router, Switch, Route} from "react-router-dom";
-import {useFetchOnce} from "./util/fetch";
+import {useFetch} from "./util/fetch";
 import {AuthState, AuthStateContext} from "./entity/AuthState";
 import {GroupListPage} from "./pages/GroupListPage";
 import {GroupInfoPage} from "./pages/GroupInfoPage";
@@ -13,14 +13,14 @@ import {GroupEditPage} from "./pages/GroupEditPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
-  const authState: AuthState | null = useFetchOnce("/api/auth");
+  const authState = useFetch<AuthState>("/api/auth");
 
-  if (authState == null) {
+  if (authState.result.data === null) {
     return null;
   }
 
   return (
-      <AuthStateContext.Provider value={authState}>
+      <AuthStateContext.Provider value={authState.value}>
         <Router>
           <NavBar />
           <Switch>

@@ -3,13 +3,22 @@ import {Box, Container, Grid, Icon, IconButton, Tooltip, Typography} from "@mate
 import {FindChatCard} from "../components/FindChatCard";
 import {TagsInput} from "../components/TagsInput";
 import {Group} from "../entity/Group";
-import {useFetchOnce} from "../util/fetch";
+import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
 import {GroupCard} from "../components/GroupCard";
 
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
-  const groups: Group[] = useFetchOnce(`/api/groupSearch?tags=${JSON.stringify(tags)}`) || [];
-  const allGroups: Group[] = useFetchOnce(`/api/groupList?all=true`) || [];
+  const groups = useFetch<Group[]>("/api/groupList?all=true");
+
+  if (hasFetchFailed(groups)) {
+    return getFetchErrorPage(groups);
+  }
+
+  const tagsSet = new Set(tags);
+
+  const suggestGroups = groups.value.filter(group =>
+      group.tags.filter(tag => tagsSet.has(tag)).length > 0
+  );
 
   return (
       <Box mt={4}>
@@ -24,7 +33,7 @@ export function MainPage() {
                   tags={tags}
                   setTags={setTags}
                   label="What do you want to chat about?"
-                  suggestGroups={allGroups}
+                  suggestGroups={groups.value}
               />
             </Grid>
 
@@ -43,7 +52,7 @@ export function MainPage() {
               <Grid item xs={12}>
                 <FindChatCard interests={tags}/>
               </Grid>
-              {groups.map(group =>
+              {suggestGroups.map(group =>
                   <Grid item md={4} key={group.id}>
                     <GroupCard group={group} withDescription={false} />
                   </Grid>
