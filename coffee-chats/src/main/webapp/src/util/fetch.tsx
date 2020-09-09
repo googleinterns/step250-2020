@@ -74,10 +74,18 @@ export function useFetch<T>(url: string): FetchContext<T> {
   };
 }
 
+/**
+ * Accepts any number of FetchContexts and returns true if any of them
+ * have either failed or are still loading.
+ */
 export function hasFetchFailed(...data: FetchContext<any>[]): boolean {
   return data.find(item => item.result.data === null) !== undefined;
 }
 
+/**
+ * Accepts any number of FetchContexts and returns an appropriate error page,
+ * assuming that at least one of them failed or is still loading.
+ */
 export function getFetchErrorPage(...data: FetchContext<any>[]) {
   const error = data.find(item => item.result.data === null);
 
