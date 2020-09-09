@@ -1,5 +1,5 @@
 import React from "react";
-import {Typography} from "@material-ui/core";
+import {Box, Container, Card, CardContent, CardActions, Button, Typography} from "@material-ui/core";
 
 const LOADING = -1;
 
@@ -105,7 +105,18 @@ export function getFetchErrorPage(...data: FetchContext<any>[]) {
   }
 
   return (
-      <Typography variant="h5">{error.result.message}</Typography>
+      <Box mt={4}>
+        <Container maxWidth="md">
+          <Card>
+            <CardContent>
+              <Typography variant="h5">{error.result.message}</Typography>
+            </CardContent>
+            <CardActions>
+              <Button href="#/">Go to home page</Button>
+            </CardActions>
+          </Card>
+        </Container>
+      </Box>
   );
 }
 
