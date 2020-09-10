@@ -36,7 +36,7 @@ public class AuthServlet extends JsonServlet {
     PermissionChecker.ensureLoggedIn();
 
     if (!userStore.hasUserInfo(UserManager.getCurrentUserId())) {
-      userStore.addNewUser(UserManager.getCurrentGAEUser());
+      userStore.addNewUser(UserManager.getCurrentUser());
     }
 
     return new Response();

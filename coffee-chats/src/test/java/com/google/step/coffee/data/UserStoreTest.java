@@ -2,11 +2,9 @@ package com.google.step.coffee.data;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.appengine.api.users.User;
 import com.google.step.coffee.TestHelper;
+import com.google.step.coffee.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,19 +17,20 @@ public class UserStoreTest extends TestHelper {
 
   @Test
   public void addingNewUserHasCorrectEmail() {
-    User user = mock(User.class);
-    when(user.getUserId()).thenReturn(testUserId);
-    when(user.getEmail()).thenReturn(testEmail);
+    User user = User.builder()
+        .setId(testUserId)
+        .setEmail(testEmail)
+        .build();
 
     userStore.addNewUser(user);
 
-    assertThat(userStore.getEmail(testUserId), equalTo(testEmail));
+    assertThat(userStore.getUser(testUserId).email(), equalTo(testEmail));
   }
 
   @Test
   public void noUserInfoOnGetEmailThrowsException() {
     try {
-      userStore.getEmail(testUserId);
+      userStore.getUser(testUserId);
       Assert.fail("Should not be able to retrieve email from no stored users.");
     } catch (IllegalArgumentException e) {
       assertThat(e.getMessage(), equalTo("No UserInfo stored for userId " + testUserId));
@@ -40,9 +39,10 @@ public class UserStoreTest extends TestHelper {
 
   @Test
   public void addingUserCreatesCheckableEntry() {
-    User user = mock(User.class);
-    when(user.getUserId()).thenReturn(testUserId);
-    when(user.getEmail()).thenReturn(testEmail);
+    User user = User.builder()
+        .setId(testUserId)
+        .setEmail(testEmail)
+        .build();
 
     userStore.addNewUser(user);
 

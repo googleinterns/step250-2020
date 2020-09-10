@@ -13,6 +13,8 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.step.coffee.OAuthService;
 import com.google.step.coffee.entity.TimeSlot;
+import com.google.step.coffee.entity.User;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -98,7 +100,8 @@ public class CalendarUtils {
 
   private static List<EventAttendee> getAttendees(List<String> participantIds) {
     return participantIds.stream()
-        .map(userStore::getEmail)
+        .map(userStore::getUser)
+        .map(User::email)
         .map(email -> new EventAttendee().setEmail(email))
         .collect(Collectors.toList());
   }
