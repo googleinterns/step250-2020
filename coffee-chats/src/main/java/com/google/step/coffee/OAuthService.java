@@ -2,7 +2,6 @@ package com.google.step.coffee;
 
 import static com.google.step.coffee.APIUtils.HTTP_TRANSPORT;
 import static com.google.step.coffee.APIUtils.JSON_FACTORY;
-import static com.google.step.coffee.data.CalendarUtils.SCOPES;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
@@ -10,16 +9,27 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.people.v1.PeopleServiceScopes;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * Provides tools for authorising permissions to Google APIs.
  */
 public class OAuthService {
+  public static final List<String> SCOPES = Arrays.asList(
+      CalendarScopes.CALENDAR_SETTINGS_READONLY,
+      CalendarScopes.CALENDAR_READONLY,
+      CalendarScopes.CALENDAR_EVENTS,
+      PeopleServiceScopes.USERINFO_PROFILE
+  );
 
   private static final String CREDENTIALS_FILEPATH = "/client_secret.json";
 

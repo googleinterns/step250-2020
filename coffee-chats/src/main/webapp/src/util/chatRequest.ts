@@ -1,6 +1,6 @@
 import {CalAuthState} from "../entity/AuthState";
 
-const calAuthURL = 'api/auth/calendar';
+const calAuthURL = '/api/auth/calendar';
 const chatRequestURL = '/api/chat-request';
 
 const STATUS_OK = 200;

@@ -5,7 +5,6 @@ import static com.google.step.coffee.APIUtils.HTTP_TRANSPORT;
 import static com.google.step.coffee.APIUtils.JSON_FACTORY;
 
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.ConferenceData;
 import com.google.api.services.calendar.model.ConferenceSolutionKey;
 import com.google.api.services.calendar.model.CreateConferenceRequest;
@@ -15,7 +14,6 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.step.coffee.OAuthService;
 import com.google.step.coffee.entity.TimeSlot;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,9 +23,6 @@ import java.util.stream.Collectors;
  */
 public class CalendarUtils {
   private static final UserStore userStore = new UserStore();
-
-  public static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_SETTINGS_READONLY,
-      CalendarScopes.CALENDAR_READONLY, CalendarScopes.CALENDAR_EVENTS);
 
   /**
    * Adds given event to user's primary calendar.

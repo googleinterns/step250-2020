@@ -12,7 +12,7 @@ export function MainPage() {
   const [authLink, setAuthLink] = useState("");
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const groups = useFetch<Group[]>("/api/groupList?all=true");
-  
+
   if (hasFetchFailed(groups)) {
     return getFetchErrorPage(groups);
   }
