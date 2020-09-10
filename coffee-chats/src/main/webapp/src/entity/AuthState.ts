@@ -9,7 +9,10 @@ export interface AuthState {
 export const AuthStateContext = React.createContext<AuthState>({
   logoutUrl: "",
   user: {
-    id: ""
+    id: "",
+    email: "",
+    name: "",
+    avatarUrl: ""
   }
 });
 

@@ -52,10 +52,9 @@ public class PeopleUtils {
       builder.setName(names.get(0).getDisplayName());
     }
 
-    for (Photo photo : person.getPhotos()) {
-      if (photo.getDefault()) {
-        builder.setAvatarUrl(photo.getUrl());
-      }
+    List<Photo> photos = person.getPhotos();
+    if (!photos.isEmpty()) {
+      builder.setAvatarUrl(photos.get(0).getUrl());
     }
 
     return builder.build();

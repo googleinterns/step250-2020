@@ -37,9 +37,9 @@ export function GroupMemberListItem({member, status, setMembershipStatus}: Group
   return (
       <ListItem>
         <ListItemAvatar>
-          <Avatar src={`https://api.adorable.io/avatars/64/${member.user.id}.png`}/>
+          <Avatar src={member.user.avatarUrl}/>
         </ListItemAvatar>
-        <ListItemText primary={`<User id="${member.user.id}">`} secondary={convertMembershipStatus(member.status)}/>
+        <ListItemText primary={member.user.name} secondary={convertMembershipStatus(member.status)}/>
         {(((status === "ADMINISTRATOR" && member.status === "REGULAR_MEMBER") || status === "OWNER") && member.status !== "OWNER") &&
             <ListItemSecondaryAction>
               <IconButton

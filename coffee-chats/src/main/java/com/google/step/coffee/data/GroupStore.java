@@ -11,9 +11,11 @@ import java.util.List;
 
 public class GroupStore {
   private DatastoreService datastore;
+  private UserStore userStore;
 
   public GroupStore() {
     datastore = DatastoreServiceFactory.getDatastoreService();
+    userStore =  new UserStore();
   }
 
   public Group create(String name) {
@@ -68,9 +70,7 @@ public class GroupStore {
       members.add(GroupMembership.builder()
           .setStatus(GroupMembership.Status.valueOf((String) entity.getProperty("status")))
           .setGroup(group)
-          .setUser(User.builder()
-              .setId((String) entity.getProperty("user"))
-              .build())
+          .setUser(userStore.getUser((String) entity.getProperty("user")))
           .build());
     }
 

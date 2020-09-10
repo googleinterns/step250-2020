@@ -71,12 +71,6 @@ public class UserStore {
    * Ensures that the current user has all the info about them stored in the database.
    */
   public void updateCurrentUserInfo() {
-    User user = PeopleUtils.getCurrentUser();
-    Key key = KeyFactory.createKey("UserInfo", user.id());
-
-    Entity entity = new Entity(key);
-    entity.setProperty("email", user.email());
-    entity.setProperty("name", user.name());
-    entity.setProperty("avatarUrl", user.avatarUrl());
+    addNewUser(PeopleUtils.getCurrentUser());
   }
 }
