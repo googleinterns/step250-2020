@@ -5,7 +5,7 @@ import {TagsInput} from "../components/TagsInput";
 import {Group} from "../entity/Group";
 import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
 import {GroupCard} from "../components/GroupCard";
-import {CalAuthDialog} from "../components/CalAuthDialog";
+import {OAuthDialog} from "../components/OAuthDialog";
 
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
@@ -71,7 +71,7 @@ export function MainPage() {
             </Grid>
           </Box>
 
-          <CalAuthDialog
+          <OAuthDialog
             submitAuthRequest={submitAuthRequest}
             open={authDialogOpen}
             setOpen={setAuthDialogOpen}

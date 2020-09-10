@@ -1,6 +1,5 @@
 package com.google.step.coffee.servlets;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.OAuthService;
@@ -12,19 +11,19 @@ import javax.servlet.annotation.WebServlet;
  * Manage and check user authorisation for scopes for Google Calendar API in
  * <code>OAuthService</code>
  */
-@WebServlet("/api/auth/calendar")
-public class AuthCalendarServlet extends JsonServlet {
+@WebServlet("/api/oauth")
+public class OAuthServlet extends JsonServlet {
 
   /** Response object for fetching authorisation status of user. */
-  private static class CalAuthResponse {
+  private static class OAuthResponse {
     private boolean authorised;
     private String authLink;
 
-    CalAuthResponse(boolean authorised) {
+    OAuthResponse(boolean authorised) {
       this.authorised = authorised;
     }
 
-    CalAuthResponse(boolean authorised, String authLink) {
+    OAuthResponse(boolean authorised, String authLink) {
       this(authorised);
       this.authLink = authLink;
     }
@@ -32,12 +31,12 @@ public class AuthCalendarServlet extends JsonServlet {
 
   @Override
   public Object get(JsonServletRequest request) throws IOException {
-    CalAuthResponse responseData;
+    OAuthResponse responseData;
 
     if (!OAuthService.userHasAuthorised(UserManager.getCurrentUserId())) {
-      responseData = new CalAuthResponse(false, OAuthService.getAuthURL(request));
+      responseData = new OAuthResponse(false, OAuthService.getAuthURL(request));
     } else {
-      responseData = new CalAuthResponse(true);
+      responseData = new OAuthResponse(true);
     }
 
     return responseData;

@@ -52,4 +52,12 @@ public abstract class User {
         .setAvatarUrl(avatarUrl)
         .build();
   }
+
+  /**
+   * Some user objects might not have the info that is fetched from Google API.
+   * This function checks if the user has all info fetched.
+   */
+  public boolean hasAllInfo() {
+    return !name().isEmpty() || !avatarUrl().isEmpty();
+  }
 }

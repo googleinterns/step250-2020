@@ -1,20 +1,20 @@
-import {CalAuthState} from "../entity/AuthState";
+import {OAuthState} from "../entity/AuthState";
 
-const calAuthURL = '/api/auth/calendar';
+const OAuthUrl = '/api/oauth';
 const chatRequestURL = '/api/chat-request';
 
 const STATUS_OK = 200;
 
 /**
  * Submit a fetch request to check the authorisation status of the current user
- * for the Google Calendar API scopes required by app functionality.
+ * for the Google API scopes required by app functionality.
  */
 export const submitCalAuthRequest = async () => {
   try {
-    const authResponse = await fetch(calAuthURL);
-    return authResponse.json() as Promise<CalAuthState>;
+    const authResponse = await fetch(OAuthUrl);
+    return authResponse.json() as Promise<OAuthState>;
   } catch (reason) {
-    console.log('Calendar Authorisation check failed: ' + reason.toString());
+    console.log('OAuth Authorisation check failed: ' + reason.toString());
     return {authorised: false, authLink: ""};
   }
 };

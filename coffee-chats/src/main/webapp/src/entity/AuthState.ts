@@ -13,7 +13,7 @@ export const AuthStateContext = React.createContext<AuthState>({
   }
 });
 
-export interface CalAuthState {
+export interface OAuthState {
   authorised: boolean,
   authLink: string
 }
