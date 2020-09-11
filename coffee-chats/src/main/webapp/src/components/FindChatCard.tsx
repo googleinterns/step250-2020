@@ -1,9 +1,11 @@
 import React, {useState, ChangeEvent} from "react";
 import "./FindChatCard.css";
-import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
-  createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
+import {
+  Typography, CardActions, Card, CardContent, Button, CardHeader,
+  createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel,
   Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
-  Snackbar, Box, Chip} from "@material-ui/core";
+  Snackbar, Box, Chip, Tooltip
+} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import clsx from "clsx";
@@ -11,6 +13,7 @@ import {addWeeks, startOfWeek, addDays} from "date-fns";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {green} from "@material-ui/core/colors";
 import {submitChatRequest} from "../util/chatRequest";
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -61,8 +64,8 @@ interface FindChatCardProps {
 }
 
 export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
-
   const classes = useStyles();
+  const authState: AuthState = React.useContext(AuthStateContext);
 
   const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
   const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}));
@@ -134,15 +137,19 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
         </Button>
 
         <div className={classes.successBtnWrapper}>
-          <Button 
-            variant="contained"
-            color="primary"
-            className={clsx({[classes.btnSuccess]: success})}
-            disabled={loading}
-            onClick={chatRequestSend}
-          >
-            Find a chat!
-          </Button>
+          <Tooltip title={authState.oauthAuthorized ? "" : "You need to authorize the app with your Google Calendar first"}>
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                className={clsx({[classes.btnSuccess]: success})}
+                disabled={loading || !authState.oauthAuthorized}
+                onClick={chatRequestSend}
+              >
+                Find a chat!
+              </Button>
+            </span>
+          </Tooltip>
           {loading && <CircularProgress size={24} className={classes.btnProgress} />}
         </div>
       </CardActions>
