@@ -4,10 +4,10 @@ import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.TestHelper;
-import com.google.step.coffee.entity.Group;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,16 +29,19 @@ public class GroupDeleteServletTest extends TestHelper {
     Entity groupEntity1 = new Entity("group");
     groupEntity1.setProperty("name", "foo");
     groupEntity1.setProperty("description", new Text("foo's desc"));
+    groupEntity1.setProperty("ownerId", "test_user");
     datastore.put(groupEntity1);
 
     Entity groupEntity2 = new Entity("group");
     groupEntity2.setProperty("name", "bar");
     groupEntity2.setProperty("description", new Text("bar's desc"));
+    groupEntity2.setProperty("ownerId", "test_user");
     datastore.put(groupEntity2);
 
     Entity groupEntity3 = new Entity("group");
     groupEntity3.setProperty("name", "baz");
     groupEntity3.setProperty("description", new Text("baz's desc"));
+    groupEntity3.setProperty("ownerId", "test_user");
     datastore.put(groupEntity3);
 
     deleteGroup(groupEntity2.getKey());
@@ -52,5 +55,25 @@ public class GroupDeleteServletTest extends TestHelper {
       datastore.get(groupEntity2.getKey());
       assert false;
     } catch (EntityNotFoundException ignored) {}
+  }
+
+  @Test
+  public void testDeleteNoPermissions() throws Exception {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity groupEntity = new Entity("group");
+    groupEntity.setProperty("name", "foo");
+    groupEntity.setProperty("description", new Text("foo's desc"));
+    groupEntity.setProperty("ownerId", "another_user");
+    datastore.put(groupEntity);
+
+    try {
+      deleteGroup(groupEntity.getKey());
+      assertThat("HttpError not thrown", false);
+    } catch (HttpError err) {
+      assertThat(err.getErrorCode(), equalTo(HttpServletResponse.SC_FORBIDDEN));
+    }
+
+    datastore.get(groupEntity.getKey());
   }
 }
