@@ -1,15 +1,21 @@
 import React from 'react'
 import {Dialog, DialogContent, DialogTitle, DialogContentText, DialogActions, Button} from '@material-ui/core'
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 
 interface OAuthDialogProps {
-  submitAuthRequest: () => void,
   open: boolean,
   setOpen: (open: boolean) => void
 }
 
-export const OAuthDialog: React.FC<OAuthDialogProps> = ({submitAuthRequest, open, setOpen}) => {
+export const OAuthDialog: React.FC<OAuthDialogProps> = ({open, setOpen}) => {
+  const authState: AuthState = React.useContext(AuthStateContext);
+
   const dialogClose = () => {
     setOpen(false);
+  };
+
+  const submitAuthRequest = () => {
+    window.location.href = authState.oauthLink!;
   };
   
   return (
@@ -29,7 +35,7 @@ export const OAuthDialog: React.FC<OAuthDialogProps> = ({submitAuthRequest, open
         </DialogContentText>
         <DialogActions>
           <Button onClick={dialogClose} color="primary">
-            Cancel
+            Later
           </Button>
           <Button onClick={submitAuthRequest} color="primary" variant="contained">
             Authorise

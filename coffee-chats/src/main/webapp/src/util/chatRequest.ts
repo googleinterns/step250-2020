@@ -1,23 +1,6 @@
-import {OAuthState} from "../entity/AuthState";
-
-const OAuthUrl = '/api/oauth';
 const chatRequestURL = '/api/chat-request';
 
 const STATUS_OK = 200;
-
-/**
- * Submit a fetch request to check the authorisation status of the current user
- * for the Google API scopes required by app functionality.
- */
-export const submitCalAuthRequest = async () => {
-  try {
-    const authResponse = await fetch(OAuthUrl);
-    return authResponse.json() as Promise<OAuthState>;
-  } catch (reason) {
-    console.log('OAuth Authorisation check failed: ' + reason.toString());
-    return {authorised: false, authLink: ""};
-  }
-};
 
 /**
  * A function to handle formatting and sending the data for the chat request.

@@ -9,25 +9,19 @@ import java.io.IOException;
 
 @WebServlet("/api/auth")
 public class AuthServlet extends JsonServlet {
-
   private UserStore userStore = new UserStore();
 
   private static class Response {
-
     private String logoutUrl;
     private User user;
+    private boolean oauthAuthorized; // Has the user granted the app access to their Google account?
+    private String oauthLink;        // If not, they will need to follow this link.
 
-    public Response() {
+    public Response(boolean oauthAuthorized, String oauthLink) {
       this.logoutUrl = UserManager.getLogoutUrl();
       this.user = UserManager.getCurrentUser();
-    }
-
-    public String getLogoutUrl() {
-      return logoutUrl;
-    }
-
-    public User getUser() {
-      return user;
+      this.oauthAuthorized = oauthAuthorized;
+      this.oauthLink = oauthLink;
     }
   }
 
@@ -39,6 +33,10 @@ public class AuthServlet extends JsonServlet {
       userStore.addNewUser(UserManager.getCurrentUser());
     }
 
-    return new Response();
+    if (!OAuthService.userHasAuthorised(UserManager.getCurrentUserId())) {
+      return new Response(false, OAuthService.getAuthURL(request));
+    } else {
+      return new Response(true, null);
+    }
   }
 }

@@ -4,6 +4,8 @@ import React from "react";
 export interface AuthState {
   logoutUrl: string;
   user: User;
+  oauthAuthorized: boolean;
+  oauthLink: string | null;
 }
 
 export const AuthStateContext = React.createContext<AuthState>({
@@ -13,10 +15,7 @@ export const AuthStateContext = React.createContext<AuthState>({
     email: "",
     name: "",
     avatarUrl: ""
-  }
+  },
+  oauthAuthorized: false,
+  oauthLink: null
 });
-
-export interface OAuthState {
-  authorised: boolean,
-  authLink: string
-}

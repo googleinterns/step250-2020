@@ -10,7 +10,7 @@ import clsx from "clsx";
 import {addWeeks, startOfWeek, addDays} from "date-fns";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {green} from "@material-ui/core/colors";
-import {submitChatRequest, submitCalAuthRequest} from "../util/chatRequest";
+import {submitChatRequest} from "../util/chatRequest";
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -57,13 +57,11 @@ const MIN_PARTICIPANTS = 1;
 const MAX_PARTICIPANTS = 4;
 
 interface FindChatCardProps {
-  interests: string[],
-  setAuthLink: (link: string) => void,
-  setAuthDialogOpen: (open: boolean) => void
-};
+  interests: string[]
+}
 
-export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLink, setAuthDialogOpen}) => {
-  
+export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
+
   const classes = useStyles();
 
   const startOfNextWeek = startOfWeek(addWeeks(new Date(), 1), {weekStartsOn: MONDAY});
@@ -93,25 +91,6 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
-  };
-
-  const chatRequestClick = async () => {
-    const response = await calendarAuth();
-    
-    if (response.authorised) {
-      chatRequestSend();
-    }
-  };
-
-  const calendarAuth = async () => {
-    const response = await submitCalAuthRequest();
-
-    if (!response.authorised) {
-      setAuthLink(response.authLink);
-      setAuthDialogOpen(true);
-    }
-
-    return response;
   };
 
   const chatRequestSend = async () => {
@@ -160,7 +139,7 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
             color="primary"
             className={clsx({[classes.btnSuccess]: success})}
             disabled={loading}
-            onClick={chatRequestClick}
+            onClick={chatRequestSend}
           >
             Find a chat!
           </Button>
