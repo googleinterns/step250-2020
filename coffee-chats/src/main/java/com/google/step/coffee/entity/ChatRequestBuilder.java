@@ -3,6 +3,7 @@ package com.google.step.coffee.entity;
 import com.google.step.coffee.InvalidEntityException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -53,6 +54,8 @@ public class ChatRequestBuilder {
    */
   public ChatRequestBuilder onDates(List<DateRange> dateRanges) throws InvalidEntityException {
     if (!dateRanges.isEmpty()) {
+      Collections.sort(dateRanges);
+
       this.dateRanges = dateRanges;
       return this;
     } else {
@@ -69,8 +72,11 @@ public class ChatRequestBuilder {
    */
   public ChatRequestBuilder onDates(List<Date> startDates, List<Date> endDates) throws InvalidEntityException {
     if (!startDates.isEmpty() && !endDates.isEmpty()) {
-      this.dateRanges = DateRange.combineLists(startDates, endDates);
+      List<DateRange> combinedRanges = DateRange.combineLists(startDates, endDates);
 
+      Collections.sort(combinedRanges);
+
+      this.dateRanges = combinedRanges;
       return this;
     } else {
       throw new InvalidEntityException("No date ranges selected");

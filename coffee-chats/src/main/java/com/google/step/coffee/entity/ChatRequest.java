@@ -10,7 +10,6 @@ import java.util.List;
 /** Represents a request made by a user for a chat on given topics. */
 public class ChatRequest {
 
-  private long requestId;
   private List<String> tags;
   private List<DateRange> dateRanges;
   private int minPeople;
@@ -19,6 +18,9 @@ public class ChatRequest {
   private boolean matchRandom;
   private boolean matchRecents;
   private String userId;
+
+  private long requestId;
+  private boolean hasRequestId;
 
   public ChatRequest(List<String> tags, List<DateRange> dateRanges, int minPeople, int maxPeople,
       Duration duration, boolean matchRandom, boolean matchRecents, String userId) {
@@ -131,11 +133,20 @@ public class ChatRequest {
     return userId;
   }
 
+  public boolean hasRequestId() {
+    return hasRequestId;
+  }
+
   public void setRequestId(long requestId) {
+    this.hasRequestId = true;
     this.requestId = requestId;
   }
 
-  public Key getRequestKey() {
-    return KeyFactory.createKey("ChatRequest", requestId);
+  public long getRequestId() {
+    return requestId;
+  }
+
+  public Date getLastEndDate() {
+    return dateRanges.get(dateRanges.size() - 1).getEnd();
   }
 }

@@ -67,6 +67,10 @@ public class DateRange implements Comparable<DateRange> {
    */
   public static List<DateRange> combineLists(List<Date> startDates, List<Date> endDates)
       throws InvalidEntityException {
+    if (startDates.size() != endDates.size()) {
+      throw new IllegalArgumentException("Must have the same number of start and end dates.");
+    }
+
     List<DateRange> dateRanges = new ArrayList<>();
 
     for (int i = 0; i < startDates.size(); i++) {

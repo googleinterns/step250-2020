@@ -23,9 +23,13 @@ public class AvailabilityScheduler {
 
   public AvailabilityScheduler() {};
 
+  public AvailabilityScheduler(List<ChatRequest> requests) {
+    this.chatRequests = (ChatRequest[]) requests.toArray();
+    this.userIds = requests.stream().map(ChatRequest::getUserId).collect(Collectors.toList());
+  }
+
   public AvailabilityScheduler(ChatRequest ...requests) {
-    this.chatRequests = requests;
-    this.userIds = Arrays.stream(requests).map(ChatRequest::getUserId).collect(Collectors.toList());
+    this(Arrays.asList(requests));
   }
 
   public void setUserIds(List<String> userIds) {
