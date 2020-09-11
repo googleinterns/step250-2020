@@ -15,7 +15,7 @@ public class GroupStore {
 
   public GroupStore() {
     datastore = DatastoreServiceFactory.getDatastoreService();
-    userStore =  new UserStore();
+    userStore = new UserStore();
   }
 
   public Group create(String name) {
