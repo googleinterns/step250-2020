@@ -50,7 +50,7 @@ export function GroupListPage() {
               </Grid>
               {groups.value.map(group =>
                   <Grid item xs={12} key={group.id}>
-                    <GroupCard group={group} />
+                    <GroupCard group={group} withDescription={false} />
                   </Grid>
               )}
             </Grid>

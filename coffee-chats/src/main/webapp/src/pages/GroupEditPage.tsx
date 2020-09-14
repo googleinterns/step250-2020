@@ -3,6 +3,7 @@ import {useParams} from "react-router-dom";
 import {Group} from "../entity/Group";
 import {getFetchErrorPage, hasFetchFailed, postData, useFetch} from "../util/fetch";
 import {Box, Button, Container, Icon, Snackbar, TextField, Typography} from "@material-ui/core";
+import {TagsInput} from "../components/TagsInput";
 
 export function GroupEditPage() {
   const {groupId} = useParams();
@@ -18,6 +19,7 @@ export function GroupEditPage() {
     const data = new Map();
     data.set("name", group.value.name);
     data.set("description", group.value.description);
+    data.set("tags", JSON.stringify(group.value.tags));
     await postData(infoUrl, data);
     setSnackbarOpen(true);
   };
@@ -56,9 +58,11 @@ export function GroupEditPage() {
               onChange={(e) => group.set({...group.value, description: e.target.value})}
           />
 
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" color="textSecondary" gutterBottom>
             Markdown is supported
           </Typography>
+
+          <TagsInput label="Tags" tags={group.value.tags} setTags={(tags) => group.set({...group.value, tags})}/>
 
           <Box mt={1}>
             <Button

@@ -33,6 +33,7 @@ public class GroupCreateServletTest extends TestHelper {
       entity.setProperty("name", name);
       entity.setProperty("description", new Text(""));
       entity.setProperty("ownerId", "test_user");
+      entity.setProperty("tags", null);
       expected.add(entity);
     }
 

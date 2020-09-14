@@ -14,6 +14,10 @@ public class GroupListServlet extends JsonServlet {
   public Object get(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
 
+    if (Boolean.parseBoolean(request.getParameter("all"))) {
+      return groupStore.getAllGroups();
+    }
+
     return groupStore.getUserGroups(UserManager.getCurrentUser());
   }
 }

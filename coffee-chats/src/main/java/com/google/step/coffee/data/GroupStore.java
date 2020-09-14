@@ -50,6 +50,7 @@ public class GroupStore {
     entity.setProperty("name", group.name());
     entity.setProperty("description", new Text(group.description()));
     entity.setProperty("ownerId", group.ownerId());
+    entity.setProperty("tags", group.tags());
 
     datastore.put(entity);
 
@@ -88,6 +89,18 @@ public class GroupStore {
       try {
         groups.add(Group.fromEntity(datastore.get(groupKey)));
       } catch (EntityNotFoundException ignored) {}
+    }
+
+    return groups;
+  }
+
+  public List<Group> getAllGroups() {
+    List<Group> groups = new ArrayList<>();
+
+    Query query = new Query("group");
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      groups.add(Group.fromEntity(entity));
     }
 
     return groups;
