@@ -29,7 +29,7 @@ export function GroupCard({group, children, clickable, withDescription}: GroupCa
   const inner = (<React.Fragment>
     <CardContent>
       <Typography variant="h5">{group.name}</Typography>
-      {withDescription ? <ReactMarkdown source={group.description}/> : null}
+      {withDescription && <ReactMarkdown source={group.description}/>}
       <Box mt={1}>
         {group.tags.map(tag =>
             <Chip key={tag}

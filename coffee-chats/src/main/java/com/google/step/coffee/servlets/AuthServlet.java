@@ -11,11 +11,11 @@ import java.io.IOException;
 public class AuthServlet extends JsonServlet {
   private UserStore userStore = new UserStore();
 
-  private static class Response {
-    private String logoutUrl;
-    private User user;
-    private boolean oauthAuthorized; // Has the user granted the app access to their Google account?
-    private String oauthLink;        // If not, they will need to follow this link.
+  public static class Response {
+    public String logoutUrl;
+    public User user;
+    public boolean oauthAuthorized; // Has the user granted the app access to their Google account?
+    public String oauthLink;        // If not, they will need to follow this link.
 
     public Response(boolean oauthAuthorized, String oauthLink) {
       this.logoutUrl = UserManager.getLogoutUrl();
