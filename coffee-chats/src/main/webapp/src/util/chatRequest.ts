@@ -40,8 +40,8 @@ export const submitChatRequest = async (interests: string[],
   const data = new URLSearchParams();
   
   data.append('tags', interests.toString());
-  data.append('startDates', startDates.map(d => d!).map(d => +d).toString());
-  data.append('endDates', endDates.map(d => d!).map(d => +d).toString());
+  data.append('startDates', startDates.map(d => +d!).toString());
+  data.append('endDates', endDates.map(d => +d!).toString());
   data.append('minPeople', numPeopleRange[0].toString());
   data.append('maxPeople', numPeopleRange[1].toString());
   data.append('durationMins', durationMins.toString());

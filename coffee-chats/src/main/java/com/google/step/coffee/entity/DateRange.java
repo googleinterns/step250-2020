@@ -127,7 +127,9 @@ public class DateRange implements Comparable<DateRange> {
 
   @Override
   public int compareTo(DateRange otherRange) {
-    return this.getStart().compareTo(otherRange.getStart());
+    int startCompare = this.getStart().compareTo(otherRange.getStart());
+
+    return (startCompare == 0) ? this.getEnd().compareTo(otherRange.getEnd()) : startCompare;
   }
 
   @Override
@@ -140,7 +142,7 @@ public class DateRange implements Comparable<DateRange> {
     if (obj instanceof DateRange) {
       DateRange otherDateRange = (DateRange) obj;
 
-      return this.start.equals(otherDateRange.start) && this.end.equals(otherDateRange.end);
+      return this.compareTo(otherDateRange) == 0;
     }
 
     return false;
