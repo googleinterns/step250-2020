@@ -1,5 +1,8 @@
 import React from "react";
-import {Card, CardActionArea, CardContent, Typography} from "@material-ui/core";
+import {
+  Box, Card, CardActionArea, CardContent, Chip, createStyles,
+  makeStyles, Theme, Typography
+} from "@material-ui/core";
 import {Group} from "../entity/Group";
 import {useRenderLink} from "./LinkComponents";
 import ReactMarkdown from "react-markdown";
@@ -8,13 +11,32 @@ interface GroupCardProps {
   children: React.ReactNode;
   group: Group;
   clickable: boolean;
+  withDescription: boolean;
 }
 
-export function GroupCard({group, children, clickable}: GroupCardProps) {
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+      tagChip: {
+        marginTop: 4,
+        marginRight: 4
+      }
+    })
+);
+
+export function GroupCard({group, children, clickable, withDescription}: GroupCardProps) {
+  const classes = useStyles();
+
   const inner = (<React.Fragment>
     <CardContent>
       <Typography variant="h5">{group.name}</Typography>
-      <ReactMarkdown source={group.description} />
+      {withDescription && <ReactMarkdown source={group.description}/>}
+      <Box mt={1}>
+        {group.tags.map(tag =>
+            <Chip key={tag}
+                  variant="outlined"
+                  label={tag}
+                  className={classes.tagChip}/>)}
+      </Box>
     </CardContent>
     {children}
   </React.Fragment>);
@@ -24,14 +46,15 @@ export function GroupCard({group, children, clickable}: GroupCardProps) {
   return (
       <Card>
         {clickable ?
-        <CardActionArea component={link}>
-          {inner}
-        </CardActionArea> : inner}
+            <CardActionArea component={link}>
+              {inner}
+            </CardActionArea> : inner}
       </Card>
   );
 }
 
 GroupCard.defaultProps = {
   children: null,
-  clickable: true
+  clickable: true,
+  withDescription: true
 };

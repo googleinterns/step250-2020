@@ -3,7 +3,7 @@ import {Box, Container, Fab, Grid, Icon, TextField} from "@material-ui/core";
 import {GroupCard} from "../components/GroupCard";
 import {makeStyles} from "@material-ui/core/styles";
 import {GroupCreateDialog} from "../components/GroupCreateDialog";
-import {useFetch} from "../util/fetch";
+import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
 import {Group} from "../entity/Group";
 
 const useStyles = makeStyles((theme) => ({
@@ -17,15 +17,19 @@ const useStyles = makeStyles((theme) => ({
 
 export function GroupListPage() {
   const classes = useStyles();
-  const [groups, updateGroups]: [Group[], () => void] = useFetch("/api/groupList", []);
+  const groups = useFetch<Group[]>("/api/groupList");
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+
+  if (hasFetchFailed(groups)) {
+    return getFetchErrorPage(groups);
+  }
 
   return (
       <React.Fragment>
         <GroupCreateDialog
             open={createDialogOpen}
             setOpen={setCreateDialogOpen}
-            onSubmit={updateGroups} />
+            onSubmit={groups.reload} />
         <Box mt={4}>
           <Container maxWidth="md">
             <Grid container spacing={2}>
@@ -44,9 +48,9 @@ export function GroupListPage() {
                   create
                 </Fab>
               </Grid>
-              {groups.map(group =>
+              {groups.value.map(group =>
                   <Grid item xs={12} key={group.id}>
-                    <GroupCard group={group} />
+                    <GroupCard group={group} withDescription={false} />
                   </Grid>
               )}
             </Grid>

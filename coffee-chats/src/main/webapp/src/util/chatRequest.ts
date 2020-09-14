@@ -18,7 +18,7 @@ export const submitCalAuthRequest = async () => {
     console.log('Calendar Authorisation check failed: ' + reason.toString());
     return {authorised: false, authLink: ""};
   }
-}
+};
 
 /**
  * A function to handle formatting and sending the data for the chat request.
