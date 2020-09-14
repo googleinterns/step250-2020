@@ -61,8 +61,7 @@ export function TagsInput({label, tags, setTags, suggestGroups}: TagsInputProps)
                   <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
               ))
           }
-          renderOption={(option, state) => {
-            return (
+          renderOption={(option, state) => (
                 <Grid container spacing={2}>
                   <Grid item>
                     <Icon>{option.group ? "people" : "local_offer"}</Icon>
@@ -71,8 +70,7 @@ export function TagsInput({label, tags, setTags, suggestGroups}: TagsInputProps)
                     {option.name}
                   </Grid>
                 </Grid>
-            );
-          }}
+          )}
           renderInput={(params) => (
               <TextField
                   {...params}
