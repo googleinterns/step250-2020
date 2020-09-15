@@ -120,4 +120,92 @@ public class RequestMatcherTest {
     assertThat(matcher.groupSizeInRange(2, req), is(false));
     assertThat(matcher.groupSizeInRange(5, req), is(false));
   }
+
+  @Test
+  public void sameTagsInSameTagMapLists() {
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Photography"));
+
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getTags()).thenReturn(Arrays.asList("Football", "Photography"));
+
+    Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
+
+    assertThat(tagMap.keySet(), containsInAnyOrder("Football", "Photography"));
+    assertThat(tagMap.get("Football"), contains(req1, req2));
+    assertThat(tagMap.get("Photography"), contains(req1, req2));
+  }
+
+  @Test
+  public void differentTagsInDifferentTagMapLists() {
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Photography"));
+
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getTags()).thenReturn(Arrays.asList("Basketball", "Gardening"));
+
+    Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
+
+    assertThat(tagMap.keySet(),
+        containsInAnyOrder("Football", "Photography", "Basketball", "Gardening"));
+    assertThat(tagMap.get("Football"), contains(req1));
+    assertThat(tagMap.get("Photography"), contains(req1));
+    assertThat(tagMap.get("Basketball"), contains(req2));
+    assertThat(tagMap.get("Gardening"), contains(req2));
+  }
+
+  @Test
+  public void emptyAndRandomRequestsInSameTagMapList() {
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getTags()).thenReturn(Collections.emptyList());
+
+    Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
+
+    assertThat(tagMap.keySet(), containsInAnyOrder("Football", "Random"));
+    assertThat(tagMap.get("Football"), contains(req1));
+    assertThat(tagMap.get("Random"), contains(req1, req2));
+  }
+
+  @Test
+  public void removingFromTagMapRemovesAllInstances() {
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getTags()).thenReturn(Arrays.asList("Football", "Photography"));
+
+    Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
+
+    assertThat(tagMap.get("Football"), contains(req1, req2));
+    assertThat(tagMap.get("Random"), contains(req1));
+    assertThat(tagMap.get("Photography"), contains(req2));
+
+    matcher.removeFromTagMap(tagMap, req1);
+
+    assertThat(tagMap.get("Football"), contains(req2));
+    assertThat(tagMap.get("Random").isEmpty(), is(true));
+  }
+
+  @Test
+  public void removeEmptyTagRequestRemovesFromTagMap() {
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getTags()).thenReturn(Collections.emptyList());
+
+    Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
+
+    assertThat(tagMap.get("Football"), contains(req1));
+    assertThat(tagMap.get("Random"), contains(req1, req2));
+
+    matcher.removeFromTagMap(tagMap, req2);
+
+    assertThat(tagMap.get("Football"), contains(req1));
+    assertThat(tagMap.get("Random").size(), is(1));
+    assertThat(tagMap.get("Random"), contains(req1));
+  }
 }

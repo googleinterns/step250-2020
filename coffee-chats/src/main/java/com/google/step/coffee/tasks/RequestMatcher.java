@@ -161,6 +161,10 @@ public class RequestMatcher extends HttpServlet {
     return compatibleReqs;
   }
 
+  /**
+   * Creates mapping from tags in given requests, to all requests in given list which share the same
+   * tag.
+   */
   Map<String, List<ChatRequest>> buildTagMap(List<ChatRequest> requestList) {
     Map<String, List<ChatRequest>> tagMap = new HashMap<>();
 
@@ -183,7 +187,11 @@ public class RequestMatcher extends HttpServlet {
     return tagMap;
   }
 
-  private void removeFromTagMap(Map<String, List<ChatRequest>> tagMap, ChatRequest request) {
+  /**
+   * Removes a single request from the tag mapping, so that the request is removed from all mappings
+   * of tags to list of matching requests.
+   */
+  void removeFromTagMap(Map<String, List<ChatRequest>> tagMap, ChatRequest request) {
     if (request.getTags().isEmpty()) {
       tagMap.get("Random").remove(request);
     } else {
@@ -193,15 +201,31 @@ public class RequestMatcher extends HttpServlet {
     }
   }
 
-  private Date weekFromNow() {
-    return Date.from(Instant.now().plus(Duration.ofDays(7)));
-  }
-
   /**
    * Tests whether the proposed group size is compatible with the given request.
    */
   boolean groupSizeInRange(int groupSize, ChatRequest request) {
     return request.getMinPeople() <= (groupSize - 1) && (groupSize - 1) <= request.getMaxPeople();
+  }
+
+  /**
+   * Creates calendar events and datastore entries for matched requests and their details
+   * Package-private for testing purposes, not intended for direct usage but can be used.
+   *
+   * @param requestStore Instance of RequestStore providing access to entities in datastore.
+   * @param participantIds List of Strings of user Ids for participants involved in this matching.
+   * @param meetingSlot Time slot found to be available for participants.
+   * @param commonTags List of Strings for the commonTags.
+   * @param reqs ChatRequests in this matching.
+   */
+  void addMatchingRequests(RequestStore requestStore, List<String> participantIds,
+      TimeSlot meetingSlot, List<String> commonTags, List<ChatRequest> reqs) {
+    Event event = CalendarUtils.createEvent(meetingSlot, participantIds, commonTags);
+
+    for (ChatRequest req : reqs) {
+      requestStore.addMatchedRequest(req, meetingSlot, participantIds, commonTags);
+      CalendarUtils.addEvent(req.getUserId(), event);
+    }
   }
 
   private void removeExpiredRequests(List<ChatRequest> requestList, RequestStore requestStore) {
@@ -238,23 +262,8 @@ public class RequestMatcher extends HttpServlet {
     requestStore.removeChatRequests(requests);
   }
 
-  /**
-   * Creates calendar events and datastore entries for matched requests and their details
-   *
-   * @param requestStore Instance of RequestStore providing access to entities in datastore.
-   * @param participantIds List of Strings of user Ids for participants involved in this matching.
-   * @param meetingSlot Time slot found to be available for participants.
-   * @param commonTags List of Strings for the commonTags.
-   * @param reqs ChatRequests in this matching.
-   */
-  void addMatchingRequests(RequestStore requestStore, List<String> participantIds,
-      TimeSlot meetingSlot, List<String> commonTags, List<ChatRequest> reqs) {
-    Event event = CalendarUtils.createEvent(meetingSlot, participantIds, commonTags);
-
-    for (ChatRequest req : reqs) {
-      requestStore.addMatchedRequest(req, meetingSlot, participantIds, commonTags);
-      CalendarUtils.addEvent(req.getUserId(), event);
-    }
+  private Date weekFromNow() {
+    return Date.from(Instant.now().plus(Duration.ofDays(7)));
   }
 
   /**
