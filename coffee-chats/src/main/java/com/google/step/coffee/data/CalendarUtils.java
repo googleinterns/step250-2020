@@ -4,6 +4,7 @@ import static com.google.step.coffee.APIUtils.APPLICATION_NAME;
 import static com.google.step.coffee.APIUtils.HTTP_TRANSPORT;
 import static com.google.step.coffee.APIUtils.JSON_FACTORY;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.ConferenceData;
@@ -12,10 +13,17 @@ import com.google.api.services.calendar.model.CreateConferenceRequest;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.FreeBusyCalendar;
+import com.google.api.services.calendar.model.FreeBusyRequest;
+import com.google.api.services.calendar.model.FreeBusyRequestItem;
+import com.google.api.services.calendar.model.FreeBusyResponse;
+import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.OAuthService;
 import com.google.step.coffee.entity.TimeSlot;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -89,6 +97,45 @@ public class CalendarUtils {
         .setAttendees(attendees)
         .setStart(new EventDateTime().setDateTime(timeSlot.getDatetimeStart()))
         .setEnd(new EventDateTime().setDateTime(timeSlot.getDatetimeEnd()));
+  }
+
+  /**
+   * Fetches ranges of time for which user is busy on primary calendar between given dates.
+   *
+   * @param userId Id of user who's primary calendar is being checked.
+   * @param start Start time for which to check calendar for.
+   * @param end End time for which to check calendar for.
+   * @return List of time periods coinciding with events on user's calendar.
+   */
+  public List<TimePeriod> getFreeBusy(String userId, DateTime start, DateTime end) {
+    Calendar service = getCalendarService(userId);
+
+    List<FreeBusyRequestItem> calendars = new ArrayList<>();
+    calendars.add(new FreeBusyRequestItem().setId("primary"));
+
+    FreeBusyRequest request = new FreeBusyRequest()
+        .setTimeMin(start)
+        .setTimeMax(end)
+        .setItems(calendars);
+
+    FreeBusyResponse response;
+
+    try {
+      response = service.freebusy().query(request).execute();
+    } catch (IOException e) {
+      System.out.println("FreeBusy query failed: " + e.getMessage());
+      System.out.println("Retrying...");
+
+      try {
+        response = service.freebusy().query(request).execute();
+      } catch (IOException ex) {
+        return Collections.emptyList();
+      }
+    }
+
+    FreeBusyCalendar cal = response.getCalendars().get("primary");
+
+    return cal.getBusy();
   }
 
   private static Calendar getCalendarService(String userId) {
