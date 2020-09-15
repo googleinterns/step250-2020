@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 public class AvailabilityScheduler {
 
   private List<String> userIds;
-  private ChatRequest[] chatRequests;
+  private List<ChatRequest> chatRequests;
 
   private CalendarUtils utils = new CalendarUtils();
 
   public AvailabilityScheduler() {};
 
   public AvailabilityScheduler(List<ChatRequest> requests) {
-    this.chatRequests = (ChatRequest[]) requests.toArray();
+    this.chatRequests = requests;
     this.userIds = requests.stream().map(ChatRequest::getUserId).collect(Collectors.toList());
   }
 
@@ -36,8 +36,12 @@ public class AvailabilityScheduler {
     this.userIds = userIds;
   }
 
-  public void setChatRequests(ChatRequest ...requests) {
+  public void setChatRequests(List<ChatRequest> requests) {
     this.chatRequests = requests;
+  }
+
+  public void setChatRequests(ChatRequest ...requests) {
+    this.chatRequests = Arrays.asList(requests);
   }
 
   public void setUtils(CalendarUtils utils) {
@@ -135,14 +139,14 @@ public class AvailabilityScheduler {
   /**
    * Find intersecting ranges common to all requests' DateRanges.
    *
-   * @param requests Array of ChatRequest objects from which to find common ranges.
+   * @param requests List of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(ChatRequest ...requests) {
+  public List<DateRange> findCommonRanges(List<ChatRequest> requests) {
     List<DateRange> commonRanges = new ArrayList<>();
 
-    for (int i = 0; i < requests.length; i++) {
-      List<DateRange> coalescedRanges = coalesceRanges(requests[i].getDateRanges());
+    for (int i = 0; i < requests.size(); i++) {
+      List<DateRange> coalescedRanges = coalesceRanges(requests.get(i).getDateRanges());
 
       if (i != 0) {
         commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);

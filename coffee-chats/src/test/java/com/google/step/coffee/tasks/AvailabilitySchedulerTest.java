@@ -174,7 +174,7 @@ public class AvailabilitySchedulerTest {
     DateRange expectedRange1 = rangeC1;
     DateRange expectedRange2 = rangeB2;
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    assertThat(scheduler.findCommonRanges(Arrays.asList(requestA, requestB, requestC)),
         contains(expectedRange1, expectedRange2));
   }
 
@@ -205,7 +205,7 @@ public class AvailabilitySchedulerTest {
     ChatRequest requestB = new ChatRequestBuilder().onDates(rangesB).build();
     ChatRequest requestC = new ChatRequestBuilder().onDates(rangesC).build();
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    assertThat(scheduler.findCommonRanges(Arrays.asList(requestA, requestB, requestC)),
         is(Collections.emptyList()));
   }
 
