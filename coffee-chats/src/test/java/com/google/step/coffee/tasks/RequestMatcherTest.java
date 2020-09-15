@@ -1,20 +1,33 @@
 package com.google.step.coffee.tasks;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.api.services.calendar.model.Event;
+import com.google.step.coffee.data.CalendarUtils;
+import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
+import com.google.step.coffee.entity.ChatRequestBuilder;
+import com.google.step.coffee.entity.TimeSlot;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.mockito.MockedStatic;
 
 public class RequestMatcherTest {
 
+  Date MORNING = new Date(1601888400000L);
   RequestMatcher matcher =  new RequestMatcher();
 
   @Test
@@ -52,4 +65,59 @@ public class RequestMatcherTest {
     assertThat(tagMap.get("Random"), contains(req1, req2, req3));
   }
 
+  @Test
+  public void createEventCalledOncePerUser() {
+    RequestStore store = mock(RequestStore.class);
+
+    List<String> participantIds = Arrays.asList("id1", "id2", "id3");
+    List<String> commonTags = Arrays.asList("Football", "Photography");
+    TimeSlot slot = new TimeSlot(MORNING, Duration.ofMinutes(30));
+
+    ChatRequest req1 = mock(ChatRequest.class);
+    when(req1.getUserId()).thenReturn("user1");
+    ChatRequest req2 = mock(ChatRequest.class);
+    when(req2.getUserId()).thenReturn("user2");
+    ChatRequest req3 = mock(ChatRequest.class);
+    when(req3.getUserId()).thenReturn("user3");
+
+    Event event = mock(Event.class);
+
+    try (MockedStatic<CalendarUtils> utils = mockStatic(CalendarUtils.class)) {
+      utils.when(() -> CalendarUtils.createEvent(slot, participantIds, commonTags))
+          .thenReturn(event);
+
+      matcher.addMatchingRequests(store, participantIds, slot, commonTags,
+          Arrays.asList(req1, req2, req3));
+
+      utils.verify(times(1), () -> CalendarUtils.addEvent("user1", event));
+      utils.verify(times(1), () -> CalendarUtils.addEvent("user2", event));
+      utils.verify(times(1), () -> CalendarUtils.addEvent("user3", event));
+
+      verify(store, times(1)).addMatchedRequest(req1, slot, participantIds, commonTags);
+      verify(store, times(1)).addMatchedRequest(req2, slot, participantIds, commonTags);
+      verify(store, times(1)).addMatchedRequest(req3, slot, participantIds, commonTags);
+    }
+  }
+
+  @Test
+  public void groupSizesRightForBoundaryRanges() {
+    ChatRequest req = mock(ChatRequest.class);
+
+    when(req.getMinPeople()).thenReturn(2);
+    when(req.getMaxPeople()).thenReturn(4);
+
+    assertThat(matcher.groupSizeInRange(3, req), is(true));
+    assertThat(matcher.groupSizeInRange(5, req), is(true));
+  }
+
+  @Test
+  public void groupSizesWrongOffByOne() {
+    ChatRequest req = mock(ChatRequest.class);
+
+    when(req.getMinPeople()).thenReturn(2);
+    when(req.getMaxPeople()).thenReturn(3);
+
+    assertThat(matcher.groupSizeInRange(2, req), is(false));
+    assertThat(matcher.groupSizeInRange(5, req), is(false));
+  }
 }

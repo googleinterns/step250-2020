@@ -197,7 +197,10 @@ public class RequestMatcher extends HttpServlet {
     return Date.from(Instant.now().plus(Duration.ofDays(7)));
   }
 
-  private boolean groupSizeInRange(int groupSize, ChatRequest request) {
+  /**
+   * Tests whether the proposed group size is compatible with the given request.
+   */
+  boolean groupSizeInRange(int groupSize, ChatRequest request) {
     return request.getMinPeople() <= (groupSize - 1) && (groupSize - 1) <= request.getMaxPeople();
   }
 
@@ -212,6 +215,10 @@ public class RequestMatcher extends HttpServlet {
     }
   }
 
+  /**
+   * Finds common tags between requests and adds matching requests and removes old Chat Requests
+   * from store.
+   */
   private void createMatching(RequestStore requestStore, List<ChatRequest> requests,
       TimeSlot slot) {
     List<String> commonTags = requests.stream()
@@ -231,7 +238,16 @@ public class RequestMatcher extends HttpServlet {
     requestStore.removeChatRequests(requests);
   }
 
-  private void addMatchingRequests(RequestStore requestStore, List<String> participantIds,
+  /**
+   * Creates calendar events and datastore entries for matched requests and their details
+   *
+   * @param requestStore Instance of RequestStore providing access to entities in datastore.
+   * @param participantIds List of Strings of user Ids for participants involved in this matching.
+   * @param meetingSlot Time slot found to be available for participants.
+   * @param commonTags List of Strings for the commonTags.
+   * @param reqs ChatRequests in this matching.
+   */
+  void addMatchingRequests(RequestStore requestStore, List<String> participantIds,
       TimeSlot meetingSlot, List<String> commonTags, List<ChatRequest> reqs) {
     Event event = CalendarUtils.createEvent(meetingSlot, participantIds, commonTags);
 
@@ -242,7 +258,7 @@ public class RequestMatcher extends HttpServlet {
   }
 
   /**
-   * Given matched requests, find availability for all users in the selected date ranges.
+   * Given matched requests, finds availability for all users in the selected date ranges.
    */
   private TimeSlot findSharedTimeSlot(List<ChatRequest> reqs) {
     AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
