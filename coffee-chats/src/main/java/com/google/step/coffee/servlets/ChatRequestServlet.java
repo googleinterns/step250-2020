@@ -38,21 +38,38 @@ public class ChatRequestServlet extends JsonServlet {
 
   private ChatRequest buildChatRequestFromHttpRequest(HttpServletRequest request) throws HttpError {
     List<String> tags = getParameterValues("tags", request);
-    List<String> dateStrings = getParameterValues("dates", request);
+    List<String> startDateStrings = getParameterValues("startDates", request);
+    List<String> endDateStrings = getParameterValues("endDates", request);
     int minPeople = parseIntParam("minPeople", request);
     int maxPeople = parseIntParam("maxPeople", request);
     int durationMins = parseIntParam("durationMins", request);
     boolean matchRandom = parseBooleanParam("matchRandom", request, "false");
     boolean matchRecents = parseBooleanParam("matchRecents", request, "true");
 
-    List<Date> dates = dateStrings.stream()
-        .map(Long::parseLong)
-        .map(Date::new)
-        .collect(Collectors.toList());
+    List<Date> startDates;
+    List<Date> endDates;
+
+    try {
+       startDates = startDateStrings.stream()
+          .map(Long::parseLong)
+          .map(Date::new)
+          .collect(Collectors.toList());
+
+      endDates = endDateStrings.stream()
+          .map(Long::parseLong)
+          .map(Date::new)
+          .collect(Collectors.toList());
+    } catch (NumberFormatException e) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date timestamp.");
+    }
+
+    if (startDates.size() != endDates.size()) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Mismatched date ranges");
+    }
 
     return new ChatRequestBuilder()
         .withTags(tags)
-        .onDates(dates)
+        .onDates(startDates, endDates)
         .withGroupSize(minPeople, maxPeople)
         .withMaxChatLength(durationMins)
         .willMatchRandomlyOnFail(matchRandom)

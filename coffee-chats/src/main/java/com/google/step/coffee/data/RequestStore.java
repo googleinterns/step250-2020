@@ -34,7 +34,8 @@ public class RequestStore {
   public void addRequest(ChatRequest request) {
     Entity reqEntity = new Entity("ChatRequest");
     reqEntity.setProperty("tags", request.getTags());
-    reqEntity.setProperty("dates", request.getDates());
+    reqEntity.setProperty("startDates", request.getStartDateRanges());
+    reqEntity.setProperty("endDates", request.getEndDateRanges());
     reqEntity.setProperty("minPeople", request.getMinPeople());
     reqEntity.setProperty("maxPeople", request.getMaxPeople());
     reqEntity.setProperty("durationMins", request.getDuration().toMinutes());
@@ -102,10 +103,12 @@ public class RequestStore {
     datastore.put(entity);
   }
 
+  @SuppressWarnings("unchecked")
   private ChatRequest getRequestFromEntity(Entity entity) throws InvalidEntityException {
     ChatRequest request = new ChatRequestBuilder()
         .withTags((List<String>) entity.getProperty("tags"))
-        .onDates((List<Date>) entity.getProperty("dates"))
+        .onDates((List<Date>) entity.getProperty("startDates"),
+            (List<Date>) entity.getProperty("endDates"))
         .withGroupSize(((Long) entity.getProperty("minPeople")).intValue(),
             ((Long) entity.getProperty("maxPeople")).intValue())
         .withMaxChatLength(((Long) entity.getProperty("durationMins")).intValue())

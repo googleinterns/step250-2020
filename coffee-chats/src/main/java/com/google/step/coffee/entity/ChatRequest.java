@@ -3,6 +3,7 @@ package com.google.step.coffee.entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class ChatRequest {
 
   private long requestId;
   private List<String> tags;
-  private List<Date> dates;
+  private List<DateRange> dateRanges;
   private int minPeople;
   private int maxPeople;
   private Duration duration;
@@ -19,10 +20,10 @@ public class ChatRequest {
   private boolean matchRecents;
   private String userId;
 
-  public ChatRequest(List<String> tags, List<Date> dates, int minPeople, int maxPeople,
+  public ChatRequest(List<String> tags, List<DateRange> dateRanges, int minPeople, int maxPeople,
       Duration duration, boolean matchRandom, boolean matchRecents, String userId) {
     this.tags = tags;
-    this.dates = dates;
+    this.dateRanges = dateRanges;
     this.minPeople = minPeople;
     this.maxPeople = maxPeople;
     this.duration = duration;
@@ -41,12 +42,42 @@ public class ChatRequest {
   }
 
   /**
-   * Get days to schedule chat on from user's request.
+   * Get date ranges to schedule chat on from user's request.
    *
-   * @return A list of Date objects representing each day selected by the user.
+   * @return A list of DateRange objects representing each datetime range selected by the user.
    */
-  public List<Date> getDates() {
-    return dates;
+  public List<DateRange> getDateRanges() {
+    return dateRanges;
+  }
+
+  /**
+   * Get start dates for ranges of chat request for storage in datastore.
+   *
+   * @return A list of Dates representing the start of date ranges from user's request.
+   */
+  public List<Date> getStartDateRanges() {
+    List<Date> startDates = new ArrayList<>();
+
+    for (DateRange range: dateRanges) {
+      startDates.add(range.getStart());
+    }
+
+    return startDates;
+  }
+
+  /**
+   * Get end dates for ranges of chat request for storage in datastore.
+   *
+   * @return A list of Dates representing the end of date ranges from user's request.
+   */
+  public List<Date> getEndDateRanges() {
+    List<Date> endDates = new ArrayList<>();
+
+    for (DateRange range: dateRanges) {
+      endDates.add(range.getEnd());
+    }
+
+    return endDates;
   }
 
   /**
