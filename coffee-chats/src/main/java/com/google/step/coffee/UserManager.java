@@ -1,8 +1,12 @@
 package com.google.step.coffee;
 
+import com.google.api.services.people.v1.PeopleService;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.step.coffee.data.PeopleUtils;
 import com.google.step.coffee.entity.User;
+
+import java.io.IOException;
 
 public class UserManager {
   private static UserService getUserService() {
@@ -52,7 +56,10 @@ public class UserManager {
       return null;
     }
 
-    return User.builder().setId(userId).build();
+    return User.builder()
+        .setId(userId)
+        .setEmail(getUserService().getCurrentUser().getEmail())
+        .build();
   }
 
   /** Returns an AppEngine User object for the current user. */

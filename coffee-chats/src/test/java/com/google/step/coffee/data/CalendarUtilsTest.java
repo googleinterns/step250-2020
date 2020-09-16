@@ -11,9 +11,9 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Events;
 import com.google.api.services.calendar.Calendar.Events.Insert;
 import com.google.api.services.calendar.model.Event;
-import com.google.appengine.api.users.User;
 import com.google.step.coffee.TestHelper;
 import com.google.step.coffee.entity.TimeSlot;
+import com.google.step.coffee.entity.User;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -41,16 +41,9 @@ public class CalendarUtilsTest extends TestHelper {
     commonTags.add("Football");
     commonTags.add("Photography");
 
-    User testUser1 = mock(User.class);
-    User testUser2 = mock(User.class);
-    User testUser3 = mock(User.class);
-
-    when(testUser1.getUserId()).thenReturn(testUser1Id);
-    when(testUser1.getEmail()).thenReturn("testUser1@example.com");
-    when(testUser2.getUserId()).thenReturn(testUser2Id);
-    when(testUser2.getEmail()).thenReturn("testUser2@example.com");
-    when(testUser3.getUserId()).thenReturn(testUser3Id);
-    when(testUser3.getEmail()).thenReturn("testUser3@example.com");
+    User testUser1 = User.builder().setId(testUser1Id).setEmail("testUser1@example.com").build();
+    User testUser2 = User.builder().setId(testUser2Id).setEmail("testUser2@example.com").build();
+    User testUser3 = User.builder().setId(testUser3Id).setEmail("testUser3@example.com").build();
 
     // UserStore entities required as creating event also creates attendants list using emails
     // retrieved via datastore using userId.

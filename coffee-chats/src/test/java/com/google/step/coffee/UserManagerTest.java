@@ -22,6 +22,7 @@ public class UserManagerTest extends TestHelper {
   public void testGetCurrentUserLoggedIn() {
     assertThat(UserManager.getCurrentUser(), equalTo(User.builder()
         .setId("test_user")
+        .setEmail("test-user@example.com")
         .build()));
   }
 

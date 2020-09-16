@@ -1,15 +1,21 @@
 import React from 'react'
 import {Dialog, DialogContent, DialogTitle, DialogContentText, DialogActions, Button} from '@material-ui/core'
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 
-interface CalAuthDialogProps {
-  submitAuthRequest: () => void,
+interface OAuthDialogProps {
   open: boolean,
   setOpen: (open: boolean) => void
-};
+}
 
-export const CalAuthDialog: React.FC<CalAuthDialogProps> = ({submitAuthRequest, open, setOpen}) => {  
+export const OAuthDialog: React.FC<OAuthDialogProps> = ({open, setOpen}) => {
+  const authState: AuthState = React.useContext(AuthStateContext);
+
   const dialogClose = () => {
     setOpen(false);
+  };
+
+  const submitAuthRequest = () => {
+    window.location.href = authState.oauthLink!;
   };
   
   return (
@@ -24,13 +30,12 @@ export const CalAuthDialog: React.FC<CalAuthDialogProps> = ({submitAuthRequest, 
       </DialogTitle>
       <DialogContent>
         <DialogContentText id="auhtorise-dialog-description">
-          To schedule this chat into your calendar, this app requires access to
-          your Google calendar to check for availability and to create the 
-          event once you are matched.
+          This app requires access to your Google calendar
+          to check for availability and to create the event once you are matched.
         </DialogContentText>
         <DialogActions>
           <Button onClick={dialogClose} color="primary">
-            Cancel
+            Later
           </Button>
           <Button onClick={submitAuthRequest} color="primary" variant="contained">
             Authorise

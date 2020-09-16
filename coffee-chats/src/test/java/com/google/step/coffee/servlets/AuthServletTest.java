@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.StoredCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -16,16 +15,16 @@ import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.OAuthService;
 import com.google.step.coffee.TestHelper;
-import com.google.step.coffee.servlets.AuthCalendarServlet.CalAuthResponse;
+
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-public class AuthCalendarServletTest extends TestHelper {
+public class AuthServletTest extends TestHelper {
 
-  AuthCalendarServlet servlet = new AuthCalendarServlet();
+  AuthServlet servlet = new AuthServlet();
   HttpServletRequest httpReq = mock(HttpServletRequest.class);
   JsonServletRequest request = new JsonServletRequest(httpReq);
 
@@ -47,10 +46,10 @@ public class AuthCalendarServletTest extends TestHelper {
       service.when(() -> OAuthService.getAuthURL(request))
           .thenReturn("https://accounts.google.com/o/oauth2/auth?access_type=offline&other_params=X");
 
-      AuthCalendarServlet.CalAuthResponse resp = (CalAuthResponse) servlet.get(request);
+      AuthServlet.Response resp = (AuthServlet.Response) servlet.get(request);
 
-      assertThat(resp.isAuthorised(), is(false));
-      assertThat(resp.getAuthLink(),
+      assertThat(resp.oauthAuthorized, is(false));
+      assertThat(resp.oauthLink,
           startsWith("https://accounts.google.com/o/oauth2/auth?access_type=offline"));
     }
   }
@@ -70,9 +69,9 @@ public class AuthCalendarServletTest extends TestHelper {
       when(flow.getCredentialDataStore()).thenReturn(credStore);
       when(credStore.containsKey(userId)).thenReturn(true);
 
-      AuthCalendarServlet.CalAuthResponse resp = (CalAuthResponse) servlet.get(request);
+      AuthServlet.Response resp = (AuthServlet.Response) servlet.get(request);
 
-      assertThat(resp.isAuthorised(), is(true));
+      assertThat(resp.oauthAuthorized, is(true));
     }
   }
 }

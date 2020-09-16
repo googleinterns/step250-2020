@@ -1,28 +1,36 @@
-import React from "react";
-import "./App.css";
+import React, {useEffect, useState} from "react";
 import {MainPage} from "./pages/MainPage";
 import {NavBar} from "./components/NavBar";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import {HashRouter as Router, Switch, Route} from "react-router-dom";
-import {useFetch} from "./util/fetch";
+import {getFetchErrorPage, hasFetchFailed, useFetch} from "./util/fetch";
 import {AuthState, AuthStateContext} from "./entity/AuthState";
 import {GroupListPage} from "./pages/GroupListPage";
 import {GroupInfoPage} from "./pages/GroupInfoPage";
 import {GroupEditPage} from "./pages/GroupEditPage";
+import {OAuthDialog} from "./components/OAuthDialog";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
   const authState = useFetch<AuthState>("/api/auth");
+  const [oauthDialogOpen, setOAuthDialogOpen] = useState(false);
 
-  if (authState.result.data === null) {
-    return null;
+  useEffect(() => {
+    if (authState.value && !authState.value.oauthAuthorized) {
+      setOAuthDialogOpen(true);
+    }
+  }, [authState.value]);
+
+  if (hasFetchFailed(authState)) {
+    return getFetchErrorPage(authState);
   }
 
   return (
       <AuthStateContext.Provider value={authState.value}>
         <Router>
-          <NavBar />
+          <NavBar openOAuthDialog={() => setOAuthDialogOpen(true)} />
+          <OAuthDialog open={oauthDialogOpen} setOpen={setOAuthDialogOpen} />
           <Switch>
             <Route path="/groups">
               <GroupListPage/>

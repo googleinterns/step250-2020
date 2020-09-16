@@ -127,6 +127,12 @@
       <artifactId>google-api-services-calendar</artifactId>
       <version>v3-rev20200818-1.30.10</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.google.apis</groupId>
+      <artifactId>google-api-services-people</artifactId>
+      <version>v1-rev20200813-1.30.10</version>
+    </dependency>
   </dependencies>
 
   <build>

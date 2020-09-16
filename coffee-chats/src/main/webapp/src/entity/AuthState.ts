@@ -4,16 +4,18 @@ import React from "react";
 export interface AuthState {
   logoutUrl: string;
   user: User;
+  oauthAuthorized: boolean;
+  oauthLink: string | null;
 }
 
 export const AuthStateContext = React.createContext<AuthState>({
   logoutUrl: "",
   user: {
-    id: ""
-  }
+    id: "",
+    email: "",
+    name: "",
+    avatarUrl: ""
+  },
+  oauthAuthorized: false,
+  oauthLink: null
 });
-
-export interface CalAuthState {
-  authorised: boolean,
-  authLink: string
-}

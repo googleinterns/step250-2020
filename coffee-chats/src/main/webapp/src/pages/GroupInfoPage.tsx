@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
-import {Box, Button, CardActions, Container} from "@material-ui/core";
+import {Box, Button, CardActions, Container, Tooltip} from "@material-ui/core";
 import {getFetchErrorPage, hasFetchFailed, postData, useFetch} from "../util/fetch";
 import {Group} from "../entity/Group";
 import {useRenderLink} from "../components/LinkComponents";
@@ -52,7 +52,18 @@ export function GroupInfoPage() {
               }
 
               {(status === "NOT_A_MEMBER") &&
-              <Button onClick={() => setMembershipStatus("REGULAR_MEMBER")}>Join</Button>
+              <Tooltip
+                  title={authState.oauthAuthorized ? "" :
+                      "You need to authorize the app with your Google Calendar before you can join groups"}>
+                <span>
+                  <Button
+                      onClick={() => setMembershipStatus("REGULAR_MEMBER")}
+                      disabled={!authState.oauthAuthorized}
+                  >
+                      Join
+                  </Button>
+                </span>
+              </Tooltip>
               }
             </CardActions>
           </GroupCard>
