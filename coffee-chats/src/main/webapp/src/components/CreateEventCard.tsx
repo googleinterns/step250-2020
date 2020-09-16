@@ -5,13 +5,16 @@ import {
 } from "@material-ui/core";
 import {DateTimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
+import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
 
 export function CreateEventCard() {
   const [duration, setDuration] = useState(30); // in minutes
   const [start, setStart] = useState<MaterialUiPickersDate>();
+  const [timeDialogOpen, setTimeDialogOpen] = useState(false);
 
   return (
       <Box mt={2}>
+        <FindOptimalTimeDialog open={timeDialogOpen} setOpen={setTimeDialogOpen} />
         <Card>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>
@@ -43,14 +46,12 @@ export function CreateEventCard() {
               />
             </FormControl>
 
-            <Button>
-              Pick optimal time
+            <Button onClick={() => setTimeDialogOpen(true)}>
+              Find an optimal time
             </Button>
           </CardContent>
           <CardActions>
-            <Button
-                color="primary"
-            >
+            <Button color="primary">
               Schedule
             </Button>
           </CardActions>
