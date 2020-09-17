@@ -70,6 +70,7 @@ public class AvailabilityScheduler {
    * busyRanges.
    */
   List<DateRange> removeBusyRanges(List<DateRange> options, List<DateRange> busyRanges) {
+    options = new ArrayList<>(options);
     List<DateRange> freeRanges = new ArrayList<>();
 
     int i = 0;

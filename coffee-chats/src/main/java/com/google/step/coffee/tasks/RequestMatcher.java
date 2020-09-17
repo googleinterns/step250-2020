@@ -48,11 +48,7 @@ public class RequestMatcher extends HttpServlet {
       ChatRequest req1 = requestList.get(i);
       ChatRequest req2 = requestList.get(i + 1);
 
-      List<Availability> reqs = new ArrayList<>();
-      reqs.add(req1);
-      reqs.add(req2);
-
-      TimeSlot meetingSlot = findSharedTimeSlot(reqs);
+      TimeSlot meetingSlot = findSharedTimeSlot(Arrays.asList(req1, req2));
 
       if (!meetingSlot.equals(TimeSlot.EMPTY)) {
         List<String> commonTags = new ArrayList<>(req1.getTags());
