@@ -12,6 +12,7 @@ import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.TimeSlot;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class RequestStore {
   /**
    * Removes ChatRequest entities from datastore given requests.
    */
-  public void removeChatRequests(List<ChatRequest> compatibleReqs) {
+  public void removeChatRequests(Collection<ChatRequest> compatibleReqs) {
     List<Key> keys = compatibleReqs.stream()
         .map(req -> KeyFactory.createKey("ChatRequest", req.getRequestId()))
         .collect(Collectors.toList());
@@ -148,8 +149,8 @@ public class RequestStore {
 
   private Entity setRequestProperties(ChatRequest request, Entity reqEntity) {
     reqEntity.setProperty("tags", request.getTags());
-    reqEntity.setProperty("startDates", request.getStartDateRanges());
-    reqEntity.setProperty("endDates", request.getEndDateRanges());
+    reqEntity.setProperty("startDates", request.getDateRangeStarts());
+    reqEntity.setProperty("endDates", request.getDateRangeEnds());
     reqEntity.setProperty("minPeople", request.getMinPeople());
     reqEntity.setProperty("maxPeople", request.getMaxPeople());
     reqEntity.setProperty("durationMins", request.getDuration().toMinutes());

@@ -42,7 +42,12 @@ public class ChatRequestBuilder {
    * @return ChatRequestBuilder object with internal state set to given tags.
    */
   public ChatRequestBuilder withTags(List<String> tags) {
-    this.tags = tags;
+    if (tags == null) {
+      this.tags = Collections.emptyList();
+    } else {
+      this.tags = tags;
+    }
+
     return this;
   }
 

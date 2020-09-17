@@ -1,23 +1,23 @@
 package com.google.step.coffee.entity;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 /** Represents a request made by a user for a chat on given topics. */
 public class ChatRequest {
 
-  private List<String> tags;
-  private List<DateRange> dateRanges;
-  private int minPeople;
-  private int maxPeople;
-  private Duration duration;
-  private boolean matchRandom;
-  private boolean matchRecents;
-  private String userId;
+  private final List<String> tags;
+  private Date lastEndDate;
+  private final List<DateRange> dateRanges;
+  private final int minPeople;
+  private final int maxPeople;
+  private final Duration duration;
+  private final boolean matchRandom;
+  private final boolean matchRecents;
+  private final String userId;
 
   private long requestId;
   private boolean hasRequestId;
@@ -57,7 +57,7 @@ public class ChatRequest {
    *
    * @return A list of Dates representing the start of date ranges from user's request.
    */
-  public List<Date> getStartDateRanges() {
+  public List<Date> getDateRangeStarts() {
     List<Date> startDates = new ArrayList<>();
 
     for (DateRange range: dateRanges) {
@@ -72,7 +72,7 @@ public class ChatRequest {
    *
    * @return A list of Dates representing the end of date ranges from user's request.
    */
-  public List<Date> getEndDateRanges() {
+  public List<Date> getDateRangeEnds() {
     List<Date> endDates = new ArrayList<>();
 
     for (DateRange range: dateRanges) {
@@ -147,6 +147,12 @@ public class ChatRequest {
   }
 
   public Date getLastEndDate() {
-    return dateRanges.get(dateRanges.size() - 1).getEnd();
+    if (this.lastEndDate == null) {
+      List<Date> endDates = getDateRangeEnds();
+      Collections.sort(endDates);
+      this.lastEndDate = endDates.get(endDates.size() - 1);
+    }
+
+    return lastEndDate;
   }
 }
