@@ -11,6 +11,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.InvalidEntityException;
 import com.google.step.coffee.data.CalendarUtils;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.DateRange;
@@ -174,7 +175,12 @@ public class AvailabilitySchedulerTest {
     DateRange expectedRange1 = rangeC1;
     DateRange expectedRange2 = rangeB2;
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    List<Availability> requests = new ArrayList<>();
+    requests.add(requestA);
+    requests.add(requestB);
+    requests.add(requestC);
+
+    assertThat(scheduler.findCommonRanges(requests),
         contains(expectedRange1, expectedRange2));
   }
 
@@ -205,7 +211,12 @@ public class AvailabilitySchedulerTest {
     ChatRequest requestB = new ChatRequestBuilder().onDates(rangesB).build();
     ChatRequest requestC = new ChatRequestBuilder().onDates(rangesC).build();
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    List<Availability> requests = new ArrayList<>();
+    requests.add(requestA);
+    requests.add(requestB);
+    requests.add(requestC);
+
+    assertThat(scheduler.findCommonRanges(requests),
         is(Collections.emptyList()));
   }
 
@@ -356,7 +367,13 @@ public class AvailabilitySchedulerTest {
         .build();
 
     scheduler.setUserIds(Arrays.asList("userA", "userB", "userC"));
-    scheduler.setAvailabilities(requestA, requestB, requestC);
+
+    List<Availability> requests = new ArrayList<>();
+    requests.add(requestA);
+    requests.add(requestB);
+    requests.add(requestC);
+
+    scheduler.setAvailabilities(requests);
 
     DateRange commonRange1 = rangeC1;
     DateRange commonRange2 = busyB2;

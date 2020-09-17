@@ -48,7 +48,11 @@ public class RequestMatcher extends HttpServlet {
       ChatRequest req1 = requestList.get(i);
       ChatRequest req2 = requestList.get(i + 1);
 
-      TimeSlot meetingSlot = findSharedTimeSlot(req1, req2);
+      List<Availability> reqs = new ArrayList<>();
+      reqs.add(req1);
+      reqs.add(req2);
+
+      TimeSlot meetingSlot = findSharedTimeSlot(reqs);
 
       if (!meetingSlot.equals(TimeSlot.EMPTY)) {
         List<String> commonTags = new ArrayList<>(req1.getTags());
@@ -77,10 +81,10 @@ public class RequestMatcher extends HttpServlet {
   /**
    * Given matched requests, find availability for all users in the selected date ranges.
    */
-  private TimeSlot findSharedTimeSlot(Availability...reqs) {
+  private TimeSlot findSharedTimeSlot(List<Availability> reqs) {
     AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
 
-    Duration minDuration = Arrays.stream(reqs)
+    Duration minDuration = reqs.stream()
         .map(Availability::getDuration)
         .min(Duration::compareTo)
         .orElse(Duration.ofMinutes(15));

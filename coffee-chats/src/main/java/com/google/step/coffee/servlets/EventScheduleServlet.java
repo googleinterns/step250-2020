@@ -4,8 +4,9 @@ import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.PermissionChecker;
-import com.google.step.coffee.entity.DateRange;
-import com.google.step.coffee.entity.Group;
+import com.google.step.coffee.data.GroupStore;
+import com.google.step.coffee.entity.*;
+import com.google.step.coffee.tasks.AvailabilityScheduler;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +15,14 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet("/api/scheduleEvent")
 public class EventScheduleServlet extends JsonServlet {
   static final Duration MIN_DURATION = Duration.ofMinutes(15);
   static final Duration MAX_DURATION = Duration.ofMinutes(180);
+
+  private GroupStore groupStore = new GroupStore();
 
   @Override
   public Object post(JsonServletRequest request) throws IOException, HttpError {
@@ -32,6 +36,14 @@ public class EventScheduleServlet extends JsonServlet {
     }
 
     List<DateRange> ranges = Arrays.asList(request.getRequiredJsonParameter("ranges", DateRange[].class));
+    List<Availability> requests = groupStore.getMembers(group).stream()
+        .map(member -> EventRequest.builder()
+            .setUserId(member.user().id())
+            .setDuration(duration)
+            .setDateRanges(ranges)
+        .build()).collect(Collectors.toList());
+
+    AvailabilityScheduler scheduler = new AvailabilityScheduler(requests);
 
     return new Date();
   }
