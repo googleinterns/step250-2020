@@ -18,7 +18,7 @@ export function CreateEventCard() {
         <Card>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>
-              Schedule an Event
+              Schedule an event
             </Typography>
 
             <FormControl fullWidth margin="normal">

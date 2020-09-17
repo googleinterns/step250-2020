@@ -68,7 +68,7 @@ export function GroupInfoPage() {
               }
             </CardActions>
           </GroupCard>
-          <CreateEventCard/>
+          {(status == "ADMINISTRATOR" || status == "OWNER") && <CreateEventCard/>}
           <GroupMembersList
               members={members.value}
               status={status}
