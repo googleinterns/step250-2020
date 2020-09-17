@@ -1,4 +1,4 @@
 cron:
 - description: "run chat request matching"
-  url: /tasks/request-matching
+  url: /api/tasks/request-matching
   schedule: every 6 hours
