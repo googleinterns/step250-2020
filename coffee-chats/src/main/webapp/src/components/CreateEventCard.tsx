@@ -1,20 +1,30 @@
 import React, {useState} from "react";
 import {
   Box, Button, Card, CardActions, CardContent, FormControl, InputLabel,
-  MenuItem, Select, Typography
-} from "@material-ui/core";
+  MenuItem, Select, Typography} from "@material-ui/core";
 import {DateTimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
+import {Group} from "../entity/Group";
 
-export function CreateEventCard() {
+interface CreateEvebtCardProps {
+  group: Group;
+}
+
+export function CreateEventCard({group}: CreateEvebtCardProps) {
   const [duration, setDuration] = useState(30); // in minutes
   const [start, setStart] = useState<MaterialUiPickersDate>();
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
 
   return (
       <Box mt={2}>
-        <FindOptimalTimeDialog open={timeDialogOpen} setOpen={setTimeDialogOpen} />
+        <FindOptimalTimeDialog
+            open={timeDialogOpen}
+            setOpen={setTimeDialogOpen}
+            group={group}
+            setDate={setStart}
+            duration={duration}
+        />
         <Card>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>

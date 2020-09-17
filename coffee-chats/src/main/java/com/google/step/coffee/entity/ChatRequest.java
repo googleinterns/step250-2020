@@ -9,7 +9,6 @@ import java.util.List;
 
 /** Represents a request made by a user for a chat on given topics. */
 public class ChatRequest {
-
   private long requestId;
   private List<String> tags;
   private List<DateRange> dateRanges;

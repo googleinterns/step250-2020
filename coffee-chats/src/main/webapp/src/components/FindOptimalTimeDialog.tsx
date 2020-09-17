@@ -1,23 +1,21 @@
 import React, {useState} from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle, Grid,
-} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {TimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
-import {setHours, setMinutes} from "date-fns";
+import {getHours, getMinutes, setHours, setMinutes, startOfDay} from "date-fns";
+import {postData} from "../util/fetch";
+import {Group} from "../entity/Group";
 
 interface FindOptimalTimeDialogProps {
   open: boolean;
   setOpen: (value: boolean) => void;
+  setDate: (value: Date) => void;
+  group: Group;
+  duration: number; // in minutes
 }
 
-export function FindOptimalTimeDialog({open, setOpen}: FindOptimalTimeDialogProps) {
+export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}: FindOptimalTimeDialogProps) {
   const [dates, setDates] = useState([new Date()]);
 
   const [timeStart, setTimeStart] = useState<MaterialUiPickersDate>( // from 9:00
@@ -27,6 +25,29 @@ export function FindOptimalTimeDialog({open, setOpen}: FindOptimalTimeDialogProp
   const [timeEnd, setTimeEnd] = useState<MaterialUiPickersDate>( // to 17:00
       setHours(setMinutes(new Date(), 0), 17)
   );
+
+  const submit = async () => {
+    const ranges = dates.map(startOfDay).map(date => (
+        {
+          start: setMinutes(setHours(date, getHours(timeStart!)), getMinutes(timeStart!)),
+          end: setMinutes(setHours(date, getHours(timeEnd!)), getMinutes(timeEnd!)),
+        }
+    ));
+
+    const data = new Map();
+    data.set("id", group.id);
+    data.set("duration", duration.toString());
+    data.set("ranges", JSON.stringify(ranges));
+
+    const response = await postData("/api/scheduleEvent", data);
+
+    if (response.status === 200) {
+      const dateText = await response.json();
+      setDate(new Date(dateText));
+    }
+
+    setOpen(false);
+  };
 
   return (
       <Dialog open={open} onClose={() => setOpen(false)}>
@@ -38,7 +59,7 @@ export function FindOptimalTimeDialog({open, setOpen}: FindOptimalTimeDialogProp
           </DialogContentText>
           <Grid container spacing={2}>
             <Grid item sm={7}>
-              <MultiDatePicker dates={dates} setDates={setDates} />
+              <MultiDatePicker dates={dates} setDates={setDates}/>
             </Grid>
             <Grid item sm={5}>
               <TimePicker
@@ -62,7 +83,7 @@ export function FindOptimalTimeDialog({open, setOpen}: FindOptimalTimeDialogProp
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button color="primary">Find</Button>
+          <Button color="primary" onClick={submit}>Find</Button>
         </DialogActions>
       </Dialog>
   );
