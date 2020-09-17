@@ -1,24 +1,8 @@
-import {CalAuthState} from "../entity/AuthState";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 
-const calAuthURL = 'api/auth/calendar';
 const chatRequestURL = '/api/chat-request';
 
 const STATUS_OK = 200;
-
-/**
- * Submit a fetch request to check the authorisation status of the current user
- * for the Google Calendar API scopes required by app functionality.
- */
-export const submitCalAuthRequest = async () => {
-  try {
-    const authResponse = await fetch(calAuthURL);
-    return authResponse.json() as Promise<CalAuthState>;
-  } catch (reason) {
-    console.log('Calendar Authorisation check failed: ' + reason.toString());
-    return {authorised: false, authLink: ""};
-  }
-}
 
 /**
  * A function to handle formatting and sending the data for the chat request.
@@ -40,8 +24,8 @@ export const submitChatRequest = async (interests: string[],
   const data = new URLSearchParams();
   
   data.append('tags', interests.toString());
-  data.append('startDates', startDates.map(d => d!).map(d => +d).toString());
-  data.append('endDates', endDates.map(d => d!).map(d => +d).toString());
+  data.append('startDates', startDates.map(d => +d!).toString());
+  data.append('endDates', endDates.map(d => +d!).toString());
   data.append('minPeople', numPeopleRange[0].toString());
   data.append('maxPeople', numPeopleRange[1].toString());
   data.append('durationMins', durationMins.toString());

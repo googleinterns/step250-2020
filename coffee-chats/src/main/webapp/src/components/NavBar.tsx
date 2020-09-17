@@ -2,13 +2,16 @@ import React from "react";
 
 import {AppBar, Grid, Icon, IconButton, List, SwipeableDrawer, Toolbar, Tooltip} from "@material-ui/core";
 import {ListItemLink} from "./LinkComponents";
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 
 interface NavBarButtonsProps {
   onDrawerOpen: () => void;
-  logoutUrl: string;
+  openOAuthDialog: () => void;
 }
 
-function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
+function NavBarButtons({onDrawerOpen, openOAuthDialog}: NavBarButtonsProps) {
+  const authState: AuthState = React.useContext(AuthStateContext);
+
   return (
       <Grid justify="space-between" container>
         <Grid item>
@@ -21,6 +24,21 @@ function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
         <Grid item>
           {/* Right side of the navbar */}
           <Grid container spacing={2}>
+            {!authState.oauthAuthorized &&
+            <Grid item>
+              <Tooltip title="You need to authorise the app with your Google Calendar">
+                <IconButton
+                    color="secondary"
+                    edge="end"
+                    aria-label="Authorise the app with your Google Calendar"
+                    onClick={openOAuthDialog}
+                >
+                  <Icon>error</Icon>
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            }
+
             <Grid item>
               <Tooltip title="Opt out of new chats">
                 <IconButton edge="end" aria-label="Opt out of new chats">
@@ -31,7 +49,7 @@ function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
 
             <Grid item>
               <Tooltip title="Log out">
-                <IconButton edge="end" aria-label="Log out" href={logoutUrl}>
+                <IconButton edge="end" aria-label="Log out" href={authState.logoutUrl}>
                   <Icon>exit_to_app</Icon>
                 </IconButton>
               </Tooltip>
@@ -45,26 +63,29 @@ function NavBarButtons({onDrawerOpen, logoutUrl}: NavBarButtonsProps) {
 function DrawerButtons() {
   return (
       <List>
-        <ListItemLink to="/" primary="Main page" />
-        <ListItemLink to="/groups" primary="My groups" />
-        <ListItemLink to="/upcoming" primary="Upcoming chats" />
-        <ListItemLink to="/history" primary="History" />
+        <ListItemLink to="/" primary="Main page"/>
+        <ListItemLink to="/groups" primary="My groups"/>
+        <ListItemLink to="/upcoming" primary="Upcoming chats"/>
+        <ListItemLink to="/history" primary="History"/>
       </List>
   );
 }
 
 interface NavBarProps {
-  logoutUrl: string;
+  openOAuthDialog: () => void;
 }
 
-export function NavBar({logoutUrl}: NavBarProps) {
+export function NavBar({openOAuthDialog}: NavBarProps) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
       <React.Fragment>
-        <AppBar position="static" style={{ background: "transparent", boxShadow: "none"}}>
+        <AppBar position="static" style={{background: "transparent", boxShadow: "none"}}>
           <Toolbar>
-            <NavBarButtons onDrawerOpen={() => setDrawerOpen(true)} logoutUrl={logoutUrl} />
+            <NavBarButtons
+                onDrawerOpen={() => setDrawerOpen(true)}
+                openOAuthDialog={openOAuthDialog}
+            />
           </Toolbar>
         </AppBar>
         <SwipeableDrawer

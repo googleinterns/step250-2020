@@ -1,32 +1,23 @@
 package com.google.step.coffee.servlets;
 
-import com.google.appengine.api.datastore.*;
-import com.google.step.coffee.HttpError;
-import com.google.step.coffee.JsonServlet;
-import com.google.step.coffee.JsonServletRequest;
-import com.google.step.coffee.PermissionChecker;
-import com.google.step.coffee.entity.Group;
+import com.google.step.coffee.*;
+import com.google.step.coffee.data.GroupStore;
 
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet("/api/groupList")
 public class GroupListServlet extends JsonServlet {
+  GroupStore groupStore = new GroupStore();
+
   @Override
   public Object get(JsonServletRequest request) throws IOException, HttpError {
     PermissionChecker.ensureLoggedIn();
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    List<Group> groups = new ArrayList<>();
-    Query query = new Query("group");
-    PreparedQuery results = datastore.prepare(query);
-
-    for (Entity entity : results.asIterable()) {
-      groups.add(Group.fromEntity(entity));
+    if (Boolean.parseBoolean(request.getParameter("all"))) {
+      return groupStore.getAllGroups();
     }
 
-    return groups;
+    return groupStore.getUserGroups(UserManager.getCurrentUser());
   }
 }

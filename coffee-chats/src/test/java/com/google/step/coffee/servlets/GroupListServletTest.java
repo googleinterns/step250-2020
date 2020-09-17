@@ -3,7 +3,9 @@ package com.google.step.coffee.servlets;
 import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.TestHelper;
+import com.google.step.coffee.data.GroupStore;
 import com.google.step.coffee.entity.Group;
+import com.google.step.coffee.entity.GroupMembership;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +38,14 @@ public class GroupListServletTest extends TestHelper {
     groupEntity.setProperty("name", "foo");
     groupEntity.setProperty("description", new Text("bar"));
     groupEntity.setProperty("ownerId", "test_user");
+    groupEntity.setProperty("tags", new ArrayList<>());
     datastore.put(groupEntity);
+
+    Entity membershipEntity = new Entity("groupMembership");
+    membershipEntity.setProperty("group", groupEntity.getKey());
+    membershipEntity.setProperty("user", "test_user");
+    membershipEntity.setProperty("status", GroupMembership.Status.OWNER.toString());
+    datastore.put(membershipEntity);
 
     assertThat(getGroupList(), equalTo(Collections.singletonList(
         Group.builder()
@@ -46,5 +55,19 @@ public class GroupListServletTest extends TestHelper {
             .setOwnerId("test_user")
             .build()
     )));
+  }
+
+  @Test
+  public void testOtherPeoplesGroupsNotVisible() throws Exception {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity groupEntity = new Entity("group");
+    groupEntity.setProperty("name", "foo");
+    groupEntity.setProperty("description", new Text("bar"));
+    groupEntity.setProperty("ownerId", "not_a_test_user");
+    groupEntity.setProperty("tags", new ArrayList<>());
+    datastore.put(groupEntity);
+
+    assertThat(getGroupList(), equalTo(new ArrayList<>()));
   }
 }

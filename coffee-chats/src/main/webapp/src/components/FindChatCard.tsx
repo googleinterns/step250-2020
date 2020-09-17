@@ -1,15 +1,18 @@
 import React, {useState, ChangeEvent} from "react";
 import "./FindChatCard.css";
-import {Typography, CardActions, Card, CardContent, Button, CardHeader, 
-  createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel, 
+import {
+  Typography, CardActions, Card, CardContent, Button, CardHeader,
+  createStyles, makeStyles, Theme, Collapse, Grid, MenuItem, InputLabel,
   Select, FormControl, FormControlLabel, Checkbox, CircularProgress, Slider,
-  Snackbar, Chip, List} from "@material-ui/core";
+  Snackbar, List, Chip, Tooltip
+} from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import {green} from "@material-ui/core/colors";
-import {submitChatRequest, submitCalAuthRequest} from "../util/chatRequest";
+import {submitChatRequest} from "../util/chatRequest";
+import {AuthState, AuthStateContext} from "../entity/AuthState";
 import {DatetimeRangeListItem} from "./DatetimeRangeListItem";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 
@@ -57,14 +60,12 @@ const MIN_PARTICIPANTS = 1;
 const MAX_PARTICIPANTS = 4;
 
 interface FindChatCardProps {
-  interests: string[],
-  setAuthLink: (link: string) => void,
-  setAuthDialogOpen: (open: boolean) => void
-};
+  interests: string[]
+}
 
-export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLink, setAuthDialogOpen}) => {
-  
+export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
   const classes = useStyles();
+  const authState: AuthState = React.useContext(AuthStateContext);
 
   const participantSliderMarks = [1,2,3,4].map((num) => ({value: num, label: num.toString()}));
 
@@ -133,25 +134,6 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
-  };
-
-  const chatRequestClick = async () => {
-    const response = await calendarAuth();
-    
-    if (response.authorised) {
-      chatRequestSend();
-    }
-  };
-
-  const calendarAuth = async () => {
-    const response = await submitCalAuthRequest();
-
-    if (!response.authorised) {
-      setAuthLink(response.authLink);
-      setAuthDialogOpen(true);
-    }
-
-    return response;
   };
 
   const chatRequestSend = async () => {
@@ -227,15 +209,19 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests, setAuthLin
         </Button>
 
         <div className={classes.successBtnWrapper}>
-          <Button 
-            variant="contained"
-            color="primary"
-            className={clsx({[classes.btnSuccess]: success})}
-            disabled={loading}
-            onClick={chatRequestClick}
-          >
-            Find a chat!
-          </Button>
+          <Tooltip title={authState.oauthAuthorized ? "" : "You need to authorize the app with your Google Calendar first"}>
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                className={clsx({[classes.btnSuccess]: success})}
+                disabled={loading || !authState.oauthAuthorized}
+                onClick={chatRequestSend}
+              >
+                Find a chat!
+              </Button>
+            </span>
+          </Tooltip>
           {loading && <CircularProgress size={24} className={classes.btnProgress} />}
         </div>
       </CardActions>

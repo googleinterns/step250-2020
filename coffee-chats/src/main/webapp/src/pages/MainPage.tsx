@@ -1,34 +1,24 @@
-import React, {useState, ChangeEvent, useEffect} from "react";
-import {Box, Container, Grid, Icon, IconButton, TextField, Tooltip, Typography,
-  Tabs, Tab, Chip} from "@material-ui/core";
-import {Autocomplete, createFilterOptions} from '@material-ui/lab'
-import {ConnectBackCard} from "../components/ConnectBackCard";
+import React, {useState} from "react";
+import {Box, Container, Grid, Icon, IconButton, Tooltip, Typography} from "@material-ui/core";
 import {FindChatCard} from "../components/FindChatCard";
-import {capitaliseEachWord} from "../util/stringUtils";
-import {fetchTags} from "../util/tagsRequest";
-import {CalAuthDialog} from "../components/CalAuthDialog";
+import {TagsInput} from "../components/TagsInput";
+import {Group} from "../entity/Group";
+import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
+import {GroupCard} from "../components/GroupCard";
 
 export function MainPage() {
-  const CHATS_VIEW = 0;
-  
-  const filter = createFilterOptions<string>();
-  const [tagOptions, setTagOptions] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
+  const groups = useFetch<Group[]>("/api/groupList?all=true");
 
-  const [currView, setCurrView] = useState(CHATS_VIEW);
-  const [authLink, setAuthLink] = useState("");
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  if (hasFetchFailed(groups)) {
+    return getFetchErrorPage(groups);
+  }
 
-  useEffect(() => {
-    const initFetchTags = (async () => {
-      setTagOptions(await fetchTags());
-    });
-    initFetchTags();
-  }, []);
+  const tagsSet = new Set(tags);
 
-  const submitAuthRequest = () => {
-    window.location.href = authLink;
-  };
+  const suggestGroups = groups.value.filter(group =>
+      group.tags.filter(tag => tagsSet.has(tag)).length > 0
+  );
 
   return (
       <Box mt={4}>
@@ -37,97 +27,38 @@ export function MainPage() {
             Coffee Chats
           </Typography>
 
-          <Tabs
-            value={currView}
-            onChange={(_event: ChangeEvent<{}>, newView: number) => setCurrView(newView)}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="fullWidth"
-            centered
-          >
-            <Tab label="Chats" />
-            <Tab label="Groups" />
-          </Tabs>
-
-          <br />
-
           <Grid container alignItems="center" justify="space-around" spacing={1}>
             <Grid item xs={10} sm={11}>
-              <Autocomplete 
-                multiple
-                options={tagOptions}
-                freeSolo
-                autoHighlight
-                onChange={(_event: any, newValue: string[]) => {
-                  setTags(newValue);
-                }}
-                renderTags={(value: string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField 
-                    {...params}
-                    variant="outlined"
-                    label={currView === CHATS_VIEW ?
-                      'What do you want to chat about?' :
-                      'What are you interested in?'
-                    }
-                  />
-                )}
-                filterOptions={(options, params) => {
-                  const filtered = filter(options, params);
-                  const currInput = capitaliseEachWord(params.inputValue);
-          
-                  // Suggest the creation of a new tag
-                  if (params.inputValue !== '' && !options.includes(currInput)) {
-                    filtered.push(currInput);
-                  }
-
-                  return filtered;
-                }}
+              <TagsInput
+                  tags={tags}
+                  setTags={setTags}
+                  label="What do you want to chat about?"
+                  suggestGroups={groups.value}
               />
             </Grid>
 
             <Grid item xs={2} sm={1}>
-              {currView === CHATS_VIEW ?
-                <Tooltip title="Any topic">
-                  <IconButton
-                      aria-label="chat about any topic">
-                    <Icon>casino</Icon>
-                  </IconButton>
-                </Tooltip> :
-                <Tooltip title="Search Filters">
-                  <IconButton 
-                      aria-label="filter search results">
-                    <Icon>tune</Icon>
-                  </IconButton>
-                </Tooltip>
-              }
+              <Tooltip title="Any topic">
+                <IconButton
+                    aria-label="chat about any topic">
+                  <Icon>casino</Icon>
+                </IconButton>
+              </Tooltip>
             </Grid>
           </Grid>
 
           <Box mt={2}>
             <Grid container spacing={4}>
               <Grid item xs={12}>
-                <FindChatCard
-                  interests={tags}
-                  setAuthLink={setAuthLink}
-                  setAuthDialogOpen={setAuthDialogOpen}
-                />
+                <FindChatCard interests={tags} />
               </Grid>
-              <Grid item md={4}>
-                <ConnectBackCard names={["Natalie Lynn", "Ian Hall"]} tags={["movies"]} />
-              </Grid>
+              {suggestGroups.map(group =>
+                  <Grid item md={4} key={group.id}>
+                    <GroupCard group={group} withDescription={false} />
+                  </Grid>
+              )}
             </Grid>
           </Box>
-
-          <CalAuthDialog
-            submitAuthRequest={submitAuthRequest}
-            open={authDialogOpen}
-            setOpen={setAuthDialogOpen}
-          />
         </Container>
       </Box>
   );

@@ -1,6 +1,8 @@
 package com.google.step.coffee;
 
 import com.google.appengine.api.datastore.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -31,6 +33,16 @@ public class JsonServletRequest extends HttpServletRequestWrapper {
       throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "No value specified for parameter '" + name + "'");
     }
     return value;
+  }
+
+  public <T> T getRequiredJsonParameter(String name, Class<T> classOfT) throws HttpError {
+    String encoded = getRequiredParameter(name);
+    Gson gson = new Gson();
+    try {
+      return gson.fromJson(encoded, classOfT);
+    } catch (JsonSyntaxException exception) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid value for parameter '" + name + "'");
+    }
   }
 
   /**
