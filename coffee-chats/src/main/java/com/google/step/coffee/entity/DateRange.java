@@ -165,7 +165,9 @@ public class DateRange implements Comparable<DateRange> {
     if (this.overlaps(removeRange)) {
       if (this.getStart().before(removeRange.getStart())) {
         splitRanges.add(new DateRange(this.getStart(), removeRange.getStart()));
-      } else if (removeRange.getEnd().before(this.getEnd())) {
+      }
+
+      if (removeRange.getEnd().before(this.getEnd())) {
         splitRanges.add(new DateRange(removeRange.getEnd(), this.getEnd()));
       }
     } else {

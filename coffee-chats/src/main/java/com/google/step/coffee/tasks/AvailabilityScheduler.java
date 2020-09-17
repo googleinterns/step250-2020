@@ -70,37 +70,48 @@ public class AvailabilityScheduler {
    * busyRanges.
    */
   List<DateRange> removeBusyRanges(List<DateRange> options, List<DateRange> busyRanges) {
-    options = new ArrayList<>(options);
+    if (options.isEmpty()) {
+      return new ArrayList<>();
+    }
+
     List<DateRange> freeRanges = new ArrayList<>();
 
-    int i = 0;
-    int j = 0;
+    int curIdx = 0;
+    DateRange current = options.get(curIdx);
 
-    while (i != options.size() && j != busyRanges.size()) {
-      DateRange freeRange = options.get(i);
-      DateRange busyRange = busyRanges.get(j);
+    for (DateRange busy : busyRanges) {
+      while (!current.overlaps(busy)) {
+        freeRanges.add(current);
 
-      if (freeRange.overlaps(busyRange)) {
-        List<DateRange> splitRanges = freeRange.removeRange(busyRange);
-
-        if (splitRanges.isEmpty()) {
-          i++;
-        } else {
-          options.set(i, splitRanges.remove(splitRanges.size() - 1));
-          freeRanges.addAll(splitRanges);
+        ++curIdx;
+        if (curIdx == options.size()) {
+          return freeRanges;
         }
+
+        current = options.get(curIdx);
+      }
+
+      List<DateRange> split = current.removeRange(busy);
+
+      if (split.size() == 2) {
+        freeRanges.add(split.get(0));
+        current = split.get(1);
+      } else if (split.size() == 1) {
+        current = split.get(0);
       } else {
-        if (!busyRange.getEnd().after(freeRange.getStart())) {
-          j++;
-        } else if (!busyRange.getStart().before(freeRange.getEnd())) {
-          freeRanges.add(freeRange);
-          i++;
+        ++curIdx;
+        if (curIdx == options.size()) {
+          return freeRanges;
         }
+
+        current = options.get(curIdx);
       }
     }
 
-    for (; i < options.size(); i++) {
-      freeRanges.add(options.get(i));
+    freeRanges.add(current);
+
+    for (++curIdx; curIdx < options.size(); ++curIdx) {
+      freeRanges.add(options.get(curIdx));
     }
 
     return freeRanges;
