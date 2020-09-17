@@ -11,7 +11,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @WebServlet("/api/scheduleEvent")
 public class EventScheduleServlet extends JsonServlet {
@@ -28,6 +30,8 @@ public class EventScheduleServlet extends JsonServlet {
         duration.compareTo(MAX_DURATION) > 0) {
       throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Invalid duration");
     }
+
+    List<DateRange> ranges = Arrays.asList(request.getRequiredJsonParameter("ranges", DateRange[].class));
 
     return new Date();
   }

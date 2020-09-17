@@ -3,6 +3,7 @@ package com.google.step.coffee.tasks;
 import com.google.api.services.calendar.model.Event;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.DateRange;
 import com.google.step.coffee.entity.TimeSlot;
@@ -76,11 +77,11 @@ public class RequestMatcher extends HttpServlet {
   /**
    * Given matched requests, find availability for all users in the selected date ranges.
    */
-  private TimeSlot findSharedTimeSlot(ChatRequest ...reqs) {
+  private TimeSlot findSharedTimeSlot(Availability...reqs) {
     AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
 
     Duration minDuration = Arrays.stream(reqs)
-        .map(ChatRequest::getDuration)
+        .map(Availability::getDuration)
         .min(Duration::compareTo)
         .orElse(Duration.ofMinutes(15));
 

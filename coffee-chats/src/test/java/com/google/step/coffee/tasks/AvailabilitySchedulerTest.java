@@ -356,7 +356,7 @@ public class AvailabilitySchedulerTest {
         .build();
 
     scheduler.setUserIds(Arrays.asList("userA", "userB", "userC"));
-    scheduler.setChatRequests(requestA, requestB, requestC);
+    scheduler.setAvailabilities(requestA, requestB, requestC);
 
     DateRange commonRange1 = rangeC1;
     DateRange commonRange2 = busyB2;

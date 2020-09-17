@@ -5,7 +5,7 @@ import static com.google.step.coffee.entity.DateRange.toDateRanges;
 
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.data.CalendarUtils;
-import com.google.step.coffee.entity.ChatRequest;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.DateRange;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -17,23 +17,23 @@ import java.util.stream.Collectors;
 public class AvailabilityScheduler {
 
   private List<String> userIds;
-  private ChatRequest[] chatRequests;
+  private Availability[] availabilities;
 
   private CalendarUtils utils = new CalendarUtils();
 
   public AvailabilityScheduler() {};
 
-  public AvailabilityScheduler(ChatRequest ...requests) {
-    this.chatRequests = requests;
-    this.userIds = Arrays.stream(requests).map(ChatRequest::getUserId).collect(Collectors.toList());
+  public AvailabilityScheduler(Availability...requests) {
+    this.availabilities = requests;
+    this.userIds = Arrays.stream(requests).map(Availability::getUserId).collect(Collectors.toList());
   }
 
   public void setUserIds(List<String> userIds) {
     this.userIds = userIds;
   }
 
-  public void setChatRequests(ChatRequest ...requests) {
-    this.chatRequests = requests;
+  public void setAvailabilities(Availability...requests) {
+    this.availabilities = requests;
   }
 
   public void setUtils(CalendarUtils utils) {
@@ -44,7 +44,7 @@ public class AvailabilityScheduler {
    * Finds suitable ranges of at least minDuration length that is available by all participants.
    */
   public List<DateRange> findAvailableRanges(Duration minDuration) {
-    List<DateRange> commonRanges = findCommonRanges(chatRequests);
+    List<DateRange> commonRanges = findCommonRanges(availabilities);
     if (commonRanges.isEmpty()) {
       return Collections.emptyList();
     }
@@ -134,7 +134,7 @@ public class AvailabilityScheduler {
    * @param requests Array of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(ChatRequest ...requests) {
+  public List<DateRange> findCommonRanges(Availability...requests) {
     List<DateRange> commonRanges = new ArrayList<>();
 
     for (int i = 0; i < requests.length; i++) {
