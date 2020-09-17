@@ -14,7 +14,6 @@ import com.google.api.services.calendar.model.Event;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
-import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.TimeSlot;
 import java.time.Duration;
 import java.util.Arrays;
