@@ -11,6 +11,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.InvalidEntityException;
 import com.google.step.coffee.data.CalendarUtils;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.DateRange;
@@ -174,7 +175,7 @@ public class AvailabilitySchedulerTest {
     DateRange expectedRange1 = rangeC1;
     DateRange expectedRange2 = rangeB2;
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    assertThat(scheduler.findCommonRanges(Arrays.asList(requestA, requestB, requestC)),
         contains(expectedRange1, expectedRange2));
   }
 
@@ -205,7 +206,7 @@ public class AvailabilitySchedulerTest {
     ChatRequest requestB = new ChatRequestBuilder().onDates(rangesB).build();
     ChatRequest requestC = new ChatRequestBuilder().onDates(rangesC).build();
 
-    assertThat(scheduler.findCommonRanges(requestA, requestB, requestC),
+    assertThat(scheduler.findCommonRanges(Arrays.asList(requestA, requestB, requestC)),
         is(Collections.emptyList()));
   }
 
@@ -267,6 +268,27 @@ public class AvailabilitySchedulerTest {
 
     assertThat(scheduler.fetchBusyRanges(givenRanges),
         contains(expectedRange1, expectedRange2, expectedRange3));
+  }
+
+  /**
+   * Tests what resultant ranges are when removing nested ranges.
+   *
+   * Given Ranges: |----------------|
+   * Busy Ranges:      |--|
+   * Expected:     |---|  |---------|
+   */
+  @Test
+  public void removeNestedRanges() {
+    DateRange range = new DateRange(DAY1_MORNING, DAY3_EVENING);
+    DateRange busy = new DateRange(DAY1_EVENING, DAY2_MORNING);
+
+    List<DateRange> options = Arrays.asList(range);
+    List<DateRange> busyRanges = Arrays.asList(busy);
+
+    assertThat(scheduler.removeBusyRanges(options, busyRanges), contains(
+        new DateRange(DAY1_MORNING, DAY1_EVENING),
+        new DateRange(DAY2_MORNING, DAY3_EVENING)
+    ));
   }
 
   /**
@@ -356,7 +378,8 @@ public class AvailabilitySchedulerTest {
         .build();
 
     scheduler.setUserIds(Arrays.asList("userA", "userB", "userC"));
-    scheduler.setChatRequests(requestA, requestB, requestC);
+
+    scheduler.setAvailabilities(Arrays.asList(requestA, requestB, requestC));
 
     DateRange commonRange1 = rangeC1;
     DateRange commonRange2 = busyB2;

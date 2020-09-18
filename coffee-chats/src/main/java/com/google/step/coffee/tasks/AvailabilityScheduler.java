@@ -5,7 +5,7 @@ import static com.google.step.coffee.entity.DateRange.toDateRanges;
 
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.data.CalendarUtils;
-import com.google.step.coffee.entity.ChatRequest;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.DateRange;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -17,23 +17,23 @@ import java.util.stream.Collectors;
 public class AvailabilityScheduler {
 
   private List<String> userIds;
-  private ChatRequest[] chatRequests;
+  private List<Availability> availabilities;
 
   private CalendarUtils utils = new CalendarUtils();
 
   public AvailabilityScheduler() {};
 
-  public AvailabilityScheduler(ChatRequest ...requests) {
-    this.chatRequests = requests;
-    this.userIds = Arrays.stream(requests).map(ChatRequest::getUserId).collect(Collectors.toList());
+  public AvailabilityScheduler(List<Availability> requests) {
+    this.availabilities = requests;
+    this.userIds = requests.stream().map(Availability::getUserId).collect(Collectors.toList());
   }
 
   public void setUserIds(List<String> userIds) {
     this.userIds = userIds;
   }
 
-  public void setChatRequests(ChatRequest ...requests) {
-    this.chatRequests = requests;
+  public void setAvailabilities(List<Availability> requests) {
+    this.availabilities = requests;
   }
 
   public void setUtils(CalendarUtils utils) {
@@ -44,7 +44,7 @@ public class AvailabilityScheduler {
    * Finds suitable ranges of at least minDuration length that is available by all participants.
    */
   public List<DateRange> findAvailableRanges(Duration minDuration) {
-    List<DateRange> commonRanges = findCommonRanges(chatRequests);
+    List<DateRange> commonRanges = findCommonRanges(availabilities);
     if (commonRanges.isEmpty()) {
       return Collections.emptyList();
     }
@@ -70,36 +70,48 @@ public class AvailabilityScheduler {
    * busyRanges.
    */
   List<DateRange> removeBusyRanges(List<DateRange> options, List<DateRange> busyRanges) {
+    if (options.isEmpty()) {
+      return new ArrayList<>();
+    }
+
     List<DateRange> freeRanges = new ArrayList<>();
 
-    int i = 0;
-    int j = 0;
+    int curIdx = 0;
+    DateRange current = options.get(curIdx);
 
-    while (i != options.size() && j != busyRanges.size()) {
-      DateRange freeRange = options.get(i);
-      DateRange busyRange = busyRanges.get(j);
+    for (DateRange busy : busyRanges) {
+      while (!current.overlaps(busy)) {
+        freeRanges.add(current);
 
-      if (freeRange.overlaps(busyRange)) {
-        List<DateRange> splitRanges = freeRange.removeRange(busyRange);
-
-        if (splitRanges.isEmpty()) {
-          i++;
-        } else {
-          options.set(i, splitRanges.remove(splitRanges.size() - 1));
-          freeRanges.addAll(splitRanges);
+        ++curIdx;
+        if (curIdx == options.size()) {
+          return freeRanges;
         }
+
+        current = options.get(curIdx);
+      }
+
+      List<DateRange> split = current.removeRange(busy);
+
+      if (split.size() == 2) {
+        freeRanges.add(split.get(0));
+        current = split.get(1);
+      } else if (split.size() == 1) {
+        current = split.get(0);
       } else {
-        if (!busyRange.getEnd().after(freeRange.getStart())) {
-          j++;
-        } else if (!busyRange.getStart().before(freeRange.getEnd())) {
-          freeRanges.add(freeRange);
-          i++;
+        ++curIdx;
+        if (curIdx == options.size()) {
+          return freeRanges;
         }
+
+        current = options.get(curIdx);
       }
     }
 
-    for (; i < options.size(); i++) {
-      freeRanges.add(options.get(i));
+    freeRanges.add(current);
+
+    for (++curIdx; curIdx < options.size(); ++curIdx) {
+      freeRanges.add(options.get(curIdx));
     }
 
     return freeRanges;
@@ -134,11 +146,11 @@ public class AvailabilityScheduler {
    * @param requests Array of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(ChatRequest ...requests) {
+  public List<DateRange> findCommonRanges(List<Availability> requests) {
     List<DateRange> commonRanges = new ArrayList<>();
 
-    for (int i = 0; i < requests.length; i++) {
-      List<DateRange> coalescedRanges = coalesceRanges(requests[i].getDateRanges());
+    for (int i = 0; i < requests.size(); i++) {
+      List<DateRange> coalescedRanges = coalesceRanges(requests.get(i).getDateRanges());
 
       if (i != 0) {
         commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);
