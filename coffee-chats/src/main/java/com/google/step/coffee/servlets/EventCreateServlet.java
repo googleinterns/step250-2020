@@ -4,6 +4,7 @@ import com.google.step.coffee.HttpError;
 import com.google.step.coffee.JsonServlet;
 import com.google.step.coffee.JsonServletRequest;
 import com.google.step.coffee.PermissionChecker;
+import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.EventStore;
 import com.google.step.coffee.entity.Event;
 import com.google.step.coffee.entity.Group;
@@ -26,12 +27,16 @@ public class EventCreateServlet extends JsonServlet {
     Duration duration = Duration.ofMinutes(request.getRequiredLongParameter("duration"));
     String description = request.getRequiredParameter("description");
 
-    return eventStore.put(Event.builder()
+    Event event = eventStore.put(Event.builder()
         .setGroupId(group.id())
         .setStart(start)
         .setDuration(duration)
         .setDescription(description)
         .build()
     );
+
+    CalendarUtils.createGroupEvent(event);
+
+    return event;
   }
 }

@@ -7,6 +7,8 @@ import {DateTimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
 import {Group} from "../entity/Group";
+import {postData} from "../util/fetch";
+import {getUnixTime} from "date-fns";
 
 interface CreateEvebtCardProps {
   group: Group;
@@ -19,7 +21,12 @@ export function CreateEventCard({group}: CreateEvebtCardProps) {
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
 
   const submit = async () => {
-
+    const data = new Map();
+    data.set("id", group.id);
+    data.set("duration", duration);
+    data.set("start", getUnixTime(start!));
+    data.set("description", description);
+    await postData("/api/eventCreate", data);
   };
 
   return (

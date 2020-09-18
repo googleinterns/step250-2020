@@ -3,9 +3,6 @@ package com.google.step.coffee.data;
 import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.entity.Event;
 
-import java.time.Duration;
-import java.time.Instant;
-
 public class EventStore {
   private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -17,7 +14,7 @@ public class EventStore {
     Key key = event.key();
     Entity entity = key != null ? new Entity(key) : new Entity("event");
     entity.setProperty("description", new Text(event.description()));
-    entity.setProperty("start", event.start());
+    entity.setProperty("start", event.start().getEpochSecond());
     entity.setProperty("duration", event.duration().toMinutes());
     entity.setProperty("group", KeyFactory.stringToKey(event.groupId()));
 

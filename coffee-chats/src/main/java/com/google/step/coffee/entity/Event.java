@@ -45,8 +45,9 @@ public abstract class Event {
     return Event.builder()
         .setId(KeyFactory.keyToString(entity.getKey()))
         .setDescription(((Text) entity.getProperty("description")).getValue())
-        .setStart((Instant) entity.getProperty("start"))
+        .setStart(Instant.ofEpochSecond((long) entity.getProperty("start")))
         .setDuration(Duration.ofMinutes((long) entity.getProperty("duration")))
+        .setGroupId(KeyFactory.keyToString((Key) entity.getProperty("group")))
         .build();
   }
 
