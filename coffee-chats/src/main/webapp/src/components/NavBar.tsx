@@ -65,8 +65,8 @@ function DrawerButtons() {
       <List>
         <ListItemLink to="/" primary="Main page"/>
         <ListItemLink to="/groups" primary="My groups"/>
-        <ListItemLink to="/chats" primary="My chats"/>
         <ListItemLink to="/requests" primary="Requests"/>
+        <ListItemLink to="/chats" primary="My chats"/>
       </List>
   );
 }
