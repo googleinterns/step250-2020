@@ -197,6 +197,7 @@ public class RequestMatcher {
     requestList.removeAll(randomRequests);
 
     List<ChatRequest> tryMatchRandomReqs = requestList.stream()
+        .filter(ChatRequest::shouldMatchRandom)
         .filter(req -> req.getLastEndDate().before(weekFromNow()))
         .collect(
             Collectors.toList());
@@ -310,7 +311,7 @@ public class RequestMatcher {
       // Lambdas cannot use non-final variables
       int attemptGroupSize = groupSize;
       compatibleReqs = tagReqs.stream()
-          .filter(req -> request.getRequestId() != req.getRequestId())
+          .filter(req -> !request.getUserId().equals(req.getUserId()))
           .filter(req -> rangeIntersections.get(request).contains(req))
           .filter(req -> groupSizeInRange(attemptGroupSize, req))
           .collect(Collectors.toList());
@@ -371,7 +372,7 @@ public class RequestMatcher {
     for (ChatRequest req : rangeIntersections.get(currReq)) {
       Set<ChatRequest> newCombination = new HashSet<>(currCombination);
       newCombination.add(req);
-      if (!combinations.contains(newCombination)) {
+      if (!combinations.contains(newCombination) && distinctUsers(currCombination, req)) {
         if (intersectWithCombination(req, currCombination, rangeIntersections)) {
           combinations.add(newCombination);
 
@@ -382,6 +383,13 @@ public class RequestMatcher {
         }
       }
     }
+  }
+
+  private boolean distinctUsers(Set<ChatRequest> currCombination, ChatRequest newRequest) {
+    return !currCombination.stream()
+        .map(ChatRequest::getUserId)
+        .collect(Collectors.toSet())
+        .contains(newRequest.getUserId());
   }
 
   private boolean intersectWithCombination(ChatRequest request, Set<ChatRequest> combination,
