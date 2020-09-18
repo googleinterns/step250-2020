@@ -40,6 +40,14 @@ public class GroupStore {
     for (Entity entity : datastore.prepare(query).asIterable()) {
       datastore.delete(entity.getKey());
     }
+
+    query = new Query("event")
+        .setFilter(new Query.FilterPredicate(
+            "group", Query.FilterOperator.EQUAL, key));
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      datastore.delete(entity.getKey());
+    }
   }
 
   /**
@@ -57,6 +65,14 @@ public class GroupStore {
     datastore.put(entity);
 
     return Group.fromEntity(entity);
+  }
+
+  public Group get(String groupId) {
+    try {
+      return Group.fromEntity(datastore.get(KeyFactory.stringToKey(groupId)));
+    } catch (EntityNotFoundException exception) {
+      return null;
+    }
   }
 
   public List<GroupMembership> getMembers(Group group) {

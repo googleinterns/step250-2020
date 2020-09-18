@@ -18,6 +18,7 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.OAuthService;
+import com.google.step.coffee.entity.Group;
 import com.google.step.coffee.entity.TimeSlot;
 import com.google.step.coffee.entity.User;
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  */
 public class CalendarUtils {
   private static final UserStore userStore = new UserStore();
+  private static final GroupStore groupStore = new GroupStore();
 
   /**
    * Adds given event to user's primary calendar.
@@ -94,6 +96,38 @@ public class CalendarUtils {
         .setAttendees(attendees)
         .setStart(new EventDateTime().setDateTime(timeSlot.getDatetimeStart()))
         .setEnd(new EventDateTime().setDateTime(timeSlot.getDatetimeEnd()));
+  }
+
+  /**
+   * Creates a group event in Google Calendar with information provided.
+   */
+  public static void createGroupEvent(com.google.step.coffee.entity.Event event) {
+    Event calendarEvent = new Event();
+
+    Group group = groupStore.get(event.groupId());
+
+    List<EventAttendee> attendees = getAttendees(
+        groupStore.getMembers(group).stream()
+            .map(member -> member.user().id())
+            .collect(Collectors.toList()));
+
+    calendarEvent
+        .setSummary(group.name() + " Event")
+        .setConferenceData(new ConferenceData()
+            .setCreateRequest(new CreateConferenceRequest()
+                .setRequestId(generateRandomUUID())
+                .setConferenceSolutionKey(new ConferenceSolutionKey().setType("hangoutsMeet"))))
+        .setDescription("This event was scheduled in Coffee Chats\n" + event.description())
+        .setGuestsCanModify(true)
+        .setAttendees(attendees)
+        .setStart(new EventDateTime().setDateTime(
+            new DateTime(event.start().toEpochMilli())
+        ))
+        .setEnd(new EventDateTime().setDateTime(
+            new DateTime(event.start().toEpochMilli() + event.duration().toMillis())
+        ));
+
+    addEvent(group.ownerId(), calendarEvent);
   }
 
   /**

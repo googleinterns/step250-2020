@@ -9,15 +9,6 @@ import java.time.Instant;
 public class EventStore {
   private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-  public Event create(String groupId, Instant start, Duration duration) {
-    return put(Event.builder()
-        .setGroupId(groupId)
-        .setStart(start)
-        .setDuration(duration)
-        .setDescription("")
-        .build());
-  }
-
   /**
    * Saves the event to the database. Returns an <code>Event</code>
    * that has its id set, which the group passed to the function might not.
@@ -28,7 +19,7 @@ public class EventStore {
     entity.setProperty("description", new Text(event.description()));
     entity.setProperty("start", event.start());
     entity.setProperty("duration", event.duration().toMinutes());
-    entity.setProperty("groupId", event.groupId());
+    entity.setProperty("group", KeyFactory.stringToKey(event.groupId()));
 
     datastore.put(entity);
 

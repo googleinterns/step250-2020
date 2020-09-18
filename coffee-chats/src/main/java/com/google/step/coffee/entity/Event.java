@@ -6,12 +6,17 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 
 @AutoValue
 public abstract class Event {
+  @Nullable
   public abstract String id();
+
+  @Nullable
+  public abstract String calendarId();
 
   public abstract String groupId();
 
@@ -28,6 +33,7 @@ public abstract class Event {
   @AutoValue.Builder
   public abstract static class Builder {
     abstract public Builder setId(String value);
+    abstract public Builder setCalendarId(String value);
     abstract public Builder setGroupId(String value);
     abstract public Builder setDescription(String value);
     abstract public Builder setDuration(Duration value);
