@@ -25,6 +25,7 @@ abstract public class JsonServlet extends HttpServlet {
   private static String stringify(Object object, boolean onlyExposed) {
     GsonBuilder builder = new GsonBuilder();
     builder.disableHtmlEscaping();
+    builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     if (onlyExposed) {
       builder.excludeFieldsWithoutExposeAnnotation();
     }

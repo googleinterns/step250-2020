@@ -35,6 +35,22 @@ public class JsonServletRequest extends HttpServletRequestWrapper {
     return value;
   }
 
+  /**
+   * Returns the value of a specified request parameter, parsed as long, or throws <code>HttpError</code>
+   * if the parameter doesn't exist or is not a valid long
+   *
+   * @param name parameter name
+   * @return parameter value
+   * @throws HttpError with <code>errorCode = SC_BAD_REQUEST</code> if the parameter doesn't exist or is not a valid long
+   */
+  public long getRequiredLongParameter(String name) throws HttpError {
+    try {
+      return Long.parseLong(getRequiredParameter(name));
+    } catch (NumberFormatException exception) {
+      throw new HttpError(HttpServletResponse.SC_BAD_REQUEST, "Parameter '" + name + "' is not a valid integer");
+    }
+  }
+
   public <T> T getRequiredJsonParameter(String name, Class<T> classOfT) throws HttpError {
     String encoded = getRequiredParameter(name);
     Gson gson = new Gson();

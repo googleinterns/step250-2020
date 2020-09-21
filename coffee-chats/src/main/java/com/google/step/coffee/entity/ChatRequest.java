@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 /** Represents a request made by a user for a chat on given topics. */
-public class ChatRequest {
+public class ChatRequest implements Availability {
 
   private final List<String> tags;
   private Date lastEndDate;

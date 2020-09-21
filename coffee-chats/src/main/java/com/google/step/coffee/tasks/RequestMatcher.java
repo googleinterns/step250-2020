@@ -3,6 +3,7 @@ package com.google.step.coffee.tasks;
 import com.google.api.services.calendar.model.Event;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.DateRange;
 import com.google.step.coffee.entity.TimeSlot;
@@ -276,7 +277,8 @@ public class RequestMatcher {
     Set<ChatRequest> selectedCombo = null;
 
     for (Set<ChatRequest> combo : compatibleReqCombos) {
-      meetingSlot = findSharedTimeSlot(combo);
+      Set<Availability> comboAvails = new HashSet<>(combo);
+      meetingSlot = findSharedTimeSlot(comboAvails);
 
       if (!meetingSlot.isEmpty()) {
         selectedCombo = combo;
@@ -466,15 +468,15 @@ public class RequestMatcher {
   /**
    * Given matched requests, finds availability for all users in the selected date ranges.
    */
-  private TimeSlot findSharedTimeSlot(Collection<ChatRequest> reqs) {
-    AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
+  private TimeSlot findSharedTimeSlot(Collection<Availability> reqs) {
+    AvailabilityScheduler scheduler = new AvailabilityScheduler();
 
     Duration minDuration = reqs.stream()
-        .map(ChatRequest::getDuration)
+        .map(Availability::getDuration)
         .min(Duration::compareTo)
         .orElse(Duration.ofMinutes(15));
 
-    List<DateRange> rangeOptions = scheduler.findAvailableRanges(minDuration);
+    List<DateRange> rangeOptions = scheduler.findAvailableRanges(reqs, minDuration);
 
     if (rangeOptions.isEmpty()) {
       return TimeSlot.EMPTY;
