@@ -6,7 +6,10 @@ import com.google.step.coffee.entity.Group;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventStore {
   private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -32,10 +35,20 @@ public class EventStore {
   }
 
   public List<Event> getUpcomingEventsForGroup(Group group) {
+    return getUpcomingEventsForGroups(Collections.singletonList(group.id()));
+  }
+
+  public List<Event> getUpcomingEventsForGroups(List<String> groupIds) {
     Query query = new Query("event")
-        .setFilter(new Query.FilterPredicate(
-            "start", Query.FilterOperator.GREATER_THAN_OR_EQUAL, Instant.now().getEpochSecond()
-        ));
+        .setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND,
+            Arrays.asList(
+                new Query.FilterPredicate(
+            "start", Query.FilterOperator.GREATER_THAN_OR_EQUAL, Instant.now().getEpochSecond()),
+                new Query.CompositeFilter(Query.CompositeFilterOperator.OR,
+                  groupIds.stream().map(id -> new Query.FilterPredicate(
+                      "group", Query.FilterOperator.EQUAL, KeyFactory.stringToKey(id)
+                  )).collect(Collectors.toList()))
+            )));
 
     List<Event> result = new ArrayList<>();
 
