@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, Card, CardContent, Chip, Typography} from "@material-ui/core";
+import {Box, Card, CardContent, Typography} from "@material-ui/core";
 import {Event} from "../entity/Event";
 import {format, fromUnixTime} from "date-fns";
 
