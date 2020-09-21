@@ -19,12 +19,10 @@ public class AvailabilityScheduler {
       START, END
     }
 
-    private Availability availability;
     private Date date;
     private Kind kind;
 
-    public TimePoint(Availability availability, Date date, Kind kind) {
-      this.availability = availability;
+    public TimePoint(Date date, Kind kind) {
       this.date = date;
       this.kind = kind;
     }
@@ -49,10 +47,6 @@ public class AvailabilityScheduler {
       return compareTo(that) == 0;
     }
 
-    Availability getAvailability() {
-      return availability;
-    }
-
     Date getDate() {
       return date;
     }
@@ -63,16 +57,13 @@ public class AvailabilityScheduler {
   }
 
   private List<String> userIds;
-  private List<Availability> availabilities;
+  private Collection<? extends Availability> availabilities;
 
   private CalendarUtils utils = new CalendarUtils();
 
-  public AvailabilityScheduler() {
-  }
+  public AvailabilityScheduler() {}
 
-  ;
-
-  public AvailabilityScheduler(List<Availability> requests) {
+  public AvailabilityScheduler(Collection<? extends Availability> requests) {
     this.availabilities = requests;
     this.userIds = requests.stream().map(Availability::getUserId).collect(Collectors.toList());
   }
@@ -81,7 +72,7 @@ public class AvailabilityScheduler {
     this.userIds = userIds;
   }
 
-  public void setAvailabilities(List<Availability> requests) {
+  public void setAvailabilities(Collection<? extends Availability> requests) {
     this.availabilities = requests;
   }
 
@@ -246,33 +237,37 @@ public class AvailabilityScheduler {
    * @param requests Array of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(List<Availability> requests) {
+  public List<DateRange> findCommonRanges(Collection<? extends Availability> requests) {
     List<DateRange> commonRanges = new ArrayList<>();
 
-    for (int i = 0; i < requests.size(); i++) {
-      List<DateRange> coalescedRanges = coalesceRanges(requests.get(i).getDateRanges());
+    boolean first = true;
 
-      if (i != 0) {
-        commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);
+    for (Availability request : requests) {
+      List<DateRange> coalescedRanges = coalesceRanges(request.getDateRanges());
 
-        if (commonRanges.isEmpty()) {
-          return Collections.emptyList();
-        }
-      } else {
+      if (first) {
         commonRanges.addAll(coalescedRanges);
+        first = false;
+        continue;
+      }
+
+      commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);
+
+      if (commonRanges.isEmpty()) {
+        return Collections.emptyList();
       }
     }
 
     return commonRanges;
   }
 
-  private List<TimePoint> getRequestsTimePoints(List<Availability> requests) {
+  private List<TimePoint> getRequestsTimePoints(Collection<? extends Availability> requests) {
     List<TimePoint> result = new ArrayList<>();
 
     for (Availability request : requests) {
       for (DateRange range : coalesceRanges(request.getDateRanges())) {
-        result.add(new TimePoint(request, range.getStart(), TimePoint.Kind.START));
-        result.add(new TimePoint(request, range.getEnd(), TimePoint.Kind.END));
+        result.add(new TimePoint(range.getStart(), TimePoint.Kind.START));
+        result.add(new TimePoint(range.getEnd(), TimePoint.Kind.END));
       }
     }
 
