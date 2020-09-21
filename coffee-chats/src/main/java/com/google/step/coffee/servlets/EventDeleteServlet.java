@@ -35,7 +35,7 @@ public class EventDeleteServlet extends JsonServlet {
 
     CalendarUtils.removeEvent(group.ownerId(), event.calendarId());
     datastore.delete(event.key());
-    
+
     return null;
   }
 }
