@@ -10,11 +10,11 @@ import {Group} from "../entity/Group";
 import {postData} from "../util/fetch";
 import {getUnixTime} from "date-fns";
 
-interface CreateEvebtCardProps {
+interface CreateEventCardProps {
   group: Group;
 }
 
-export function CreateEventCard({group}: CreateEvebtCardProps) {
+export function CreateEventCard({group}: CreateEventCardProps) {
   const [duration, setDuration] = useState(30); // in minutes
   const [start, setStart] = useState<MaterialUiPickersDate>();
   const [description, setDescription] = useState("");

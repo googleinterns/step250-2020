@@ -39,15 +39,28 @@ public class EventStore {
   }
 
   public List<Event> getUpcomingEventsForGroups(List<String> groupIds) {
+    if (groupIds.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    Query.Filter filter;
+
+    if (groupIds.size() > 1) {
+      filter = new Query.CompositeFilter(Query.CompositeFilterOperator.OR,
+          groupIds.stream().map(id -> new Query.FilterPredicate(
+              "group", Query.FilterOperator.EQUAL, KeyFactory.stringToKey(id)
+          )).collect(Collectors.toList()));
+    } else {
+      filter = new Query.FilterPredicate(
+          "group", Query.FilterOperator.EQUAL, KeyFactory.stringToKey(groupIds.get(0)));
+    }
+
     Query query = new Query("event")
         .setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND,
             Arrays.asList(
                 new Query.FilterPredicate(
             "start", Query.FilterOperator.GREATER_THAN_OR_EQUAL, Instant.now().getEpochSecond()),
-                new Query.CompositeFilter(Query.CompositeFilterOperator.OR,
-                  groupIds.stream().map(id -> new Query.FilterPredicate(
-                      "group", Query.FilterOperator.EQUAL, KeyFactory.stringToKey(id)
-                  )).collect(Collectors.toList()))
+                filter
             )));
 
     List<Event> result = new ArrayList<>();
