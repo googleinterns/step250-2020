@@ -2,6 +2,11 @@ package com.google.step.coffee.data;
 
 import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.entity.Event;
+import com.google.step.coffee.entity.Group;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventStore {
   private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -24,5 +29,20 @@ public class EventStore {
     return event.modify()
         .setId(KeyFactory.keyToString(entity.getKey()))
         .build();
+  }
+
+  public List<Event> getUpcomingEventsForGroup(Group group) {
+    Query query = new Query("event")
+        .setFilter(new Query.FilterPredicate(
+            "start", Query.FilterOperator.GREATER_THAN_OR_EQUAL, Instant.now().getEpochSecond()
+        ));
+
+    List<Event> result = new ArrayList<>();
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      result.add(Event.fromEntity(entity));
+    }
+
+    return result;
   }
 }
