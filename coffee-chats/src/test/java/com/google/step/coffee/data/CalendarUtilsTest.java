@@ -61,6 +61,7 @@ public class CalendarUtilsTest extends TestHelper {
   @Test
   public void addingEventAddsOnceOnSuccess() throws IOException {
     Event event = mock(Event.class);
+    when(event.getId()).thenReturn(null);
     Calendar service = mock(Calendar.class);
     Events events = mock(Events.class);
     Insert insertReturn = mock(Insert.class);
@@ -80,6 +81,7 @@ public class CalendarUtilsTest extends TestHelper {
   @Test
   public void addingAnEventRetriesIfFails() throws IOException {
     Event event = mock(Event.class);
+    when(event.getId()).thenReturn(null);
     Calendar service = mock(Calendar.class);
     Events events = mock(Events.class);
     Insert insertReturn = mock(Insert.class);

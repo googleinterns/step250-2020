@@ -33,6 +33,7 @@ public abstract class Event {
   public Builder modify() {
     return new AutoValue_Event.Builder()
         .setId(id())
+        .setGroupId(groupId())
         .setCalendarId(calendarId())
         .setDescription(description())
         .setDuration(duration())
@@ -57,6 +58,7 @@ public abstract class Event {
         .setStart(Instant.ofEpochSecond((long) entity.getProperty("start")))
         .setDuration(Duration.ofMinutes((long) entity.getProperty("duration")))
         .setGroupId(KeyFactory.keyToString((Key) entity.getProperty("group")))
+        .setCalendarId((String) entity.getProperty("calendarId"))
         .build();
   }
 

@@ -17,6 +17,7 @@ public class EventStore {
     entity.setProperty("start", event.start().getEpochSecond());
     entity.setProperty("duration", event.duration().toMinutes());
     entity.setProperty("group", KeyFactory.stringToKey(event.groupId()));
+    entity.setProperty("calendarId", event.calendarId());
 
     datastore.put(entity);
 
