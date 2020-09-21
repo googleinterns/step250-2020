@@ -8,7 +8,7 @@ import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
 import {Group} from "../entity/Group";
 import {postData} from "../util/fetch";
-import {getUnixTime} from "date-fns";
+import {getUnixTime, roundToNearestMinutes} from "date-fns";
 
 interface CreateEventCardProps {
   group: Group;
@@ -16,7 +16,9 @@ interface CreateEventCardProps {
 
 export function CreateEventCard({group}: CreateEventCardProps) {
   const [duration, setDuration] = useState(30); // in minutes
-  const [start, setStart] = useState<MaterialUiPickersDate>();
+  const [start, setStart] = useState<MaterialUiPickersDate>(roundToNearestMinutes(new Date(), {
+    nearestTo: 15
+  }));
   const [description, setDescription] = useState("");
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
 
