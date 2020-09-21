@@ -288,7 +288,8 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
                   <FormControl fullWidth>
                     <FormControlLabel 
                       control={
-                        <Checkbox 
+                        <Checkbox
+                          disabled
                           checked={matchRecents}
                           onChange={(event: ChangeEvent<HTMLInputElement>) => setMatchRecents(event.target.checked)}
                           color="primary"
