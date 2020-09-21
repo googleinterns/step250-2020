@@ -50,6 +50,22 @@ public class CalendarUtils {
   }
 
   /**
+   * Removes given event from user's primary calendar.
+   *
+   * @param userId String of user's id whose calendar to remove the event from.
+   * @param eventId id of the event to remove.
+   */
+  public static void removeEvent(String userId, String eventId) {
+    Calendar service = getCalendarService(userId);
+    for (int retry = 0; retry < MAX_RETRIES; ++retry) {
+      try {
+        service.events().delete("primary", eventId).execute();
+        return;
+      } catch (IOException ignored) {}
+    }
+  }
+
+  /**
    * Adds (or updates if exists) given event to user's primary calendar using provided calendar service.
    *
    * @param service Calendar service to use to insert event.

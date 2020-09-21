@@ -12,9 +12,10 @@ import {getUnixTime, roundToNearestMinutes} from "date-fns";
 
 interface CreateEventCardProps {
   group: Group;
+  onSubmit: () => void;
 }
 
-export function CreateEventCard({group}: CreateEventCardProps) {
+export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
   const [duration, setDuration] = useState(30); // in minutes
   const [start, setStart] = useState<MaterialUiPickersDate>(roundToNearestMinutes(new Date(), {
     nearestTo: 15
@@ -29,6 +30,7 @@ export function CreateEventCard({group}: CreateEventCardProps) {
     data.set("start", getUnixTime(start!));
     data.set("description", description);
     await postData("/api/eventCreate", data);
+    onSubmit();
   };
 
   return (

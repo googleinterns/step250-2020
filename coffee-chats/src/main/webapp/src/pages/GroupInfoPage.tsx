@@ -36,6 +36,13 @@ export function GroupInfoPage() {
     members.reload();
   };
 
+  const deleteEvent = async (id: string) => {
+    const data = new Map();
+    data.set("id", id);
+    await postData(`/api/eventDelete`, data);
+    events.reload();
+  };
+
   const status = members.value.find(member => member.user.id === authState.user.id)?.status || "NOT_A_MEMBER";
 
   return (
@@ -71,8 +78,14 @@ export function GroupInfoPage() {
               }
             </CardActions>
           </GroupCard>
-          {(status === "ADMINISTRATOR" || status === "OWNER") && <CreateEventCard group={group.value} />}
-          {events.value.map(event => <EventCard event={event} key={event.id} />)}
+          {(status === "ADMINISTRATOR" || status === "OWNER") &&
+            <CreateEventCard group={group.value} onSubmit={() => events.reload()} />}
+          {events.value.map(event => <EventCard
+              event={event}
+              key={event.id}
+              status={status}
+              onDelete={() => deleteEvent(event.id)}
+          />)}
           <GroupMembersList
               members={members.value}
               status={status}
