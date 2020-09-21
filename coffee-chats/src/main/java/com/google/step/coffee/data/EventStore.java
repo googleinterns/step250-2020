@@ -21,6 +21,8 @@ public class EventStore {
 
     datastore.put(entity);
 
-    return Event.fromEntity(entity);
+    return event.modify()
+        .setId(KeyFactory.keyToString(entity.getKey()))
+        .build();
   }
 }
