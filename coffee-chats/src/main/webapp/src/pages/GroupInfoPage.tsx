@@ -9,6 +9,7 @@ import {GroupDeleteDialog} from "../components/GroupDeleteDialog";
 import {GroupMembersList} from "../components/GroupMembersList";
 import {Member, MembershipStatus} from "../entity/Member";
 import {AuthState, AuthStateContext} from "../entity/AuthState";
+import {CreateEventCard} from "../components/CreateEventCard";
 
 export function GroupInfoPage() {
   const authState: AuthState = React.useContext(AuthStateContext);
@@ -67,6 +68,7 @@ export function GroupInfoPage() {
               }
             </CardActions>
           </GroupCard>
+          {(status === "ADMINISTRATOR" || status === "OWNER") && <CreateEventCard group={group.value} />}
           <GroupMembersList
               members={members.value}
               status={status}

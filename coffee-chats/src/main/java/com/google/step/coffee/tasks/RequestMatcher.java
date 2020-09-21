@@ -3,6 +3,7 @@ package com.google.step.coffee.tasks;
 import com.google.api.services.calendar.model.Event;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.data.RequestStore;
+import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.DateRange;
 import com.google.step.coffee.entity.TimeSlot;
@@ -197,6 +198,7 @@ public class RequestMatcher {
     requestList.removeAll(randomRequests);
 
     List<ChatRequest> tryMatchRandomReqs = requestList.stream()
+        .filter(ChatRequest::shouldMatchRandom)
         .filter(req -> req.getLastEndDate().before(weekFromNow()))
         .collect(
             Collectors.toList());
@@ -310,7 +312,7 @@ public class RequestMatcher {
       // Lambdas cannot use non-final variables
       int attemptGroupSize = groupSize;
       compatibleReqs = tagReqs.stream()
-          .filter(req -> request.getRequestId() != req.getRequestId())
+          .filter(req -> !request.getUserId().equals(req.getUserId()))
           .filter(req -> rangeIntersections.get(request).contains(req))
           .filter(req -> groupSizeInRange(attemptGroupSize, req))
           .collect(Collectors.toList());
@@ -371,7 +373,7 @@ public class RequestMatcher {
     for (ChatRequest req : rangeIntersections.get(currReq)) {
       Set<ChatRequest> newCombination = new HashSet<>(currCombination);
       newCombination.add(req);
-      if (!combinations.contains(newCombination)) {
+      if (!combinations.contains(newCombination) && distinctUsers(currCombination, req)) {
         if (intersectWithCombination(req, currCombination, rangeIntersections)) {
           combinations.add(newCombination);
 
@@ -382,6 +384,13 @@ public class RequestMatcher {
         }
       }
     }
+  }
+
+  private boolean distinctUsers(Set<ChatRequest> currCombination, ChatRequest newRequest) {
+    return !currCombination.stream()
+        .map(ChatRequest::getUserId)
+        .collect(Collectors.toSet())
+        .contains(newRequest.getUserId());
   }
 
   private boolean intersectWithCombination(ChatRequest request, Set<ChatRequest> combination,
@@ -459,14 +468,14 @@ public class RequestMatcher {
    * Given matched requests, finds availability for all users in the selected date ranges.
    */
   private TimeSlot findSharedTimeSlot(Collection<ChatRequest> reqs) {
-    AvailabilityScheduler scheduler = new AvailabilityScheduler(reqs);
+    AvailabilityScheduler scheduler = new AvailabilityScheduler();
 
     Duration minDuration = reqs.stream()
-        .map(ChatRequest::getDuration)
+        .map(Availability::getDuration)
         .min(Duration::compareTo)
         .orElse(Duration.ofMinutes(15));
 
-    List<DateRange> rangeOptions = scheduler.findAvailableRanges(minDuration);
+    List<DateRange> rangeOptions = scheduler.findAvailableRanges(reqs, minDuration);
 
     if (rangeOptions.isEmpty()) {
       return TimeSlot.EMPTY;

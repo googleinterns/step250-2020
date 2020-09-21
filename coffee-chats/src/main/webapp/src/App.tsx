@@ -29,6 +29,7 @@ function App() {
 
   return (
       <AuthStateContext.Provider value={authState.value}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Router>
           <NavBar openOAuthDialog={() => setOAuthDialogOpen(true)} />
           <OAuthDialog open={oauthDialogOpen} setOpen={setOAuthDialogOpen} />
@@ -50,12 +51,11 @@ function App() {
             </Route>
 
             <Route path="/">
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <MainPage />
-              </MuiPickersUtilsProvider>
+                <MainPage/>
             </Route>
           </Switch>
         </Router>
+      </MuiPickersUtilsProvider>
       </AuthStateContext.Provider>
   );
 }
