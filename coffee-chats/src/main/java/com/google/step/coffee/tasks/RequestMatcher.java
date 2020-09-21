@@ -277,8 +277,7 @@ public class RequestMatcher {
     Set<ChatRequest> selectedCombo = null;
 
     for (Set<ChatRequest> combo : compatibleReqCombos) {
-      Set<Availability> comboAvails = new HashSet<>(combo);
-      meetingSlot = findSharedTimeSlot(comboAvails);
+      meetingSlot = findSharedTimeSlot(combo);
 
       if (!meetingSlot.isEmpty()) {
         selectedCombo = combo;
@@ -468,7 +467,7 @@ public class RequestMatcher {
   /**
    * Given matched requests, finds availability for all users in the selected date ranges.
    */
-  private TimeSlot findSharedTimeSlot(Collection<Availability> reqs) {
+  private TimeSlot findSharedTimeSlot(Collection<ChatRequest> reqs) {
     AvailabilityScheduler scheduler = new AvailabilityScheduler();
 
     Duration minDuration = reqs.stream()

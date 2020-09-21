@@ -19,7 +19,7 @@ public class AvailabilityScheduler {
   private List<String> userIds;
   private CalendarUtils utils = new CalendarUtils();
 
-  void setUserIds(Collection<Availability> requests) {
+  void setUserIds(Collection<? extends Availability> requests) {
     this.userIds = requests.stream().map(Availability::getUserId).collect(Collectors.toList());
   }
 
@@ -34,7 +34,8 @@ public class AvailabilityScheduler {
   /**
    * Finds suitable ranges of at least minDuration length that is available by all participants.
    */
-  public List<DateRange> findAvailableRanges(Collection<Availability> availabilities, Duration minDuration) {
+  public List<DateRange> findAvailableRanges(Collection<? extends Availability> availabilities,
+      Duration minDuration) {
     List<DateRange> commonRanges = findCommonRanges(availabilities);
     if (commonRanges.isEmpty()) {
       return Collections.emptyList();
@@ -139,7 +140,7 @@ public class AvailabilityScheduler {
    * @param requests Collection of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(final Collection<Availability> requests) {
+  public List<DateRange> findCommonRanges(final Collection<? extends Availability> requests) {
     if (requests.isEmpty()) {
       return Collections.emptyList();
     }
