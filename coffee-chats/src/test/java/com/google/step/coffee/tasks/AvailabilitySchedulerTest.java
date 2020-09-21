@@ -3,6 +3,7 @@ package com.google.step.coffee.tasks;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -403,5 +404,132 @@ public class AvailabilitySchedulerTest {
     DateRange expected = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
 
     assertThat(scheduler.findAvailableRanges(Duration.ofMinutes(30)), contains(expected));
+  }
+
+  /**
+   * Tests if the best effort algorithm can correctly find available slot common to all users.
+   *
+   * UserA ranges:  |-----|  |--|  |-------|
+   * UserA busy:    |--|        |-----|
+   * UserB ranges:  |-----|     |----------|
+   * UserB busy:             |--|  |--|
+   * UserC ranges:     |--|     |-----|
+   * UserC busy:    |--|
+   *
+   * Expected:         |--|
+   */
+  @Test
+  public void findsMaxAvailableRangeBestEffort() throws InvalidEntityException {
+    DateRange rangeA1 = new DateRange(DAY1_MORNING, DAY1_EVENING);
+    DateRange rangeA2 = new DateRange(DAY2_MORNING, DAY2_AFTERNOON);
+    DateRange rangeA3 = new DateRange(DAY2_EVENING, DAY3_EVENING);
+    DateRange rangeB1 = new DateRange(DAY1_MORNING, DAY1_EVENING);
+    DateRange rangeB2 = new DateRange(DAY2_AFTERNOON, DAY3_EVENING);
+    DateRange rangeC1 = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
+    DateRange rangeC2 = new DateRange(DAY2_AFTERNOON, DAY3_MORNING);
+
+    DateRange busyA1 = new DateRange(DAY1_MORNING, DAY1_AFTERNOON);
+    DateRange busyA2 = new DateRange(DAY2_AFTERNOON, DAY3_MORNING);
+    DateRange busyB1 = new DateRange(DAY2_MORNING, DAY2_AFTERNOON);
+    DateRange busyB2 = new DateRange(DAY2_EVENING, DAY3_MORNING);
+    DateRange busyC1 = new DateRange(DAY1_MORNING, DAY1_AFTERNOON);
+
+    ChatRequest requestA = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeA1, rangeA2, rangeA3))
+        .forUser("userA")
+        .build();
+    ChatRequest requestB = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeB1, rangeB2))
+        .forUser("userB")
+        .build();
+    ChatRequest requestC = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeC1, rangeC2))
+        .forUser("userC")
+        .build();
+
+    scheduler.setAvailabilities(Arrays.asList(requestA, requestB, requestC));
+
+    CalendarUtils utils = Mockito.mock(CalendarUtils.class);
+    when(utils.getFreeBusy(eq("userA"), any(), any()))
+        .thenReturn(Arrays.asList(busyA1.toTimePeriod(), busyA2.toTimePeriod()));
+    when(utils.getFreeBusy(eq("userB"), any(), any()))
+        .thenReturn(Arrays.asList(busyB1.toTimePeriod(), busyB2.toTimePeriod()));
+    when(utils.getFreeBusy(eq("userC"), any(), any()))
+        .thenReturn(Collections.singletonList(busyC1.toTimePeriod()));
+
+    scheduler.setUtils(utils);
+
+    DateRange expected = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
+
+    assertThat(scheduler.findAvailableRangesBestEffort(Duration.ofMinutes(30)), contains(expected));
+  }
+
+  /**
+   * Tests if can correctly find available slot common to maximum number of users.
+   *
+   * UserA ranges:  |-----|  |--|  |-------|
+   * UserA busy:    |--|        |-----|
+   * UserB ranges:  |-----|     |----------|
+   * UserB busy:             |--|  |--|
+   * UserC ranges:     |--|     |-----|
+   * UserC busy:    |--|
+   * UserD ranges:  |----------------------|
+   * UserD busy:    |----------------------|
+   *
+   * Expected:         |--|
+   */
+  @Test
+  public void findsSuitableAvailableRangeBestEffort() throws InvalidEntityException {
+    DateRange rangeA1 = new DateRange(DAY1_MORNING, DAY1_EVENING);
+    DateRange rangeA2 = new DateRange(DAY2_MORNING, DAY2_AFTERNOON);
+    DateRange rangeA3 = new DateRange(DAY2_EVENING, DAY3_EVENING);
+    DateRange rangeB1 = new DateRange(DAY1_MORNING, DAY1_EVENING);
+    DateRange rangeB2 = new DateRange(DAY2_AFTERNOON, DAY3_EVENING);
+    DateRange rangeC1 = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
+    DateRange rangeC2 = new DateRange(DAY2_AFTERNOON, DAY3_MORNING);
+    DateRange rangeD1 = new DateRange(DAY1_MORNING, DAY3_EVENING);
+
+    DateRange busyA1 = new DateRange(DAY1_MORNING, DAY1_AFTERNOON);
+    DateRange busyA2 = new DateRange(DAY2_AFTERNOON, DAY3_MORNING);
+    DateRange busyB1 = new DateRange(DAY2_MORNING, DAY2_AFTERNOON);
+    DateRange busyB2 = new DateRange(DAY2_EVENING, DAY3_MORNING);
+    DateRange busyC1 = new DateRange(DAY1_MORNING, DAY1_AFTERNOON);
+    DateRange busyD1 = new DateRange(DAY1_MORNING, DAY3_EVENING);
+
+
+    ChatRequest requestA = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeA1, rangeA2, rangeA3))
+        .forUser("userA")
+        .build();
+    ChatRequest requestB = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeB1, rangeB2))
+        .forUser("userB")
+        .build();
+    ChatRequest requestC = new ChatRequestBuilder()
+        .onDates(Arrays.asList(rangeC1, rangeC2))
+        .forUser("userC")
+        .build();
+    ChatRequest requestD = new ChatRequestBuilder()
+        .onDates(Collections.singletonList(rangeD1))
+        .forUser("userD")
+        .build();
+
+    scheduler.setAvailabilities(Arrays.asList(requestA, requestB, requestC, requestD));
+
+    CalendarUtils utils = Mockito.mock(CalendarUtils.class);
+    when(utils.getFreeBusy(eq("userA"), any(), any()))
+        .thenReturn(Arrays.asList(busyA1.toTimePeriod(), busyA2.toTimePeriod()));
+    when(utils.getFreeBusy(eq("userB"), any(), any()))
+        .thenReturn(Arrays.asList(busyB1.toTimePeriod(), busyB2.toTimePeriod()));
+    when(utils.getFreeBusy(eq("userC"), any(), any()))
+        .thenReturn(Collections.singletonList(busyC1.toTimePeriod()));
+    when(utils.getFreeBusy(eq("userD"), any(), any()))
+        .thenReturn(Collections.singletonList(busyD1.toTimePeriod()));
+
+    scheduler.setUtils(utils);
+
+    DateRange expected = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
+
+    assertThat(scheduler.findAvailableRangesBestEffort(Duration.ofMinutes(30)), contains(expected));
   }
 }
