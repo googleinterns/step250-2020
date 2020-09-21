@@ -2,8 +2,6 @@ package com.google.step.coffee.tasks;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.step.coffee.PermissionChecker;
-import com.google.step.coffee.UserManager;
 import com.google.step.coffee.data.RequestStore;
 import com.google.step.coffee.entity.ChatRequest;
 import java.io.IOException;
