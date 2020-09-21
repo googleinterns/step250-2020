@@ -30,6 +30,15 @@ public abstract class Event {
     return new AutoValue_Event.Builder();
   }
 
+  public Builder modify() {
+    return new AutoValue_Event.Builder()
+        .setId(id())
+        .setCalendarId(calendarId())
+        .setDescription(description())
+        .setDuration(duration())
+        .setStart(start());
+  }
+
   @AutoValue.Builder
   public abstract static class Builder {
     abstract public Builder setId(String value);

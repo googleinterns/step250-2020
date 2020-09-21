@@ -27,15 +27,15 @@ public class EventCreateServlet extends JsonServlet {
     Duration duration = Duration.ofMinutes(request.getRequiredLongParameter("duration"));
     String description = request.getRequiredParameter("description");
 
-    Event event = eventStore.put(Event.builder()
+    Event event = Event.builder()
         .setGroupId(group.id())
         .setStart(start)
         .setDuration(duration)
         .setDescription(description)
-        .build()
-    );
+        .build();
 
-    CalendarUtils.createGroupEvent(event);
+    event = CalendarUtils.updateGroupEvent(event);
+    event = eventStore.put(event);
 
     return event;
   }
