@@ -1,5 +1,6 @@
 package com.google.step.coffee.tasks;
 
+import static com.google.step.coffee.tasks.RequestMatcher.MATCH_RANDOM_TAG;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -36,22 +37,22 @@ public class RequestMatcherTest {
     ChatRequest req2 = mock(ChatRequest.class);
     when(req2.getTags()).thenReturn(Arrays.asList("Football", "C++"));
     ChatRequest req3 = mock(ChatRequest.class);
-    when(req3.getTags()).thenReturn(Arrays.asList("C++", "Random"));
+    when(req3.getTags()).thenReturn(Arrays.asList("C++", MATCH_RANDOM_TAG));
 
     Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2, req3));
 
     assertThat(tagMap.keySet(),
-        containsInAnyOrder("Football", "Photography", "C++", "Random"));
+        containsInAnyOrder("Football", "Photography", "C++", MATCH_RANDOM_TAG));
     assertThat(tagMap.get("Football"), contains(req1, req2));
     assertThat(tagMap.get("Photography"), contains(req1));
     assertThat(tagMap.get("C++"), contains(req1, req2, req3));
-    assertThat(tagMap.get("Random"), contains(req3));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req3));
   }
 
   @Test
   public void emptyTagRequestsAndRandomReqsMappedTogether() {
     ChatRequest req1 = mock(ChatRequest.class);
-    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", MATCH_RANDOM_TAG));
     ChatRequest req2 = mock(ChatRequest.class);
     when(req2.getTags()).thenReturn(Collections.emptyList());
     ChatRequest req3 = mock(ChatRequest.class);
@@ -59,9 +60,9 @@ public class RequestMatcherTest {
 
     Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2, req3));
 
-    assertThat(tagMap.keySet(), containsInAnyOrder("Football", "Random"));
+    assertThat(tagMap.keySet(), containsInAnyOrder("Football", MATCH_RANDOM_TAG));
     assertThat(tagMap.get("Football"), contains(req1));
-    assertThat(tagMap.get("Random"), contains(req1, req2, req3));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req1, req2, req3));
   }
 
   @Test
@@ -156,22 +157,22 @@ public class RequestMatcherTest {
   @Test
   public void emptyAndRandomRequestsInSameTagMapList() {
     ChatRequest req1 = mock(ChatRequest.class);
-    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", MATCH_RANDOM_TAG));
 
     ChatRequest req2 = mock(ChatRequest.class);
     when(req2.getTags()).thenReturn(Collections.emptyList());
 
     Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
 
-    assertThat(tagMap.keySet(), containsInAnyOrder("Football", "Random"));
+    assertThat(tagMap.keySet(), containsInAnyOrder("Football", MATCH_RANDOM_TAG));
     assertThat(tagMap.get("Football"), contains(req1));
-    assertThat(tagMap.get("Random"), contains(req1, req2));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req1, req2));
   }
 
   @Test
   public void removingFromTagMapRemovesAllInstances() {
     ChatRequest req1 = mock(ChatRequest.class);
-    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", MATCH_RANDOM_TAG));
 
     ChatRequest req2 = mock(ChatRequest.class);
     when(req2.getTags()).thenReturn(Arrays.asList("Football", "Photography"));
@@ -179,19 +180,19 @@ public class RequestMatcherTest {
     Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
 
     assertThat(tagMap.get("Football"), contains(req1, req2));
-    assertThat(tagMap.get("Random"), contains(req1));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req1));
     assertThat(tagMap.get("Photography"), contains(req2));
 
     matcher.removeFromTagMap(tagMap, req1);
 
     assertThat(tagMap.get("Football"), contains(req2));
-    assertThat(tagMap.get("Random").isEmpty(), is(true));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG).isEmpty(), is(true));
   }
 
   @Test
   public void removeEmptyTagRequestRemovesFromTagMap() {
     ChatRequest req1 = mock(ChatRequest.class);
-    when(req1.getTags()).thenReturn(Arrays.asList("Football", "Random"));
+    when(req1.getTags()).thenReturn(Arrays.asList("Football", MATCH_RANDOM_TAG));
 
     ChatRequest req2 = mock(ChatRequest.class);
     when(req2.getTags()).thenReturn(Collections.emptyList());
@@ -199,12 +200,12 @@ public class RequestMatcherTest {
     Map<String, List<ChatRequest>> tagMap = matcher.buildTagMap(Arrays.asList(req1, req2));
 
     assertThat(tagMap.get("Football"), contains(req1));
-    assertThat(tagMap.get("Random"), contains(req1, req2));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req1, req2));
 
     matcher.removeFromTagMap(tagMap, req2);
 
     assertThat(tagMap.get("Football"), contains(req1));
-    assertThat(tagMap.get("Random").size(), is(1));
-    assertThat(tagMap.get("Random"), contains(req1));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG).size(), is(1));
+    assertThat(tagMap.get(MATCH_RANDOM_TAG), contains(req1));
   }
 }

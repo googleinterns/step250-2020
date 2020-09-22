@@ -28,6 +28,7 @@ public class RequestMatcher {
 
   // Number of hours between each attempt at request matching triggered by cron job
   private static final long MATCHING_FREQUENCY = 6;
+  static final String MATCH_RANDOM_TAG = "Random";
 
   /**
    * Take current list of chat requests and store any matched requests into datastore.
@@ -76,7 +77,7 @@ public class RequestMatcher {
 
     for (ChatRequest request : requestList) {
       if (request.getTags().isEmpty()) {
-        addIntersections(request, "Random", tagMap, scheduler, intersectMap);
+        addIntersections(request, MATCH_RANDOM_TAG, tagMap, scheduler, intersectMap);
       } else {
         for (String tag : request.getTags()) {
           addIntersections(request, tag, tagMap, scheduler, intersectMap);
@@ -99,10 +100,10 @@ public class RequestMatcher {
 
     for (ChatRequest request : requestList) {
       if (request.getTags().isEmpty()) {
-        List<ChatRequest> randomReqs = tagMap.getOrDefault("Random", new ArrayList<>());
+        List<ChatRequest> randomReqs = tagMap.getOrDefault(MATCH_RANDOM_TAG, new ArrayList<>());
 
         randomReqs.add(request);
-        tagMap.put("Random", randomReqs);
+        tagMap.put(MATCH_RANDOM_TAG, randomReqs);
       } else {
         for (String tag : request.getTags()) {
           List<ChatRequest> tagReqs = tagMap.getOrDefault(tag, new ArrayList<>());
@@ -122,7 +123,7 @@ public class RequestMatcher {
    */
   void removeFromTagMap(Map<String, List<ChatRequest>> tagMap, ChatRequest request) {
     if (request.getTags().isEmpty()) {
-      tagMap.get("Random").remove(request);
+      tagMap.get(MATCH_RANDOM_TAG).remove(request);
     } else {
       for (String tag : request.getTags()) {
         tagMap.get(tag).remove(request);
@@ -194,7 +195,7 @@ public class RequestMatcher {
       RequestStore requestStore, Set<ChatRequest> matched,
       Map<String, List<ChatRequest>> tagMap,
       Map<ChatRequest, Set<ChatRequest>> rangeIntersections) {
-    List<ChatRequest> randomRequests = tagMap.getOrDefault("Random", new ArrayList<>());
+    List<ChatRequest> randomRequests = tagMap.getOrDefault(MATCH_RANDOM_TAG, new ArrayList<>());
     requestList.removeAll(randomRequests);
 
     List<ChatRequest> tryMatchRandomReqs = requestList.stream()
