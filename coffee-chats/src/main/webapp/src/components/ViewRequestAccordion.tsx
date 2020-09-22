@@ -1,9 +1,10 @@
 import React from 'react'
-import { Accordion, AccordionSummary, Grid, makeStyles, Theme, createStyles, Typography, Chip, darken, lighten } from '@material-ui/core'
+import {Accordion, AccordionSummary, Grid, makeStyles, Theme, createStyles, Typography, Chip, darken, lighten} from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import HelpIcon from '@material-ui/icons/Help'
 import CancelIcon from '@material-ui/icons/Cancel'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
+import {ChatRequest, CompletedRequest, isMatched, isPending} from '../entity/Requests'
 
 const useStyles = makeStyles((theme: Theme) => {
   const getBackgroundColor = theme.palette.type === 'light' ? lighten : darken;
@@ -37,13 +38,13 @@ const useStyles = makeStyles((theme: Theme) => {
 });
 
 interface ViewRequestAccordionProps {
-  tags: string[],
-  status: "pending" | "expired" | "matched"
+  request: ChatRequest | CompletedRequest,
 }
 
-export const ViewRequestAccordion: React.FC<ViewRequestAccordionProps> = ({tags, status}) => {
+export const ViewRequestAccordion: React.FC<ViewRequestAccordionProps> = ({request}) => {
   const classes = useStyles();
 
+  const status = isPending(request) ? "pending" : (isMatched(request) ? "matched" : "expired");
   const colorClass = status === "matched" ? classes.matched : (status === "expired" ? classes.expired : classes.pending)
 
   return (
@@ -73,9 +74,39 @@ export const ViewRequestAccordion: React.FC<ViewRequestAccordionProps> = ({tags,
           </Grid>
 
           <Grid item xs={12} sm={8}>
-            {tags.map((tag) => (
-               <Chip variant="outlined" color="primary" label={tag} className={classes.tagChip} key={tag}/>
-            ))}
+            {isMatched(request) ?
+              (<>
+                {request.commonTags.map((commonTag) => (
+                  <Chip
+                    variant="default"
+                    color="primary"
+                    label={commonTag}
+                    className={classes.tagChip}
+                    key={commonTag}
+                  />
+                ))}
+                {request.tags.filter((tag) => !request.commonTags.includes(tag))
+                    .map((tag) => (
+                      <Chip
+                        variant="outlined"
+                        color="primary"
+                        label={tag}
+                        className={classes.tagChip}
+                        key={tag}
+                      />
+                    ))
+                }
+              </>):
+              request.tags.map((tag) => (
+                <Chip
+                  variant="outlined"
+                  color="primary"
+                  label={tag}
+                  className={classes.tagChip}
+                  key={tag}
+                />
+              ))
+            }
           </Grid>
         </Grid>
       </AccordionSummary>

@@ -86,7 +86,11 @@ interface DurationResponse {
   nanos: number
 };
 
-export const isMatched = (request: CompletedRequest): request is MatchedRequest => {
+export const isPending = (request: ChatRequest | CompletedRequest): request is ChatRequest => {
+  return (request as ChatRequest).requestId !== undefined;
+}
+
+export const isMatched = (request: ChatRequest | CompletedRequest): request is MatchedRequest => {
   return (request as MatchedRequest).participants !== undefined;
 };
 

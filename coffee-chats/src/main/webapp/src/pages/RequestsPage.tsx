@@ -37,13 +37,13 @@ export const RequestsPage = () => {
 
         {currTab === PENDING_TAB &&
           pendingReqs.map((req) => (
-            <ViewRequestAccordion tags={req.tags} status="pending" key={req.requestId} />
+            <ViewRequestAccordion request={req} key={req.requestId} />
           ))
         }
 
         {currTab === COMPLETED_TAB &&
           completedReqs.map((req, i) => (
-            <ViewRequestAccordion tags={req.tags} status={req.matched ? "matched" : "expired"} key={i} />
+            <ViewRequestAccordion request={req} key={i} />
           ))
         }
       </Container>
