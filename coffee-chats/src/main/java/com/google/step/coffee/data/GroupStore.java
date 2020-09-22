@@ -2,6 +2,7 @@ package com.google.step.coffee.data;
 
 import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.UserManager;
+import com.google.step.coffee.entity.Event;
 import com.google.step.coffee.entity.Group;
 import com.google.step.coffee.entity.GroupMembership;
 import com.google.step.coffee.entity.User;
@@ -30,12 +31,12 @@ public class GroupStore {
     return group;
   }
 
-  public void delete(Key key) {
-    datastore.delete(key);
+  public void delete(Group group) {
+    datastore.delete(group.key());
 
     Query query = new Query("groupMembership")
         .setFilter(new Query.FilterPredicate(
-            "group", Query.FilterOperator.EQUAL, key));
+            "group", Query.FilterOperator.EQUAL, group.key()));
 
     for (Entity entity : datastore.prepare(query).asIterable()) {
       datastore.delete(entity.getKey());
@@ -43,9 +44,15 @@ public class GroupStore {
 
     query = new Query("event")
         .setFilter(new Query.FilterPredicate(
-            "group", Query.FilterOperator.EQUAL, key));
+            "group", Query.FilterOperator.EQUAL, group.key()));
 
     for (Entity entity : datastore.prepare(query).asIterable()) {
+      String calendarId = Event.fromEntity(entity).calendarId();
+
+      if (calendarId != null) {
+        CalendarUtils.removeEvent(group.ownerId(), calendarId);
+      }
+
       datastore.delete(entity.getKey());
     }
   }

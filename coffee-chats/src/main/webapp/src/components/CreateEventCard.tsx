@@ -42,7 +42,7 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
     data.set("start", getUnixTime(start!));
     data.set("description", description);
     await postData("/api/eventCreate", data);
-    
+
     setExpanded(false);
     setLoading(false);
     onSubmit();
