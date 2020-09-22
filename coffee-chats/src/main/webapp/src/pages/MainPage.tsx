@@ -15,9 +15,10 @@ interface GroupSuggestion {
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
   const suggestions = useFetch<GroupSuggestion[]>(`/api/groupSuggest?tags=${JSON.stringify(tags)}`);
+  const groups = useFetch<Group[]>(`/api/groupList?all=true`);
 
-  if (hasFetchFailed(suggestions)) {
-    return getFetchErrorPage(suggestions);
+  if (hasFetchFailed(suggestions, groups)) {
+    return getFetchErrorPage(suggestions, groups);
   }
 
   return (
@@ -33,7 +34,7 @@ export function MainPage() {
                   tags={tags}
                   setTags={setTags}
                   label="What do you want to chat about?"
-                  suggestGroups={suggestions.value.map(x => x.group)}
+                  suggestGroups={groups.value}
               />
             </Grid>
 
