@@ -1,11 +1,21 @@
-import React, { useState, ChangeEvent } from 'react'
-import { Box, Container, Typography, Tabs, Tab } from '@material-ui/core'
-import { ViewRequestAccordion } from '../components/ViewRequestAccordion';
+import React, {useState, ChangeEvent, useEffect} from 'react';
+import {Box, Container, Typography, Tabs, Tab} from '@material-ui/core';
+import {ViewRequestAccordion} from '../components/ViewRequestAccordion';
+import {ChatRequest, CompletedRequest} from '../entity/Requests';
+import {fetchPendingRequests, fetchCompletedRequests} from '../util/chatRequest';
 
 export const RequestsPage = () => {
-  const [currTab, setCurrTab] = useState(0);
   const PENDING_TAB = 0;
-  const COMPLETED_TAB = 1;
+  const COMPLETED_TAB = 1
+
+  const [currTab, setCurrTab] = useState(PENDING_TAB);
+  const [pendingReqs, setPendingReqs] = useState<ChatRequest[]>([]);
+  const [completedReqs, setCompletedReqs] = useState<CompletedRequest[]>([]);
+
+  useEffect(() => {
+    fetchPendingRequests(setPendingReqs);
+    fetchCompletedRequests(setCompletedReqs);
+  }, [])
 
   return (
     <Box mt={2}>
@@ -26,15 +36,15 @@ export const RequestsPage = () => {
         </Tabs>
 
         {currTab === PENDING_TAB &&
-          <ViewRequestAccordion tags={['Photography', 'Random']} status="pending" />
+          pendingReqs.map((req) => (
+            <ViewRequestAccordion tags={req.tags} status="pending" key={req.requestId} />
+          ))
         }
 
         {currTab === COMPLETED_TAB &&
-          <>
-            <ViewRequestAccordion tags={['Football', 'Hip Hop', 'Gardening']} status="matched" />
-            <ViewRequestAccordion tags={['Basketball', 'NBA']} status="expired" />
-            <ViewRequestAccordion tags={['Hiking', 'Marathons']} status="matched" />
-          </>
+          completedReqs.map((req, i) => (
+            <ViewRequestAccordion tags={req.tags} status={req.matched ? "matched" : "expired"} key={i} />
+          ))
         }
       </Container>
     </Box>
