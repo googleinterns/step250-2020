@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {
-  Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, Button, FormControl, Icon,
+  Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, FormControl, Icon,
   InputLabel, MenuItem, Select, TextField, Typography
 } from "@material-ui/core";
 import {DateTimePicker} from "@material-ui/pickers";
@@ -31,15 +31,20 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
   const [description, setDescription] = useState("");
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
+    setLoading(true);
+
     const data = new Map();
     data.set("id", group.id);
     data.set("duration", duration);
     data.set("start", getUnixTime(start!));
     data.set("description", description);
     await postData("/api/eventCreate", data);
+    
     setExpanded(false);
+    setLoading(false);
     onSubmit();
   };
 
@@ -104,9 +109,10 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
             </div>
           </AccordionDetails>
           <AccordionActions>
+            {loading ? <CircularProgress /> :
             <Button color="primary" onClick={submit}>
               Schedule
-            </Button>
+            </Button>}
           </AccordionActions>
         </Accordion>
       </Box>
