@@ -27,8 +27,8 @@ public class RequestMatchingTask extends HttpServlet {
     String cronHeader = req.getHeader("X-Appengine-Cron");
     UserService userService = UserServiceFactory.getUserService();
 
-    if ((cronHeader == null || !Boolean.parseBoolean(cronHeader)) && !userService.isUserAdmin()) {
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden resource.");
+    if (cronHeader == null || !Boolean.parseBoolean(cronHeader)) {
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden action.");
       return;
     }
 
