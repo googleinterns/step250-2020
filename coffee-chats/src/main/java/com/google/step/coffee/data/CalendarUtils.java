@@ -136,7 +136,17 @@ public class CalendarUtils {
   public static com.google.step.coffee.entity.Event updateGroupEvent(com.google.step.coffee.entity.Event event) {
     Group group = groupStore.get(event.groupId());
 
-    Calendar service = getCalendarService(group.ownerId());
+    return updateGroupEvent(event, getCalendarService(group.ownerId()), group);
+  }
+
+  /**
+   * The implementation of updateGroupEvent, so that it can be tested separately
+   */
+  static com.google.step.coffee.entity.Event updateGroupEvent(
+      com.google.step.coffee.entity.Event event,
+      Calendar service,
+      Group group
+  ) {
     Event calendarEvent = null;
     boolean isNewEvent = false;
 
@@ -175,7 +185,7 @@ public class CalendarUtils {
             new DateTime(event.start().toEpochMilli() + event.duration().toMillis())
         ));
 
-    Event insertedEvent = addEvent(group.ownerId(), calendarEvent);
+    Event insertedEvent = addEvent(service, group.ownerId(), calendarEvent, true);
 
     if (insertedEvent != null && isNewEvent) {
       event = event.modify()
