@@ -369,17 +369,16 @@ public class AvailabilitySchedulerTest {
 
     ChatRequest requestA = new ChatRequestBuilder()
         .onDates(Arrays.asList(rangeA1, rangeA2, rangeA3))
+        .forUser("userA")
         .build();
     ChatRequest requestB = new ChatRequestBuilder()
         .onDates(Arrays.asList(rangeB1, rangeB2))
+        .forUser("userB")
         .build();
     ChatRequest requestC = new ChatRequestBuilder()
         .onDates(Arrays.asList(rangeC1, rangeC2))
+        .forUser("userC")
         .build();
-
-    scheduler.setUserIds(Arrays.asList("userA", "userB", "userC"));
-
-    scheduler.setAvailabilities(Arrays.asList(requestA, requestB, requestC));
 
     DateRange commonRange1 = rangeC1;
     DateRange commonRange2 = busyB2;
@@ -402,6 +401,7 @@ public class AvailabilitySchedulerTest {
 
     DateRange expected = new DateRange(DAY1_AFTERNOON, DAY1_EVENING);
 
-    assertThat(scheduler.findAvailableRanges(Duration.ofMinutes(30)), contains(expected));
+    assertThat(scheduler.findAvailableRanges(Arrays.asList(requestA, requestB, requestC),
+        Duration.ofMinutes(30)), contains(expected));
   }
 }

@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.step.coffee.InvalidEntityException;
@@ -11,8 +12,10 @@ import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
 import com.google.step.coffee.entity.TimeSlot;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Abstraction to access chat requests from DataStore instance.
@@ -32,16 +35,7 @@ public class RequestStore {
    * Adds ChatRequest object into datastore, adding any new tags into datastore too.
    */
   public void addRequest(ChatRequest request) {
-    Entity reqEntity = new Entity("ChatRequest");
-    reqEntity.setProperty("tags", request.getTags());
-    reqEntity.setProperty("startDates", request.getStartDateRanges());
-    reqEntity.setProperty("endDates", request.getEndDateRanges());
-    reqEntity.setProperty("minPeople", request.getMinPeople());
-    reqEntity.setProperty("maxPeople", request.getMaxPeople());
-    reqEntity.setProperty("durationMins", request.getDuration().toMinutes());
-    reqEntity.setProperty("matchRandom", request.shouldMatchRandom());
-    reqEntity.setProperty("matchRecents", request.shouldMatchRecents());
-    reqEntity.setProperty("userId", request.getUserId());
+    Entity reqEntity = createChatRequestEntity(request, "ChatRequest");
 
     datastore.put(reqEntity);
     tagStore.addTags(request.getTags());
@@ -83,6 +77,17 @@ public class RequestStore {
   }
 
   /**
+   * Removes ChatRequest entities from datastore given requests.
+   */
+  public void removeChatRequests(Collection<ChatRequest> compatibleReqs) {
+    List<Key> keys = compatibleReqs.stream()
+        .map(req -> KeyFactory.createKey("ChatRequest", req.getRequestId()))
+        .collect(Collectors.toList());
+
+    datastore.delete(keys);
+  }
+
+  /**
    * Creates new MatchedRequest entity within datastore.
    *
    * @param resolvedRequest ChatRequest object of user's original request.
@@ -121,4 +126,39 @@ public class RequestStore {
 
     return request;
   }
+
+  /**
+   * Removes an existing ChatRequest from datastore and migrates it to an expired request (i.e. no
+   * matches were found in time).
+   */
+  public void expiredRequest(ChatRequest request) {
+    Key expiredKey = KeyFactory.createKey("ChatRequest", request.getRequestId());
+    Entity expiredEntity = createChatRequestEntity(request, "ExpiredChatRequest");
+
+    datastore.put(expiredEntity);
+    removeRequests(expiredKey);
+  }
+
+  private Entity createChatRequestEntity(ChatRequest request, String kind) {
+    Entity reqEntity = (request.hasRequestId()) ?
+        new Entity(kind, request.getRequestId()) :
+        new Entity(kind);
+
+    return setRequestProperties(request, reqEntity);
+  }
+
+  private Entity setRequestProperties(ChatRequest request, Entity reqEntity) {
+    reqEntity.setProperty("tags", request.getTags());
+    reqEntity.setProperty("startDates", request.getDateRangeStarts());
+    reqEntity.setProperty("endDates", request.getDateRangeEnds());
+    reqEntity.setProperty("minPeople", request.getMinPeople());
+    reqEntity.setProperty("maxPeople", request.getMaxPeople());
+    reqEntity.setProperty("durationMins", request.getDuration().toMinutes());
+    reqEntity.setProperty("matchRandom", request.shouldMatchRandom());
+    reqEntity.setProperty("matchRecents", request.shouldMatchRecents());
+    reqEntity.setProperty("userId", request.getUserId());
+
+    return reqEntity;
+  }
+
 }

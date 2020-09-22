@@ -43,8 +43,8 @@ public class EventScheduleServlet extends JsonServlet {
             .setDateRanges(ranges)
         .build()).collect(Collectors.toList());
 
-    AvailabilityScheduler scheduler = new AvailabilityScheduler(requests);
-    List<DateRange> suggestions = scheduler.findAvailableRanges(duration);
+    AvailabilityScheduler scheduler = new AvailabilityScheduler();
+    List<DateRange> suggestions = scheduler.findAvailableRanges(requests, duration);
 
     if (suggestions.isEmpty()) {
       return null;
