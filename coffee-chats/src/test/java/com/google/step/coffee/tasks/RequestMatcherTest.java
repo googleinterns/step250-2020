@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.contains;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -66,7 +68,7 @@ public class RequestMatcherTest {
   }
 
   @Test
-  public void createEventCalledOncePerUser() {
+  public void createEventCalledOncePerMatching() {
     RequestStore store = mock(RequestStore.class);
 
     List<String> participantIds = Arrays.asList("id1", "id2", "id3");
@@ -89,9 +91,7 @@ public class RequestMatcherTest {
       matcher.addMatchingRequests(store, participantIds, slot, commonTags,
           Arrays.asList(req1, req2, req3));
 
-      utils.verify(times(1), () -> CalendarUtils.addEvent("user1", event));
-      utils.verify(times(1), () -> CalendarUtils.addEvent("user2", event));
-      utils.verify(times(1), () -> CalendarUtils.addEvent("user3", event));
+      utils.verify(times(1), () -> CalendarUtils.addEvent(any(), eq(event)));
 
       verify(store, times(1)).addMatchedRequest(req1, slot, participantIds, commonTags);
       verify(store, times(1)).addMatchedRequest(req2, slot, participantIds, commonTags);
