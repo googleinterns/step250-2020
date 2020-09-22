@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {
-  Box, Button, Card, CardActions, CardContent, FormControl, InputLabel,
-  MenuItem, Select, TextField, Typography
+  Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, Button, FormControl, Icon,
+  InputLabel, MenuItem, Select, TextField, Typography
 } from "@material-ui/core";
 import {DateTimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
@@ -9,19 +9,28 @@ import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
 import {Group} from "../entity/Group";
 import {postData} from "../util/fetch";
 import {getUnixTime, roundToNearestMinutes} from "date-fns";
+import {makeStyles} from "@material-ui/core/styles";
 
 interface CreateEventCardProps {
   group: Group;
   onSubmit: () => void;
 }
 
+const useStyles = makeStyles((theme) => ({
+  content: {
+    width: "100%"
+  }
+}));
+
 export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
+  const classes = useStyles();
   const [duration, setDuration] = useState(30); // in minutes
   const [start, setStart] = useState<MaterialUiPickersDate>(roundToNearestMinutes(new Date(), {
     nearestTo: 15
   }));
   const [description, setDescription] = useState("");
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const submit = async () => {
     const data = new Map();
@@ -30,6 +39,7 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
     data.set("start", getUnixTime(start!));
     data.set("description", description);
     await postData("/api/eventCreate", data);
+    setExpanded(false);
     onSubmit();
   };
 
@@ -42,12 +52,16 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
             setDate={setStart}
             duration={duration}
         />
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
+        <Accordion
+            expanded={expanded}
+            onChange={(e, isExpanded) => setExpanded(isExpanded)}>
+          <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
+            <Typography color="textSecondary">
               Schedule an event
             </Typography>
-
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className={classes.content}>
             <FormControl fullWidth margin="normal">
               <InputLabel id="duration-label">Duration</InputLabel>
               <Select
@@ -87,13 +101,14 @@ export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
                   onChange={(e) => setDescription(e.target.value)}
               />
             </FormControl>
-          </CardContent>
-          <CardActions>
+            </div>
+          </AccordionDetails>
+          <AccordionActions>
             <Button color="primary" onClick={submit}>
               Schedule
             </Button>
-          </CardActions>
-        </Card>
+          </AccordionActions>
+        </Accordion>
       </Box>
   );
 }
