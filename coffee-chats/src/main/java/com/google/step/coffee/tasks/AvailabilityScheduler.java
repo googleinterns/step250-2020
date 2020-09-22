@@ -65,10 +65,13 @@ public class AvailabilityScheduler {
 
   public AvailabilityScheduler(Collection<? extends Availability> requests) {
     this.availabilities = requests;
+  }
+
+  void setUserIds(Collection<? extends Availability> requests) {
     this.userIds = requests.stream().map(Availability::getUserId).collect(Collectors.toList());
   }
 
-  public void setUserIds(List<String> userIds) {
+  void setUserIds(List<String> userIds) {
     this.userIds = userIds;
   }
 
@@ -76,18 +79,21 @@ public class AvailabilityScheduler {
     this.availabilities = requests;
   }
 
-  public void setUtils(CalendarUtils utils) {
+  void setUtils(CalendarUtils utils) {
     this.utils = utils;
   }
 
   /**
    * Finds suitable ranges of at least minDuration length that is available by all participants.
    */
-  public List<DateRange> findAvailableRanges(Duration minDuration) {
+  public List<DateRange> findAvailableRanges(Collection<? extends Availability> availabilities,
+      Duration minDuration) {
     List<DateRange> commonRanges = findCommonRanges(availabilities);
     if (commonRanges.isEmpty()) {
       return Collections.emptyList();
     }
+
+    setUserIds(availabilities);
 
     List<DateRange> rangeOptions = commonRanges.stream()
         .filter(dateRange -> dateRange.getDuration().compareTo(minDuration) >= 0)
@@ -234,7 +240,7 @@ public class AvailabilityScheduler {
   /**
    * Find intersecting ranges common to all requests' DateRanges.
    *
-   * @param requests Array of ChatRequest objects from which to find common ranges.
+   * @param requests Collection of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
   public List<DateRange> findCommonRanges(Collection<? extends Availability> requests) {
@@ -308,6 +314,38 @@ public class AvailabilityScheduler {
     }
 
     return coalesceRanges(result);
+  }
+
+  /**
+   * Finds if two requests have intersecting date ranges.
+   */
+  public boolean haveIntersectingRanges(Availability req1, Availability req2) {
+    List<DateRange> ranges1 = req1.getDateRanges();
+    List<DateRange> ranges2 = req2.getDateRanges();
+
+    int i = 0;
+    int j = 0;
+
+    while (i != ranges1.size() && j != ranges2.size()) {
+      DateRange range1 = ranges1.get(i);
+      DateRange range2 = ranges2.get(j);
+
+      if (range1.overlaps(range2)) {
+        return true;
+      }
+
+      // Remove range with earliest end, so that other range may find an intersection.
+      if (range1.getEnd().before(range2.getEnd())) {
+        i++;
+      } else if(range2.getEnd().before(range1.getEnd())) {
+        j++;
+      } else {
+        i++;
+        j++;
+      }
+    }
+
+    return false;
   }
 
   /**
