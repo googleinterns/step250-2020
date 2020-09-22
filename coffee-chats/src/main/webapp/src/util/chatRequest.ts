@@ -1,6 +1,8 @@
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
+import {ChatRequestResponse, respToChatRequest, ChatRequest, CompletedRequest, CompletedRequestResponse, respToCompletedRequests} from "../entity/Requests";
 
 const chatRequestURL = '/api/chat-request';
+const getRequestsURL = (type: string) => (`/api/requests?type=${type}`);
 
 const STATUS_OK = 200;
 
@@ -48,4 +50,45 @@ export const submitChatRequest = async (interests: string[],
     console.log('Chat request failed: ' + reason.toString());
     return false;
   }
+};
+
+/**
+ * Fetches pending requests from backend for the current user, updates state with the response via 
+ * given function.
+ * 
+ * @param setPendingRequests - Function to set the current pending requests user has.
+ */
+export const fetchPendingRequests = (setPendingRequests: (requests: ChatRequest[]) => void) => {
+  fetch(getRequestsURL('pending'))
+  .then(response => {
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json()
+  })
+  .then(data => data as ChatRequestResponse[])
+  .then(respData => respData.map(respToChatRequest))
+  .then(chatRequests => setPendingRequests(chatRequests))
+};
+
+/**
+ * Fetches completed requests from backend for the current user, updates state with the response 
+ * via given function.
+ * 
+ * @param setCompletedRequests - Function to set the current completed requests the user has.
+ */
+export const fetchCompletedRequests = 
+    (setCompletedRequests: (requests: CompletedRequest[]) => void) => {
+  fetch(getRequestsURL('completed'))
+  .then(response => {
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json()
+  })
+  .then(data => data as CompletedRequestResponse[])
+  .then(respData => respData.map(respToCompletedRequests))
+  .then(requests => setCompletedRequests(requests))
 };
