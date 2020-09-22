@@ -6,12 +6,14 @@ import {
 import {Group} from "../entity/Group";
 import {useRenderLink} from "./LinkComponents";
 import ReactMarkdown from "react-markdown";
+import {format, fromUnixTime} from "date-fns";
 
 interface GroupCardProps {
   children: React.ReactNode;
   group: Group;
   clickable: boolean;
   withDescription: boolean;
+  nearestEvent: Date | null;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -23,13 +25,16 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-export function GroupCard({group, children, clickable, withDescription}: GroupCardProps) {
+export function GroupCard({group, children, clickable, withDescription, nearestEvent}: GroupCardProps) {
   const classes = useStyles();
 
   const inner = (<React.Fragment>
     <CardContent>
       <Typography variant="h5">{group.name}</Typography>
       {withDescription && <ReactMarkdown source={group.description}/>}
+      {nearestEvent && <Typography color="textSecondary">
+          Upcoming event at {format(nearestEvent, "PP p")}
+      </Typography>}
       <Box mt={1}>
         {group.tags.map(tag =>
             <Chip key={tag}
@@ -56,5 +61,6 @@ export function GroupCard({group, children, clickable, withDescription}: GroupCa
 GroupCard.defaultProps = {
   children: null,
   clickable: true,
-  withDescription: true
+  withDescription: true,
+  nearestEvent: null
 };

@@ -5,20 +5,20 @@ import {TagsInput} from "../components/TagsInput";
 import {Group} from "../entity/Group";
 import {getFetchErrorPage, hasFetchFailed, useFetch} from "../util/fetch";
 import {GroupCard} from "../components/GroupCard";
+import {fromUnixTime} from "date-fns";
+
+interface GroupSuggestion {
+  group: Group;
+  nearestEvent: number;
+}
 
 export function MainPage() {
   const [tags, setTags] = useState<string[]>([]);
-  const groups = useFetch<Group[]>("/api/groupList?all=true");
+  const suggestions = useFetch<GroupSuggestion[]>(`/api/groupSuggest?tags=${JSON.stringify(tags)}`);
 
-  if (hasFetchFailed(groups)) {
-    return getFetchErrorPage(groups);
+  if (hasFetchFailed(suggestions)) {
+    return getFetchErrorPage(suggestions);
   }
-
-  const tagsSet = new Set(tags);
-
-  const suggestGroups = groups.value.filter(group =>
-      group.tags.filter(tag => tagsSet.has(tag)).length > 0
-  );
 
   return (
       <Box mt={4}>
@@ -33,7 +33,7 @@ export function MainPage() {
                   tags={tags}
                   setTags={setTags}
                   label="What do you want to chat about?"
-                  suggestGroups={groups.value}
+                  suggestGroups={suggestions.value.map(x => x.group)}
               />
             </Grid>
 
@@ -52,9 +52,13 @@ export function MainPage() {
               <Grid item xs={12}>
                 <FindChatCard interests={tags} />
               </Grid>
-              {suggestGroups.map(group =>
+              {suggestions.value.map(({group, nearestEvent}) =>
                   <Grid item md={4} key={group.id}>
-                    <GroupCard group={group} withDescription={false} />
+                    <GroupCard
+                        group={group}
+                        withDescription={false}
+                        nearestEvent={(nearestEvent === 0) ? null : fromUnixTime(nearestEvent)}
+                    />
                   </Grid>
               )}
             </Grid>
@@ -62,4 +66,4 @@ export function MainPage() {
         </Container>
       </Box>
   );
-};
+}

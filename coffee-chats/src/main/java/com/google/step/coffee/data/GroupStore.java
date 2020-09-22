@@ -129,6 +129,27 @@ public class GroupStore {
     return groups;
   }
 
+  /**
+   * Returns a list of groups that match any of the given tags.
+   */
+  public List<Group> findGroupsByTags(List<String> tags) {
+    if (tags.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    List<Group> groups = new ArrayList<>();
+
+    Query query = new Query("group")
+        .setFilter(new Query.FilterPredicate(
+            "tags", Query.FilterOperator.IN, tags));
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      groups.add(Group.fromEntity(entity));
+    }
+
+    return groups;
+  }
+
   private Entity getMembershipEntity(Group group, User user) {
     Query query = new Query("groupMembership")
         .setFilter(Query.CompositeFilterOperator.and(
