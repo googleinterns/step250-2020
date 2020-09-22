@@ -6,7 +6,7 @@ import {
 import {Group} from "../entity/Group";
 import {useRenderLink} from "./LinkComponents";
 import ReactMarkdown from "react-markdown";
-import {format, fromUnixTime} from "date-fns";
+import {format} from "date-fns";
 
 interface GroupCardProps {
   children: React.ReactNode;
