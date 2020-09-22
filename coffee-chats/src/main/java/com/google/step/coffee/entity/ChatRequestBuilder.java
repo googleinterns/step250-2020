@@ -1,5 +1,7 @@
 package com.google.step.coffee.entity;
 
+import static com.google.step.coffee.tasks.RequestMatcher.MATCH_RANDOM_TAG;
+
 import com.google.step.coffee.InvalidEntityException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,8 +44,8 @@ public class ChatRequestBuilder {
    * @return ChatRequestBuilder object with internal state set to given tags.
    */
   public ChatRequestBuilder withTags(List<String> tags) {
-    if (tags == null) {
-      this.tags = Collections.emptyList();
+    if (tags == null || tags.isEmpty()) {
+      this.tags = Collections.singletonList(MATCH_RANDOM_TAG);
     } else {
       this.tags = tags;
     }
