@@ -14,6 +14,7 @@ export type CompletedRequest = ExpiredRequest | MatchedRequest;
 
 export interface MatchedRequest {
   matched: boolean,
+  dateRange: DateRange,
   durationMins: number,
   userId: string,
   tags: string[],
@@ -88,7 +89,7 @@ interface DurationResponse {
 
 export const isPending = (request: ChatRequest | CompletedRequest): request is ChatRequest => {
   return (request as ChatRequest).requestId !== undefined;
-}
+};
 
 export const isMatched = (request: ChatRequest | CompletedRequest): request is MatchedRequest => {
   return (request as MatchedRequest).participants !== undefined;
@@ -118,6 +119,7 @@ export const respToCompletedRequests = (response: CompletedRequestResponse): Com
   if (isMatchedResponse(response)) {
     const request: MatchedRequest = {
       matched: response.matched,
+      dateRange: respToDateRange(response.firstDateRange),
       durationMins: respToDurationMins(response.duration),
       userId: response.userId,
       tags: response.tags,
@@ -148,8 +150,8 @@ const respToDateRange = (response: DateRangeResponse): DateRange => (
     start: new Date(response.start),
     end: new Date(response.end)
   }
-)
+);
 
 const respToDurationMins = (response: DurationResponse): number => (
   (response.seconds / 60) + (response.nanos / (60 * 1000))
-)
+);

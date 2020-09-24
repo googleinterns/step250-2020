@@ -1,10 +1,17 @@
 import React from 'react'
-import {Accordion, AccordionSummary, Grid, makeStyles, Theme, createStyles, Typography, Chip, darken, lighten} from '@material-ui/core'
+import {
+  Accordion, AccordionSummary, Grid, makeStyles, Theme, createStyles, Typography, Chip, darken, 
+  lighten, AccordionDetails
+} from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import HelpIcon from '@material-ui/icons/Help'
 import CancelIcon from '@material-ui/icons/Cancel'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import {ChatRequest, CompletedRequest, isMatched, isPending} from '../entity/Requests'
+import {
+  ChatRequest, CompletedRequest, isMatched, isPending, MatchedRequest, ExpiredRequest
+} from '../entity/Requests'
+import {MatchedRequestDetails} from './MatchedRequestDetails'
+import {ChatRequestDetails} from './ChatRequestDetails'
 
 const useStyles = makeStyles((theme: Theme) => {
   const getBackgroundColor = theme.palette.type === 'light' ? lighten : darken;
@@ -110,6 +117,17 @@ export const ViewRequestAccordion: React.FC<ViewRequestAccordionProps> = ({reque
           </Grid>
         </Grid>
       </AccordionSummary>
+      <AccordionDetails>
+        {status === "pending" &&
+          <ChatRequestDetails request={request as ChatRequest} />
+        }
+        {status === "matched" &&
+          <MatchedRequestDetails request={request as MatchedRequest} />
+        }
+        {status === "expired" &&
+          <ChatRequestDetails request={request as ExpiredRequest} />
+        }
+      </AccordionDetails>
     </Accordion>
   )
 }
