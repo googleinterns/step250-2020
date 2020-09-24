@@ -3,6 +3,7 @@ import {useParams} from "react-router-dom";
 import {Box, Button, CardActions, Container, Tooltip} from "@material-ui/core";
 import {getFetchErrorPage, hasFetchFailed, postData, useFetch} from "../util/fetch";
 import {Group} from "../entity/Group";
+import {Event} from "../entity/Event";
 import {useRenderLink} from "../components/LinkComponents";
 import {GroupCard} from "../components/GroupCard";
 import {GroupDeleteDialog} from "../components/GroupDeleteDialog";
@@ -10,6 +11,7 @@ import {GroupMembersList} from "../components/GroupMembersList";
 import {Member, MembershipStatus} from "../entity/Member";
 import {AuthState, AuthStateContext} from "../entity/AuthState";
 import {CreateEventCard} from "../components/CreateEventCard";
+import {EventCard} from "../components/EventCard";
 
 export function GroupInfoPage() {
   const authState: AuthState = React.useContext(AuthStateContext);
@@ -19,9 +21,10 @@ export function GroupInfoPage() {
 
   const group = useFetch<Group>(`/api/groupInfo?id=${groupId}`);
   const members = useFetch<Member[]>(`/api/groupMembers?id=${groupId}`);
+  const events = useFetch<Event[]>(`/api/eventList?groups=${JSON.stringify([groupId])}`);
 
-  if (hasFetchFailed(group, members)) {
-    return getFetchErrorPage(group, members);
+  if (hasFetchFailed(group, members, events)) {
+    return getFetchErrorPage(group, members, events);
   }
 
   const setMembershipStatus = async (status: MembershipStatus, user = authState.user) => {
@@ -31,6 +34,13 @@ export function GroupInfoPage() {
     data.set("status", status);
     await postData(`/api/groupMembers`, data);
     members.reload();
+  };
+
+  const deleteEvent = async (id: string) => {
+    const data = new Map();
+    data.set("id", id);
+    await postData(`/api/eventDelete`, data);
+    events.reload();
   };
 
   const status = members.value.find(member => member.user.id === authState.user.id)?.status || "NOT_A_MEMBER";
@@ -68,7 +78,14 @@ export function GroupInfoPage() {
               }
             </CardActions>
           </GroupCard>
-          {(status === "ADMINISTRATOR" || status === "OWNER") && <CreateEventCard group={group.value} />}
+          {(status === "ADMINISTRATOR" || status === "OWNER") &&
+            <CreateEventCard group={group.value} onSubmit={() => events.reload()} />}
+          {events.value.map(event => <EventCard
+              event={event}
+              key={event.id}
+              status={status}
+              onDelete={() => deleteEvent(event.id)}
+          />)}
           <GroupMembersList
               members={members.value}
               status={status}

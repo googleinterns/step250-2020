@@ -1,5 +1,8 @@
 import React, {useState} from "react";
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
+import {
+  Button, CircularProgress, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Grid, Typography
+} from "@material-ui/core";
 import {MultiDatePicker} from "./MultiDatePicker";
 import {TimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
@@ -16,6 +19,8 @@ interface FindOptimalTimeDialogProps {
 }
 
 export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}: FindOptimalTimeDialogProps) {
+  const [loading, setLoading] = useState(false);
+  const [warning, setWarning] = useState(false);
   const [dates, setDates] = useState([new Date()]);
 
   const [timeStart, setTimeStart] = useState<MaterialUiPickersDate>( // from 9:00
@@ -27,6 +32,8 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
   );
 
   const submit = async () => {
+    setLoading(true);
+
     const ranges = dates.map(startOfDay).map(date => (
         {
           start: setMinutes(setHours(date, getHours(timeStart!)), getMinutes(timeStart!)),
@@ -43,10 +50,15 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
 
     if (response.status === 200) {
       const dateText = await response.json();
-      setDate(new Date(dateText));
+      if (dateText !== null) {
+        setDate(new Date(dateText));
+        setOpen(false);
+      } else {
+        setWarning(true);
+      }
     }
 
-    setOpen(false);
+    setLoading(false);
   };
 
   return (
@@ -54,6 +66,9 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
         <DialogTitle>Find an Optimal Time</DialogTitle>
         <DialogContent>
           <DialogContentText>
+            {warning && <Typography color="secondary">
+              Couldn't find a suitable time slot.
+            </Typography>}
             Please choose when to consider scheduling the event.
             We will try to find a time so that the maximum number of members can attend.
           </DialogContentText>
@@ -63,6 +78,7 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
             </Grid>
             <Grid item sm={5}>
               <TimePicker
+                  ampm={false}
                   value={timeStart}
                   onChange={setTimeStart}
                   minutesStep={5}
@@ -72,6 +88,7 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
               />
 
               <TimePicker
+                  ampm={false}
                   value={timeEnd}
                   onChange={setTimeEnd}
                   minutesStep={5}
@@ -83,7 +100,7 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button color="primary" onClick={submit}>Find</Button>
+          {loading ? <CircularProgress /> : <Button color="primary" onClick={submit}>Find</Button>}
         </DialogActions>
       </Dialog>
   );

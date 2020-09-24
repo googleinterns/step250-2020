@@ -19,7 +19,7 @@ public class GroupDeleteServlet extends JsonServlet {
     Group group = Group.fromEntity(request.getEntityFromParameter("id", "group"));
     PermissionChecker.ensureCanManageGroup(group);
 
-    groupStore.delete(group.key());
+    groupStore.delete(group);
 
     return null;
   }
