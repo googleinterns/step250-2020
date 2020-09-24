@@ -40,7 +40,13 @@ export function MainPage() {
             <Grid item xs={2} sm={1}>
               <Tooltip title="Any topic">
                 <IconButton
-                    aria-label="chat about any topic">
+                    aria-label="chat about any topic"
+                    onClick={() => {
+                      if (!tags.includes('Random')) {
+                        setTags([...tags, 'Random']);
+                      }
+                    }}
+                >
                   <Icon>casino</Icon>
                 </IconButton>
               </Tooltip>
