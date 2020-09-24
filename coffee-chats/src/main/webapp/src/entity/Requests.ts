@@ -1,4 +1,4 @@
-export interface ChatRequest {
+interface RequestParams {
   tags: string[],
   dateRanges: DateRange[],
   minPeople: number,
@@ -6,11 +6,15 @@ export interface ChatRequest {
   durationMins: number,
   matchRandom: boolean,
   matchRecents: boolean,
-  userId: string,
+  userId: string
+}
+
+/**
+ * Exposed interfaces for using and managing entites
+ */
+export interface ChatRequest extends RequestParams {
   requestId: number
 };
-
-export type CompletedRequest = ExpiredRequest | MatchedRequest;
 
 export interface MatchedRequest {
   matched: boolean,
@@ -22,24 +26,22 @@ export interface MatchedRequest {
   commonTags: string[]
 };
 
-export interface ExpiredRequest {
-  matched: boolean,
-  durationMins: number,
-  userId: string,
-  tags: string[],
-  dateRanges: DateRange[],
-  minPeople: number,
-  maxPeople: number,
-  matchRandom: boolean,
-  matchRecents: boolean,
+export interface ExpiredRequest extends RequestParams {
+  matched: boolean
 };
+
+export type CompletedRequest = ExpiredRequest | MatchedRequest;
 
 export interface DateRange {
   start: Date,
   end: Date
 };
 
-export interface ChatRequestResponse {
+
+/**
+ * Internal interfaces for handling JSON format recieved via fetch requests.
+ */
+interface RequestParamsResponse {
   tags: string[],
   dateRanges: DateRangeResponse[],
   minPeople: number,
@@ -47,12 +49,13 @@ export interface ChatRequestResponse {
   duration: DurationResponse,
   matchRandom: boolean,
   matchRecents: boolean,
-  userId: string,
+  userId: string
+}
+
+export interface ChatRequestResponse extends RequestParamsResponse{
   requestId: number
   hasRequestId: boolean
 };
-
-export type CompletedRequestResponse = MatchedRequestResponse | ExpiredRequestResponse;
 
 interface MatchedRequestResponse {
   matched: boolean,
@@ -64,18 +67,12 @@ interface MatchedRequestResponse {
   commonTags: string[]
 };
 
-interface ExpiredRequestResponse {
+interface ExpiredRequestResponse extends RequestParamsResponse {
   matched: boolean,
-  firstDateRange: DateRangeResponse,
-  duration: DurationResponse,
-  userId: string,
-  tags: string[],
-  dateRanges: DateRangeResponse[],
-  minPeople: number,
-  maxPeople: number,
-  matchRandom: boolean,
-  matchRecents: boolean
+  firstDateRange: DateRangeResponse
 };
+
+export type CompletedRequestResponse = MatchedRequestResponse | ExpiredRequestResponse;
 
 interface DateRangeResponse {
   start: string,
@@ -87,10 +84,23 @@ interface DurationResponse {
   nanos: number
 };
 
+/**
+ * Identifies the given request as a pending request or not.
+ * 
+ * @param request - Request object of either ChatRequest or CompletedRequest type.
+ * @returns type predicate identifying request as a ChatRequest (pending) or CompletedRequest.
+ */
 export const isPending = (request: ChatRequest | CompletedRequest): request is ChatRequest => {
   return (request as ChatRequest).requestId !== undefined;
 };
 
+/**
+ * Identifies the given request as a matched request or not.
+ * 
+ * @param request - Request object of either ChatRequest, MatchedRequest or ExpiredRequest type.
+ * @returns type predicate identifying request as a MatchedRequest or either a ChatRequest or 
+ *          ExpiredRequest.
+ */
 export const isMatched = (request: ChatRequest | CompletedRequest): request is MatchedRequest => {
   return (request as MatchedRequest).participants !== undefined;
 };
