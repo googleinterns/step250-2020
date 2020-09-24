@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {MatchedRequest} from '../entity/Requests'
 import {
   Grid, Box, Divider, Chip, makeStyles, Theme, createStyles, ListItemAvatar, List, ListItem, 
   Avatar, ListItemText
 } from '@material-ui/core'
 import {format} from 'date-fns'
+import { User } from '../entity/User';
+import { fetchUsersInfo } from '../util/userRequest';
 
 interface MatchedRequestDetailsProps {
   request: MatchedRequest;
@@ -23,6 +25,12 @@ const useStyles = makeStyles((theme: Theme) => {
 
 export const MatchedRequestDetails: React.FC<MatchedRequestDetailsProps> = ({request}) => {
   const classes = useStyles();
+
+  const [usersInfo, setUsersInfo] = useState<User[]>([]);
+
+  useEffect(() => {
+    fetchUsersInfo(request.participants, setUsersInfo);
+  }, [])
 
   return (
     <Grid container justify="space-around">
@@ -87,12 +95,12 @@ export const MatchedRequestDetails: React.FC<MatchedRequestDetailsProps> = ({req
           Participants:
         </Box>
         <List>
-          {request.participants.map((userId) => (
-            <ListItem divider key={userId}>
+          {usersInfo.map((user) => (
+            <ListItem divider key={user.id}>
               <ListItemAvatar>
-                <Avatar />
+                <Avatar src={user.avatarUrl} />
               </ListItemAvatar>
-              <ListItemText primary={userId} secondary="user@example.com"/>
+              <ListItemText primary={user.name} secondary={user.email} />
             </ListItem>
           ))}
         </List>
