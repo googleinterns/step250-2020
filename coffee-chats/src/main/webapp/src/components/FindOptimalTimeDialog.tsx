@@ -78,6 +78,7 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
             </Grid>
             <Grid item sm={5}>
               <TimePicker
+                  ampm={false}
                   value={timeStart}
                   onChange={setTimeStart}
                   minutesStep={5}
@@ -87,6 +88,7 @@ export function FindOptimalTimeDialog({open, setOpen, setDate, group, duration}:
               />
 
               <TimePicker
+                  ampm={false}
                   value={timeEnd}
                   onChange={setTimeEnd}
                   minutesStep={5}
