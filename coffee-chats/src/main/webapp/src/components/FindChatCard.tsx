@@ -82,6 +82,11 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
   const setStartDate = (i: number) => {
     return (start: MaterialUiPickersDate) => {
       let newStarts = [...startDates];
+
+      if (start !== null) {
+        start.setSeconds(0,0);
+      }
+
       newStarts[i] = start;
       setStartDates(newStarts);
     }
@@ -90,6 +95,11 @@ export const FindChatCard: React.FC<FindChatCardProps> = ({interests}) => {
   const setEndDate = (i: number) => {
     return (end: MaterialUiPickersDate) => {
       let newEnds = [...endDates];
+
+      if (end !== null) {
+        end.setSeconds(0, 0);
+      }
+
       newEnds[i] = end;
       setEndDates(newEnds);
     }

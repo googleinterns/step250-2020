@@ -30,7 +30,7 @@ export const MatchedRequestDetails: React.FC<MatchedRequestDetailsProps> = ({req
 
   useEffect(() => {
     fetchUsersInfo(request.participants, setUsersInfo);
-  }, [])
+  }, [request.participants])
 
   return (
     <Grid container justify="space-around">
