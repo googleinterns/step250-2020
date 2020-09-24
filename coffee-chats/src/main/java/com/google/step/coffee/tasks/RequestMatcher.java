@@ -151,10 +151,11 @@ public class RequestMatcher {
   void addMatchingRequests(RequestStore requestStore, List<String> participantIds,
       TimeSlot meetingSlot, List<String> commonTags, Collection<ChatRequest> reqs) {
     Event event = CalendarUtils.createEvent(meetingSlot, participantIds, commonTags);
+    String randomChosenOrgnaiser = reqs.iterator().next().getUserId();
+    CalendarUtils.addEvent(randomChosenOrgnaiser, event);
 
     for (ChatRequest req : reqs) {
       requestStore.addMatchedRequest(req, meetingSlot, participantIds, commonTags);
-      CalendarUtils.addEvent(req.getUserId(), event);
     }
   }
 

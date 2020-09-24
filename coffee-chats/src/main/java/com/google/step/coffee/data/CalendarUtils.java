@@ -125,6 +125,7 @@ public class CalendarUtils {
                     + commonTags.toString())
             + "\nEnjoy!")
         .setGuestsCanModify(true)
+        .set("sendUpdates", "all")
         .setAttendees(attendees)
         .setStart(new EventDateTime().setDateTime(timeSlot.getDatetimeStart()))
         .setEnd(new EventDateTime().setDateTime(timeSlot.getDatetimeEnd()));
