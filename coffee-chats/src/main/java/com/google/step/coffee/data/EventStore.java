@@ -34,6 +34,18 @@ public class EventStore {
         .build();
   }
 
+  /**
+   * Removes the event from Datastore and Google Calendar
+   * @param event The event to remove
+   * @param group The group that the event belongs to
+   */
+  public void delete(Event event, Group group) {
+    assert event.groupId().equals(group.id());
+
+    CalendarUtils.removeEvent(group.ownerId(), event.calendarId());
+    datastore.delete(event.key());
+  }
+
   public List<Event> getUpcomingEventsForGroup(Group group) {
     return getUpcomingEventsForGroups(Collections.singletonList(group.id()));
   }

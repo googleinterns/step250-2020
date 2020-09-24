@@ -19,7 +19,7 @@ import java.io.IOException;
 @WebServlet("/api/eventDelete")
 public class EventDeleteServlet extends JsonServlet {
   private final GroupStore groupStore = new GroupStore();
-  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+  private final EventStore eventStore = new EventStore();
 
   @Override
   public Object post(JsonServletRequest request) throws IOException, HttpError {
@@ -33,8 +33,7 @@ public class EventDeleteServlet extends JsonServlet {
 
     PermissionChecker.ensureCanManageGroup(group);
 
-    CalendarUtils.removeEvent(group.ownerId(), event.calendarId());
-    datastore.delete(event.key());
+    eventStore.delete(event, group);
 
     return null;
   }
