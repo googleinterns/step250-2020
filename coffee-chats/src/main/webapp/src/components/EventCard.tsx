@@ -22,9 +22,10 @@ export function EventCard({event, status, onDelete}: EventCardProps) {
             {event.description}
           </CardContent>
           {(status === "ADMINISTRATOR" || status === "OWNER") &&
-          <CardActions>
-            <Button onClick={onDelete} color="secondary">Delete</Button>
-          </CardActions>}
+            <CardActions>
+              <Button onClick={onDelete} color="secondary">Delete</Button>
+            </CardActions>
+          }
         </Card>
       </Box>
   )
