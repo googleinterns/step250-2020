@@ -10,7 +10,7 @@ import {GroupListPage} from "./pages/GroupListPage";
 import {GroupInfoPage} from "./pages/GroupInfoPage";
 import {GroupEditPage} from "./pages/GroupEditPage";
 import {OAuthDialog} from "./components/OAuthDialog";
-import { RequestsPage } from "./pages/RequestsPage";
+import {RequestsPage} from "./pages/RequestsPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in

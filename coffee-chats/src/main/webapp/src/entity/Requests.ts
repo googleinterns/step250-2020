@@ -52,7 +52,7 @@ interface RequestParamsResponse {
   userId: string
 }
 
-export interface ChatRequestResponse extends RequestParamsResponse{
+export interface ChatRequestResponse extends RequestParamsResponse {
   requestId: number
   hasRequestId: boolean
 };

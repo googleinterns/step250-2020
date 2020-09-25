@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import {MatchedRequest} from '../entity/Requests'
 import {
   Grid, Box, Divider, Chip, makeStyles, Theme, createStyles, ListItemAvatar, List, ListItem, 
   Avatar, ListItemText
 } from '@material-ui/core'
 import {format} from 'date-fns'
-import { User } from '../entity/User';
-import { fetchUsersInfo } from '../util/userRequest';
+import {User} from '../entity/User';
+import {fetchUsersInfo} from '../util/userRequest';
 
 interface MatchedRequestDetailsProps {
   request: MatchedRequest;
