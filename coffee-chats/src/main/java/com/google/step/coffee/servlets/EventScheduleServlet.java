@@ -13,10 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This servlet returns an optimal date for specified group event based on hints:
+ * duration of the event and datetime ranges when the event should be able to occur
+ */
 @WebServlet("/api/scheduleEvent")
 public class EventScheduleServlet extends JsonServlet {
   static final Duration MIN_DURATION = Duration.ofMinutes(15);
@@ -43,8 +46,8 @@ public class EventScheduleServlet extends JsonServlet {
             .setDateRanges(ranges)
         .build()).collect(Collectors.toList());
 
-    AvailabilityScheduler scheduler = new AvailabilityScheduler();
-    List<DateRange> suggestions = scheduler.findAvailableRanges(requests, duration);
+    AvailabilityScheduler scheduler = new AvailabilityScheduler(requests);
+    List<DateRange> suggestions = scheduler.findAvailableRangesBestEffort(duration);
 
     if (suggestions.isEmpty()) {
       return null;

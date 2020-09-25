@@ -18,6 +18,7 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.OAuthService;
+import com.google.step.coffee.entity.Group;
 import com.google.step.coffee.entity.TimeSlot;
 import com.google.step.coffee.entity.User;
 
@@ -33,36 +34,69 @@ import java.util.stream.Collectors;
  */
 public class CalendarUtils {
   private static final UserStore userStore = new UserStore();
+  private static final GroupStore groupStore = new GroupStore();
+
+  private static final int MAX_RETRIES = 2;
 
   /**
-   * Adds given event to user's primary calendar.
+   * Adds (or updates if exists) given event to user's primary calendar.
    *
    * @param userId String of user's id whose calendar to add event into.
    * @param event Event to add into user's calendar.
+   * @return the inserted Event object (or null on failure)
    */
-  public static void addEvent(String userId, Event event) {
-    addEvent(getCalendarService(userId), userId, event, true);
+  public static Event addEvent(String userId, Event event) {
+    return addEvent(getCalendarService(userId), userId, event, true);
   }
 
   /**
-   * Adds given event to user's primary calendar using provided calendar service.
+   * Removes given event from user's primary calendar.
+   *
+   * @param userId String of user's id whose calendar to remove the event from.
+   * @param eventId id of the event to remove.
+   */
+  public static void removeEvent(String userId, String eventId) {
+    Calendar service = getCalendarService(userId);
+    for (int retry = 0; retry < MAX_RETRIES; ++retry) {
+      try {
+        service.events().delete("primary", eventId).execute();
+        return;
+      } catch (IOException ignored) {}
+    }
+  }
+
+  /**
+   * Adds (or updates if exists) given event to user's primary calendar using provided calendar service.
    *
    * @param service Calendar service to use to insert event.
    * @param userId String of user's id whose calendar to add event into.
    * @param event Event to add into user's calendar.
    * @param retry boolean of whether to retry adding event on failure.
+   * @return the inserted Event object (or null on failure)
    */
-  public static void addEvent(Calendar service, String userId, Event event, boolean retry) {
+  public static Event addEvent(Calendar service, String userId, Event event, boolean retry) {
     try {
-      service.events().insert("primary", event).setConferenceDataVersion(1).execute();
+      if (event.getId() == null || event.getId().isEmpty()) {
+        return service.events()
+            .insert("primary", event)
+            .setConferenceDataVersion(1)
+            .execute();
+      } else {
+        return service.events()
+            .update("primary", event.getId(), event)
+            .setConferenceDataVersion(1)
+            .execute();
+      }
     } catch (IOException e) {
       System.out.println("Event could not be created: " + e.getMessage());
 
       if (retry) {
         System.out.println("Retrying...");
-        addEvent(service, userId, event, false);
+        return addEvent(service, userId, event, false);
       }
     }
+
+    return null;
   }
 
   /**
@@ -91,9 +125,76 @@ public class CalendarUtils {
                     + commonTags.toString())
             + "\nEnjoy!")
         .setGuestsCanModify(true)
+        .set("sendUpdates", "all")
         .setAttendees(attendees)
         .setStart(new EventDateTime().setDateTime(timeSlot.getDatetimeStart()))
         .setEnd(new EventDateTime().setDateTime(timeSlot.getDatetimeEnd()));
+  }
+
+  /**
+   * Creates (or updates if it already exists) a group event in Google Calendar with information provided.
+   */
+  public static com.google.step.coffee.entity.Event updateGroupEvent(com.google.step.coffee.entity.Event event) {
+    Group group = groupStore.get(event.groupId());
+
+    return updateGroupEvent(event, getCalendarService(group.ownerId()), group);
+  }
+
+  /**
+   * The implementation of updateGroupEvent, so that it can be tested separately
+   */
+  static com.google.step.coffee.entity.Event updateGroupEvent(
+      com.google.step.coffee.entity.Event event,
+      Calendar service,
+      Group group
+  ) {
+    Event calendarEvent = null;
+    boolean isNewEvent = false;
+
+    if (event.calendarId() != null) {
+      for (int retry = 0; retry < MAX_RETRIES; ++retry) {
+        try {
+          calendarEvent = service.events().get("primary", event.calendarId()).execute();
+          break;
+        } catch (IOException ignored) {}
+      }
+    }
+
+    if (calendarEvent == null) {
+      calendarEvent = new Event();
+      isNewEvent = true;
+    }
+
+    List<EventAttendee> attendees = getAttendees(
+        groupStore.getMembers(group).stream()
+            .map(member -> member.user().id())
+            .collect(Collectors.toList()));
+
+    calendarEvent
+        .setSummary(group.name() + " Event")
+        .setConferenceData(new ConferenceData()
+            .setCreateRequest(new CreateConferenceRequest()
+                .setRequestId(generateRandomUUID())
+                .setConferenceSolutionKey(new ConferenceSolutionKey().setType("hangoutsMeet"))))
+        .setDescription("This event was scheduled in Coffee Chats\n" + event.description())
+        .setGuestsCanModify(true)
+        .setAttendees(attendees)
+        .setStart(new EventDateTime().setDateTime(
+            new DateTime(event.start().toEpochMilli())
+        ))
+        .setEnd(new EventDateTime().setDateTime(
+            new DateTime(event.start().toEpochMilli() + event.duration().toMillis())
+        ));
+
+    Event insertedEvent = addEvent(service, group.ownerId(), calendarEvent, true);
+
+    if (insertedEvent != null && isNewEvent) {
+      event = event.modify()
+          .setCalendarId(insertedEvent.getId())
+          .build();
+    }
+
+    return event;
   }
 
   /**

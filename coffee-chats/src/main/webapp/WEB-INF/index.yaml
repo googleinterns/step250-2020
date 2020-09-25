@@ -19,3 +19,9 @@ indexes:
         direction: asc
       - name: datetime
         direction: desc
+
+  - kind: event
+    properties:
+      - name: group
+      - name: start
+      

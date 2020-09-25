@@ -1,20 +1,52 @@
 import React, {useState} from "react";
 import {
-  Box, Button, Card, CardActions, CardContent, FormControl, InputLabel,
-  MenuItem, Select, Typography} from "@material-ui/core";
+  Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, FormControl, Icon,
+  InputLabel, MenuItem, Select, TextField, Typography
+} from "@material-ui/core";
 import {DateTimePicker} from "@material-ui/pickers";
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import {FindOptimalTimeDialog} from "./FindOptimalTimeDialog";
 import {Group} from "../entity/Group";
+import {postData} from "../util/fetch";
+import {getUnixTime, roundToNearestMinutes} from "date-fns";
+import {makeStyles} from "@material-ui/core/styles";
 
-interface CreateEvebtCardProps {
+interface CreateEventCardProps {
   group: Group;
+  onSubmit: () => void;
 }
 
-export function CreateEventCard({group}: CreateEvebtCardProps) {
+const useStyles = makeStyles((theme) => ({
+  content: {
+    width: "100%"
+  }
+}));
+
+export function CreateEventCard({group, onSubmit}: CreateEventCardProps) {
+  const classes = useStyles();
   const [duration, setDuration] = useState(30); // in minutes
-  const [start, setStart] = useState<MaterialUiPickersDate>();
+  const [start, setStart] = useState<MaterialUiPickersDate>(roundToNearestMinutes(new Date(), {
+    nearestTo: 15
+  }));
+  const [description, setDescription] = useState("");
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    setLoading(true);
+
+    const data = new Map();
+    data.set("id", group.id);
+    data.set("duration", duration);
+    data.set("start", getUnixTime(start!));
+    data.set("description", description);
+    await postData("/api/eventCreate", data);
+
+    setExpanded(false);
+    setLoading(false);
+    onSubmit();
+  };
 
   return (
       <Box mt={2}>
@@ -25,12 +57,16 @@ export function CreateEventCard({group}: CreateEvebtCardProps) {
             setDate={setStart}
             duration={duration}
         />
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
+        <Accordion
+            expanded={expanded}
+            onChange={(e, isExpanded) => setExpanded(isExpanded)}>
+          <AccordionSummary expandIcon={<Icon>expand_more</Icon>}>
+            <Typography color="textSecondary">
               Schedule an event
             </Typography>
-
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className={classes.content}>
             <FormControl fullWidth margin="normal">
               <InputLabel id="duration-label">Duration</InputLabel>
               <Select
@@ -59,13 +95,26 @@ export function CreateEventCard({group}: CreateEvebtCardProps) {
             <Button onClick={() => setTimeDialogOpen(true)}>
               Find an optimal time
             </Button>
-          </CardContent>
-          <CardActions>
-            <Button color="primary">
+
+            <FormControl fullWidth margin="normal">
+              <TextField
+                  fullWidth
+                  multiline
+                  label="Description"
+                  placeholder="Enter a short description of the event"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+              />
+            </FormControl>
+            </div>
+          </AccordionDetails>
+          <AccordionActions>
+            {loading ? <CircularProgress /> :
+            <Button color="primary" onClick={submit}>
               Schedule
-            </Button>
-          </CardActions>
-        </Card>
+            </Button>}
+          </AccordionActions>
+        </Accordion>
       </Box>
   );
 }

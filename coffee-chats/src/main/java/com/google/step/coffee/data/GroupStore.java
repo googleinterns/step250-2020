@@ -2,6 +2,7 @@ package com.google.step.coffee.data;
 
 import com.google.appengine.api.datastore.*;
 import com.google.step.coffee.UserManager;
+import com.google.step.coffee.entity.Event;
 import com.google.step.coffee.entity.Group;
 import com.google.step.coffee.entity.GroupMembership;
 import com.google.step.coffee.entity.User;
@@ -30,14 +31,28 @@ public class GroupStore {
     return group;
   }
 
-  public void delete(Key key) {
-    datastore.delete(key);
+  public void delete(Group group) {
+    datastore.delete(group.key());
 
     Query query = new Query("groupMembership")
         .setFilter(new Query.FilterPredicate(
-            "group", Query.FilterOperator.EQUAL, key));
+            "group", Query.FilterOperator.EQUAL, group.key()));
 
     for (Entity entity : datastore.prepare(query).asIterable()) {
+      datastore.delete(entity.getKey());
+    }
+
+    query = new Query("event")
+        .setFilter(new Query.FilterPredicate(
+            "group", Query.FilterOperator.EQUAL, group.key()));
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      String calendarId = Event.fromEntity(entity).calendarId();
+
+      if (calendarId != null) {
+        CalendarUtils.removeEvent(group.ownerId(), calendarId);
+      }
+
       datastore.delete(entity.getKey());
     }
   }
@@ -57,6 +72,14 @@ public class GroupStore {
     datastore.put(entity);
 
     return Group.fromEntity(entity);
+  }
+
+  public Group get(String groupId) {
+    try {
+      return Group.fromEntity(datastore.get(KeyFactory.stringToKey(groupId)));
+    } catch (EntityNotFoundException exception) {
+      return null;
+    }
   }
 
   public List<GroupMembership> getMembers(Group group) {
@@ -98,6 +121,27 @@ public class GroupStore {
     List<Group> groups = new ArrayList<>();
 
     Query query = new Query("group");
+
+    for (Entity entity : datastore.prepare(query).asIterable()) {
+      groups.add(Group.fromEntity(entity));
+    }
+
+    return groups;
+  }
+
+  /**
+   * Returns a list of groups that match any of the given tags.
+   */
+  public List<Group> findGroupsByTags(List<String> tags) {
+    if (tags.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    List<Group> groups = new ArrayList<>();
+
+    Query query = new Query("group")
+        .setFilter(new Query.FilterPredicate(
+            "tags", Query.FilterOperator.IN, tags));
 
     for (Entity entity : datastore.prepare(query).asIterable()) {
       groups.add(Group.fromEntity(entity));

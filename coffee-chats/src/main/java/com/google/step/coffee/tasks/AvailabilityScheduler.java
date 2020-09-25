@@ -7,17 +7,65 @@ import com.google.api.services.calendar.model.TimePeriod;
 import com.google.step.coffee.data.CalendarUtils;
 import com.google.step.coffee.entity.Availability;
 import com.google.step.coffee.entity.DateRange;
+import com.google.step.coffee.entity.EventRequest;
+
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AvailabilityScheduler {
+  private static class TimePoint implements Comparable<TimePoint> {
+    public enum Kind {
+      START, END
+    }
+
+    private Date date;
+    private Kind kind;
+
+    public TimePoint(Date date, Kind kind) {
+      this.date = date;
+      this.kind = kind;
+    }
+
+    public int compareTo(TimePoint that) {
+      if (this.date.compareTo(that.date) != 0) {
+        return this.date.compareTo(that.date);
+      }
+
+      if (getKind() == Kind.END && that.getKind() == Kind.START) {
+        return -1;
+      }
+
+      if (getKind() == Kind.START && that.getKind() == Kind.END) {
+        return 1;
+      }
+
+      return 0;
+    }
+
+    public boolean equals(TimePoint that) {
+      return compareTo(that) == 0;
+    }
+
+    Date getDate() {
+      return date;
+    }
+
+    Kind getKind() {
+      return kind;
+    }
+  }
 
   private List<String> userIds;
+  private Collection<? extends Availability> availabilities;
+
   private CalendarUtils utils = new CalendarUtils();
+
+  public AvailabilityScheduler() {}
+
+  public AvailabilityScheduler(Collection<? extends Availability> requests) {
+    this.availabilities = requests;
+  }
 
   void setUserIds(Collection<? extends Availability> requests) {
     this.userIds = requests.stream().map(Availability::getUserId).collect(Collectors.toList());
@@ -25,6 +73,10 @@ public class AvailabilityScheduler {
 
   void setUserIds(List<String> userIds) {
     this.userIds = userIds;
+  }
+
+  public void setAvailabilities(Collection<? extends Availability> requests) {
+    this.availabilities = requests;
   }
 
   void setUtils(CalendarUtils utils) {
@@ -55,10 +107,56 @@ public class AvailabilityScheduler {
   }
 
   /**
+   * Finds suitable ranges of at least minDuration length that are available
+   * for the maximum number of participants
+   */
+  public List<DateRange> findAvailableRangesBestEffort(Duration minDuration) {
+    if (availabilities.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    // Query each user's calendar and remove busy ranges from each request.
+    // Then collect it into the list of TimePoints for sorting for further use.
+    List<TimePoint> timePoints = getRequestsTimePoints(availabilities.stream()
+        .map(request -> EventRequest.builder()
+            .setDateRanges(
+                removeBusyRanges(
+                    request.getDateRanges(),
+                    fetchBusyRanges(request.getDateRanges(),
+                        Collections.singletonList(request.getUserId()))))
+            .setDuration(request.getDuration())
+            .setUserId(request.getUserId())
+            .build())
+        .collect(Collectors.toList()));
+
+    int lowerBound = 0;
+    int upperBound = availabilities.size() + 1;
+
+    List<DateRange> result = new ArrayList<>();
+
+    while (upperBound - lowerBound > 1) {
+      int midpoint = (upperBound + lowerBound) / 2;
+
+      List<DateRange> ranges = findCommonRangesWithMinimumRequests(timePoints, midpoint).stream()
+          .filter(range -> range.getDuration().compareTo(minDuration) >= 0)
+          .collect(Collectors.toList());
+
+      if (ranges.isEmpty()) {
+        upperBound = midpoint;
+      } else {
+        lowerBound = midpoint;
+        result = ranges;
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Removes given busy ranges from any range that overlaps in the given options of possible ranges.
    * Package-private scope used for testing purposes only, but can be used directly.
    *
-   * @param options List of DateRanges to attempt to use, which will have busyRanges removed from.
+   * @param options    List of DateRanges to attempt to use, which will have busyRanges removed from.
    * @param busyRanges List of DateRanges considered to be 'busy' and to be removed if overlapping.
    * @return List of DateRanges originating from input options, but do not overlap with any of
    * busyRanges.
@@ -115,11 +213,12 @@ public class AvailabilityScheduler {
    * Fetch busy ranges within the given ranges.
    * Package-private scope used for testing purposes rather than direct usage.
    *
-   * @param ranges List of ranges to search for busy ranges within.
+   * @param ranges  List of ranges to search for busy ranges within.
+   * @param userIds List of user ids to consider busy
    * @return list of ranges where at least one user within participants is busy within the given
    * ranges.
-   * */
-  List<DateRange> fetchBusyRanges(List<DateRange> ranges) {
+   */
+  List<DateRange> fetchBusyRanges(List<DateRange> ranges, List<String> userIds) {
     List<DateRange> busyRanges = new ArrayList<>();
 
     for (DateRange range : ranges) {
@@ -134,36 +233,87 @@ public class AvailabilityScheduler {
     return coalesceRanges(busyRanges);
   }
 
+  List<DateRange> fetchBusyRanges(List<DateRange> ranges) {
+    return fetchBusyRanges(ranges, userIds);
+  }
+
   /**
    * Find intersecting ranges common to all requests' DateRanges.
    *
    * @param requests Collection of ChatRequest objects from which to find common ranges.
    * @return List of DateRanges which are contained within all requests' possible ranges.
    */
-  public List<DateRange> findCommonRanges(final Collection<? extends Availability> requests) {
-    if (requests.isEmpty()) {
-      return Collections.emptyList();
-    }
-
+  public List<DateRange> findCommonRanges(Collection<? extends Availability> requests) {
     List<DateRange> commonRanges = new ArrayList<>();
-    boolean firstReq = true;
+
+    boolean first = true;
 
     for (Availability request : requests) {
       List<DateRange> coalescedRanges = coalesceRanges(request.getDateRanges());
 
-      if (!firstReq) {
-        commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);
-
-        if (commonRanges.isEmpty()) {
-          return Collections.emptyList();
-        }
-      } else {
+      if (first) {
         commonRanges.addAll(coalescedRanges);
-        firstReq = false;
+        first = false;
+        continue;
+      }
+
+      commonRanges = extractIntersectingRanges(commonRanges, coalescedRanges);
+
+      if (commonRanges.isEmpty()) {
+        return Collections.emptyList();
       }
     }
 
     return commonRanges;
+  }
+
+  private List<TimePoint> getRequestsTimePoints(Collection<? extends Availability> requests) {
+    List<TimePoint> result = new ArrayList<>();
+
+    for (Availability request : requests) {
+      for (DateRange range : coalesceRanges(request.getDateRanges())) {
+        result.add(new TimePoint(range.getStart(), TimePoint.Kind.START));
+        result.add(new TimePoint(range.getEnd(), TimePoint.Kind.END));
+      }
+    }
+
+    result.sort(TimePoint::compareTo);
+
+    return result;
+  }
+
+  /**
+   * Find intersecting ranges, that at least the specified number of requests
+   *
+   * @param points List of TimePoints of corresponding requests, sorted in ascending order
+   * @param num    Minimum number of ranges to intersect, must be > 0
+   * @return List of DateRanges which are contained within at least num requests' possible ranges.
+   */
+  private List<DateRange> findCommonRangesWithMinimumRequests(List<TimePoint> points, int num) {
+    assert num > 0;
+
+    List<DateRange> result = new ArrayList<>();
+    int availableNow = 0;
+
+    Date segmentStart = new Date(0);
+
+    for (TimePoint point : points) {
+      Date segmentEnd = point.getDate();
+
+      if (availableNow >= num) {
+        result.add(new DateRange(segmentStart, segmentEnd));
+      }
+
+      if (point.getKind() == TimePoint.Kind.START) {
+        availableNow++;
+      } else {
+        availableNow--;
+      }
+
+      segmentStart = segmentEnd;
+    }
+
+    return coalesceRanges(result);
   }
 
   /**
@@ -221,7 +371,7 @@ public class AvailabilityScheduler {
       // Remove range with earliest end, so that other range may find an intersection.
       if (range1.getEnd().before(range2.getEnd())) {
         i++;
-      } else if(range2.getEnd().before(range1.getEnd())) {
+      } else if (range2.getEnd().before(range1.getEnd())) {
         j++;
       } else {
         i++;
