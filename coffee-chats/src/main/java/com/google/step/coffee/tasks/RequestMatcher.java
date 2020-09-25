@@ -28,7 +28,7 @@ public class RequestMatcher {
 
   // Number of hours between each attempt at request matching triggered by cron job
   private static final long MATCHING_FREQUENCY = 6;
-  static final String MATCH_RANDOM_TAG = "Random";
+  public static final String MATCH_RANDOM_TAG = "Random";
 
   /**
    * Take current list of chat requests and store any matched requests into datastore.
@@ -235,7 +235,7 @@ public class RequestMatcher {
       Set<ChatRequest> matched, Map<String, List<ChatRequest>> tagMap,
       Map<ChatRequest, Set<ChatRequest>> rangeIntersections) {
     for (ChatRequest request : requestList) {
-      if (!matched.contains(request)) {
+      if (!matched.contains(request) && !isRandomOnlyRequest(request)) {
         for (String tag : request.getTags()) {
           List<ChatRequest> sameTagReqs = tagMap.get(tag);
 
@@ -251,6 +251,14 @@ public class RequestMatcher {
         }
       }
     }
+  }
+
+  /**
+   * Identifies if the given request is only specifying to chat randomly, which can be matched on
+   * the second pass when matching random requests together.
+   */
+  private boolean isRandomOnlyRequest(ChatRequest request) {
+    return request.getTags().size() == 1 && request.getTags().get(0).equals(MATCH_RANDOM_TAG);
   }
 
   /**

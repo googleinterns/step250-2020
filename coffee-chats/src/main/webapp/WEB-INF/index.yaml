@@ -1,5 +1,27 @@
 indexes:
+  - kind: ChatRequest
+    properties:
+      - name: userId
+        direction: asc
+      - name: startDates
+        direction: asc
+  
+  - kind: ExpiredChatRequest
+    properties:
+      - name: userId
+        direction: asc
+      - name: startDates
+        direction: asc
+
+  - kind: MatchedRequest
+    properties:
+      - name: userId
+        direction: asc
+      - name: datetime
+        direction: desc
+
   - kind: event
     properties:
       - name: group
       - name: start
+      

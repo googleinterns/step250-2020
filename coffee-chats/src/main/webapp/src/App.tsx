@@ -10,6 +10,7 @@ import {GroupListPage} from "./pages/GroupListPage";
 import {GroupInfoPage} from "./pages/GroupInfoPage";
 import {GroupEditPage} from "./pages/GroupEditPage";
 import {OAuthDialog} from "./components/OAuthDialog";
+import {RequestsPage} from "./pages/RequestsPage";
 
 function App() {
   // this will automatically redirect to the login page if not logged in
@@ -34,15 +35,19 @@ function App() {
           <OAuthDialog open={oauthDialogOpen} setOpen={setOAuthDialogOpen} />
           <Switch>
             <Route path="/groups">
-              <GroupListPage/>
+              <GroupListPage />
             </Route>
 
             <Route path="/group/:groupId/edit">
-              <GroupEditPage/>
+              <GroupEditPage />
             </Route>
 
             <Route path="/group/:groupId">
-              <GroupInfoPage/>
+              <GroupInfoPage />
+            </Route>
+
+            <Route path="/requests">
+              <RequestsPage />
             </Route>
 
             <Route path="/">

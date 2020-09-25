@@ -22,6 +22,7 @@ export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({sel
           <DateTimePicker
             clearable
             ampm={false}
+            minutesStep={5}
             variant="dialog"
             inputVariant="outlined"
             label="Start"
@@ -37,6 +38,7 @@ export const DatetimeRangeListItem: React.FC<DatetimeRangeListItemProps> = ({sel
           <DateTimePicker
             clearable
             ampm={false}
+            minutesStep={5}
             variant="dialog"
             inputVariant="outlined"
             label="End"

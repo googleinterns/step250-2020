@@ -7,12 +7,19 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.step.coffee.InvalidEntityException;
 import com.google.step.coffee.entity.ChatRequest;
 import com.google.step.coffee.entity.ChatRequestBuilder;
+import com.google.step.coffee.entity.ExpiredRequest;
+import com.google.step.coffee.entity.MatchedRequest;
 import com.google.step.coffee.entity.TimeSlot;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +49,7 @@ public class RequestStore {
   }
 
   /**
-   * Retrieves unmatched ChatRequest objects stored within datastore.
+   * Retrieves unmatched ChatRequests stored within datastore.
    *
    * @return List of ChatRequest objects that have not been matched.
    */
@@ -65,6 +72,66 @@ public class RequestStore {
     }
 
     return unmatchedRequests;
+  }
+
+  /**
+   * Retrieves unmatched ChatRequests stored within datastore for the given user.
+   *
+   * @return List of ChatRequest objects that have not been matched for this user.
+   */
+  public List<ChatRequest> getUnmatchedRequests(String userId) throws InvalidEntityException {
+    Query query = new Query("ChatRequest");
+    Filter filter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+
+    query.setFilter(filter).addSort("startDates", SortDirection.ASCENDING);
+
+    PreparedQuery results = datastore.prepare(query);
+    List<ChatRequest> chatRequests = new ArrayList<>();
+
+    for (Entity entity : results.asIterable()) {
+      chatRequests.add(getRequestFromEntity(entity));
+    }
+
+    return chatRequests;
+  }
+
+  /**
+   * Retrieves all requests which have been matched for the given user.
+   */
+  public List<MatchedRequest> getMatchedRequests(String userId) {
+    Query query = new Query("MatchedRequest");
+    Filter filter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+
+    query.setFilter(filter).addSort("datetime", SortDirection.DESCENDING);
+
+    PreparedQuery results = datastore.prepare(query);
+    List<MatchedRequest> matchedRequests = new ArrayList<>();
+
+    for (Entity entity : results.asIterable()) {
+      matchedRequests.add(MatchedRequest.fromEntity(entity));
+    }
+
+    return matchedRequests;
+  }
+
+  /**
+   * Retrieves all requests which expired made by the given user.
+   */
+  public List<ExpiredRequest> getExpiredRequests(String userId)
+      throws InvalidEntityException {
+    Query query = new Query("ExpiredChatRequest");
+    Filter filter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+
+    query.setFilter(filter);
+
+    PreparedQuery results = datastore.prepare(query);
+    List<ExpiredRequest> expiredRequests = new ArrayList<>();
+
+    for (Entity entity : results.asIterable()) {
+      expiredRequests.add(ExpiredRequest.fromEntity(entity));
+    }
+
+    return expiredRequests;
   }
 
   /**
@@ -111,7 +178,9 @@ public class RequestStore {
   @SuppressWarnings("unchecked")
   private ChatRequest getRequestFromEntity(Entity entity) throws InvalidEntityException {
     ChatRequest request = new ChatRequestBuilder()
-        .withTags((List<String>) entity.getProperty("tags"))
+        .withTags((entity.getProperty("tags") != null) ?
+            (List<String>) entity.getProperty("tags") :
+            Collections.emptyList())
         .onDates((List<Date>) entity.getProperty("startDates"),
             (List<Date>) entity.getProperty("endDates"))
         .withGroupSize(((Long) entity.getProperty("minPeople")).intValue(),
@@ -160,5 +229,4 @@ public class RequestStore {
 
     return reqEntity;
   }
-
 }

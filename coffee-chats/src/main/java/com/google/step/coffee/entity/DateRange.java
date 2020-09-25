@@ -38,6 +38,15 @@ public class DateRange implements Comparable<DateRange> {
     }
   }
 
+  public DateRange(Date start, Duration duration) {
+    this.start = start;
+    this.end = Date.from(start.toInstant().plus(duration));
+
+    if (this.start.after(this.end)) {
+      throw new InstantiationError("Start must be before end");
+    }
+  }
+
   public Date getStart() {
     return start;
   }
